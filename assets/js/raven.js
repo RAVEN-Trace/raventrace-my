@@ -20,6 +20,16 @@
     });
   }
 
+  qa('.footer-nav').forEach((footerNav) => {
+    if (q('a[href*="/investigations/"]', footerNav)) return;
+    const link = document.createElement('a');
+    link.href = '/raventrace-my/investigations/rci-tabung-haji/';
+    link.textContent = 'Siasatan';
+    const newsroom = q('a[href*="/news/"]', footerNav);
+    if (newsroom) newsroom.insertAdjacentElement('afterend', link);
+    else footerNav.appendChild(link);
+  });
+
   qa('[data-share]').forEach((button) => {
     button.addEventListener('click', async () => {
       const payload = {

@@ -46,10 +46,10 @@ h1 { font-size: clamp(2.65rem, 7vw, 5.8rem); } h2 { font-size: clamp(2rem, 4.5vw
 .lede { max-width: 62ch; margin-top: 1.15rem; color: #454a52; font-size: clamp(1.08rem, 2vw, 1.35rem); line-height: 1.55; }
 .dark .lede { color: #c6cdd6; } .muted { color: var(--muted); } .dark .muted { color: #a8b1bc; } .mono { font-family: var(--mono); }
 .lead-block { padding: clamp(2.25rem, 5vw, 5rem) 0 clamp(3rem, 6vw, 5.5rem); }
-.lead-grid { display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(340px, .75fr); gap: clamp(1.5rem, 4vw, 3.5rem); align-items: start; }
+.lead-grid { display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(380px, .9fr); gap: clamp(1.5rem, 4vw, 3.5rem); align-items: start; }
 .lead-visual { position: relative; background: #05070a; border: 1px solid #202833; }
 .lead-visual img { aspect-ratio: 16 / 9; object-fit: cover; }
-.lead-copy { padding-top: .2rem; } .lead-copy h1 { font-size: clamp(2.8rem, 5.2vw, 4.75rem); }
+.lead-copy { padding-top: .2rem; } .lead-copy h1 { font-size: clamp(2.65rem, 4.4vw, 3.9rem); }
 .lead-copy .dek { margin: 1.25rem 0; color: #383d45; font: 400 clamp(1.08rem, 1.8vw, 1.27rem)/1.55 var(--serif); }
 .art-caption, figcaption { padding: .65rem .8rem; border-top: 1px solid #252d38; background: #0a0d11; color: #aeb8c3; font: 600 .72rem/1.45 var(--sans); }
 .art-caption strong, figcaption strong { color: var(--cyan-bright); }

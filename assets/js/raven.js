@@ -100,7 +100,7 @@
 
   if (window.location.pathname.includes('/raventrace-my/investigations/rci-tabung-haji') && !q('script[data-raven-narrative]')) {
     const specialist = document.createElement('script');
-    specialist.src = '/raventrace-my/assets/js/raven-narrative.js?v=1.0.0';
+    specialist.src = '/raventrace-my/assets/js/raven-narrative.js?v=1.1.0';
     specialist.defer = true;
     specialist.dataset.ravenNarrative = 'true';
     document.head.appendChild(specialist);

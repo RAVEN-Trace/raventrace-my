@@ -2,7 +2,17 @@
 
 Independent evidence-led journalism for Malaysia.
 
-This repository contains the static GitHub Pages site for **RAVEN-Trace™ by SharulR X(ai) Projects**.
+This repository contains the mobile-first editorial site for **RAVEN-Trace™ by SharulR X(ai) Projects**.
+
+## Site structure
+
+- `/` — lead investigation and newsroom front page
+- `/news/` — reverse-chronology development desk
+- `/investigations/rci-tabung-haji/` — auditable casefile
+- `/methodology/` — claim taxonomy and source grading
+- `/tips/` — source-safety guidance and channel status
+- `/corrections/` — public correction ledger
+- `/about/` — identity and editorial compact
 
 ## Editorial method
 
@@ -24,6 +34,8 @@ Deploy from the `main` branch and repository root (`/`). The project-site path i
 
 ## Status
 
-Initial public build: 5 September 2026.
+V2 editorial rebuild: 5 September 2026.
+
+All supplied artworks used on the site are labeled as editorial illustrations and must not be treated as evidence.
 
 > Lie wins by speed. Truth wins by audit.

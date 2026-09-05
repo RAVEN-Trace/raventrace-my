@@ -6,6 +6,16 @@
     navToggle.addEventListener('click', () => {
       const open = nav.classList.toggle('open');
       navToggle.setAttribute('aria-expanded', String(open));
+      navToggle.textContent = open ? 'Tutup' : 'Menu';
+    });
+
+    document.addEventListener('keydown', (event) => {
+      if (event.key === 'Escape' && nav.classList.contains('open')) {
+        nav.classList.remove('open');
+        navToggle.setAttribute('aria-expanded', 'false');
+        navToggle.textContent = 'Menu';
+        navToggle.focus();
+      }
     });
   }
 
@@ -37,13 +47,17 @@
   const filters = document.querySelectorAll('[data-filter]');
   const items = document.querySelectorAll('[data-topic]');
   filters.forEach((button) => {
+    button.setAttribute('aria-pressed', String(button.classList.contains('active')));
     button.addEventListener('click', () => {
       const selected = button.dataset.filter;
-      filters.forEach((item) => item.classList.toggle('active', item === button));
+      filters.forEach((item) => {
+        const active = item === button;
+        item.classList.toggle('active', active);
+        item.setAttribute('aria-pressed', String(active));
+      });
       items.forEach((item) => {
         item.hidden = selected !== 'all' && item.dataset.topic !== selected;
       });
     });
   });
 })();
-

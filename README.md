@@ -7,16 +7,18 @@ This repository contains the mobile-first editorial site for **RAVEN-Trace™ by
 ## Site structure
 
 - `/` — lead investigation and newsroom front page
-- `/news/` — reverse-chronology development desk
-- `/investigations/rci-tabung-haji/` — auditable casefile
-- `/methodology/` — claim taxonomy and source grading
+- `/news/` — latest verified development desk
+- `/investigations/rci-tabung-haji/` — auditable CASEFILE
+- `/methodology/` — claim taxonomy, source grading and reporter rhythm
 - `/tips/` — source-safety guidance and channel status
 - `/corrections/` — public correction ledger
-- `/about/` — identity and editorial compact
+- `/about/` — identity, layer separation and editorial compact
 
 ## Editorial method
 
-Every published item separates verified facts, attributed claims, inferences, speculation, unknowns, and disputed points. Sources are graded A–X and confidence is stated when material.
+Every published item distinguishes facts supported by the available record, attributed claims, inferences, speculation, unknowns and disputed points. Sources are graded A–X by their value for the specific claim being tested, and confidence is stated when material.
+
+Reporter rhythm: **Lead → Context → Evidence → Gap → Impact → Next**.
 
 ## Local preview
 
@@ -34,8 +36,8 @@ Deploy from the `main` branch and repository root (`/`). The project-site path i
 
 ## Status
 
-V3 public evidence room: 5 September 2026.
+Public evidence room revised 6 September 2026.
 
-The RCI Tabung Haji investigation now contains the full v14 dataset, revised to the RAVEN CASEFILE structure. The primary newsroom and investigation views use evidence-led typography and data components instead of illustrative hero artwork.
+The RCI Tabung Haji investigation is now at **CASEFILE v16**, with data reconciled through **5 September 2026 MYT**. The public pages use evidence-bounded wording, explicit process status, disputed-record handling and a public correction ledger.
 
-> Lie wins by speed. Truth wins by audit.
+> A lie wins by speed. Truth wins by audit.

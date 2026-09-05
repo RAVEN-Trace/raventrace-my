@@ -36,6 +36,10 @@ Public explanation: **Apa berlaku → apa buktinya → apa yang belum tahu → k
 - If no public source is available, say so. Do not invent a source link.
 - Source protection, privacy and safety override public-link requirements for confidential material.
 
+## Evidence-reconciliation rule
+
+Research dossiers and user-supplied compilations are treated as working indexes, not automatically as publication-grade proof. Material claims are reconciled against primary records, official statements, court reporting or independent corroboration before publication. Where reliable records conflict, RAVEN-Trace keeps the point **DISPUTED** or **UNKNOWN** rather than forcing a single answer.
+
 ## Local preview
 
 Run a static server from the directory that contains this repository:
@@ -52,8 +56,10 @@ Deploy from the `main` branch and repository root (`/`). The project-site path i
 
 ## Status
 
-Public evidence room revised 6 September 2026.
+Public evidence room revised **6 September 2026**.
 
-The RCI Tabung Haji investigation is at **CASEFILE v16**, with data reconciled through **5 September 2026 MYT**. The public pages now use evidence-bounded wording, simpler public language, direct source links for newsroom updates, disputed-record handling and a public correction ledger.
+The RCI Tabung Haji investigation is at **CASEFILE v16**, with the rendered evidence layer reconciled through **6 September 2026 · early morning MYT**. Current updates include the 6 September Jamil Khir remand checkpoint, 5 September public-transparency reporting, governance reform progress, disputed Al-Rawda impairment metrics, and a stricter correction ledger.
+
+The site records several reconciliation corrections, including **211 pages rather than 252** for the public RCI report, **30 July rather than 31 July** for announcement of the MACC special task force, and separation of expected/proposed charges from charges actually read in court.
 
 > A lie wins by speed. Truth wins by audit.

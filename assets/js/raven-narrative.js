@@ -21,6 +21,81 @@
     document.head.appendChild(css);
   }
 
+  const addSourceRow = (id, grade, href, title, note) => {
+    const list = q('#sources .sources-grid');
+    if (!list || q(`#${id}`)) return;
+    const li = document.createElement('li');
+    li.id = id;
+    li.innerHTML = `<span>${grade}</span><a href="${href}" rel="noopener noreferrer">${title}</a><small>${note}</small>`;
+    list.appendChild(li);
+  };
+
+  addSourceRow('s44','B','https://www.malaymail.com/news/malaysia/2026/09/03/tabung-haji-act-amendments-in-final-stages-before-parliamentary-tabling-says-th-ceo/233776','19/25 syor selesai + pindaan Akta >90%','Malay Mail / Bernama · 3 Sep');
+  addSourceRow('s45','B','https://berita.rtm.gov.my/nasional/senarai-berita-nasional/senarai-artikel/pengurusan-tabung-haji-wajar-dikawal-selia-lebih-ketat-pm/','PM sokong kawal selia TH lebih ketat','RTM / Bernama · 4 Sep');
+  addSourceRow('s46','B','https://berita.rtm.gov.my/nasional/senarai-berita-nasional/senarai-artikel/isu-th-rakyat-mahu-siasatan-sprm-dilaksana-secara-telus/','Beberapa responden mahu siasatan lebih telus','RTM · 5 Sep');
+  addSourceRow('s47','E','https://www.malaymail.com/news/what-you-think/2026/09/05/what-happens-when-too-few-people-say-no-noor-adwa-sulaiman/233962','Analisis tadbir urus: semak dan imbang','Malay Mail · komentar · 5 Sep');
+  addSourceRow('s48','B','https://www.malaysiakini.com/news/783373','Reman Jamil Khir hingga 6 Sep','Malaysiakini · prosiding reman');
+
+  const heroDate = q('.case-hero .date-chip');
+  if (heroDate) heroDate.textContent = 'Data cut-off · 6 Sep 2026 · awal pagi MYT';
+  const description = q('meta[name="description"]');
+  if (description) description.content = 'CASEFILE RCI Tabung Haji v16: RCI, penguatkuasaan, individu, 14 pelaburan, tadbir urus, UJSB, pertikaian rekod, jurang bukti dan sumber awam hingga 6 September 2026.';
+  const sourceNote = q('#sources .source-note');
+  if (sourceNote) sourceNote.innerHTML = '<strong>Data cut-off:</strong> 6 September 2026 · awal pagi MYT. <strong>Semakan laman:</strong> 6 September 2026. Kompilasi penyelidikan digunakan sebagai indeks kerja dan disemak silang dengan rekod awam; jika kompilasi bercanggah dengan rekod primer atau mahkamah, status dikekalkan sebagai disputed atau unknown sehingga disahkan.';
+
+  const docket = q('.case-rail section dl');
+  if (docket && !q('[data-rci-pages]', docket)) {
+    const row = document.createElement('div');
+    row.dataset.rciPages = 'true';
+    row.innerHTML = '<dt>Laporan RCI</dt><dd>211 halaman</dd>';
+    docket.appendChild(row);
+  }
+
+  const jamil = qa('.person-card').find((card) => q('h3', card)?.textContent.includes('Jamil Khir'));
+  if (jamil) {
+    const status = q(':scope > div .status', jamil);
+    if (status) { status.className = 'status unknown'; status.textContent = 'Reman tamat · 6 Sep · outcome belum diumumkan'; }
+    const body = qa(':scope > p', jamil).find((p) => !p.classList.contains('role'));
+    if (body) body.textContent = 'Direman lima hari bagi membantu siasatan isu pajakan hotel TH di Arab Saudi. Tempoh reman dijadual berakhir 6 September. Setakat semakan awal pagi, belum ada rekod awam yang mengesahkan sama ada beliau dibebaskan, reman dilanjutkan atau akan didakwa.';
+    const refs = qa('a[href^="#s"]', jamil);
+    if (!refs.some((a) => a.getAttribute('href') === '#s48')) {
+      const a = document.createElement('a'); a.href = '#s48'; a.textContent = 'S48'; jamil.append(' ', a);
+    }
+  }
+
+  const updates = q('#updates');
+  const stack = q('.trace-stack', updates);
+  if (updates && stack && !q('[data-sep6-update]', stack)) {
+    const heading = q('h2', updates);
+    if (heading) heading.textContent = 'Lima perkembangan yang mengubah kedudukan kes.';
+    const card = document.createElement('article');
+    card.className = 'trace-card';
+    card.dataset.sep6Update = 'true';
+    card.innerHTML = '<div class="trace-head"><span>JEJAK / 00</span><time datetime="2026-09-06">6 Sep 2026 · awal pagi</time></div><div class="meta-row"><span class="status unknown">Checkpoint hari ini</span><span class="source-grade">Gred B</span></div><h3>Tempoh reman Jamil Khir berakhir hari ini; status seterusnya belum diumumkan.</h3><dl><div><dt>Apa diketahui?</dt><dd>Reman lima hari bermula 2 September dan dijadual berakhir 6 September.</dd></div><div><dt>Apa belum diketahui?</dt><dd>Belum ada rekod awam yang mengesahkan pembebasan, lanjutan reman atau pertuduhan.</dd></div><div><dt>Kenapa penting?</dt><dd>Tamat tempoh reman tidak boleh diterjemah secara automatik sebagai bebas daripada siasatan atau sebagai bakal didakwa.</dd></div></dl><p class="inline-sources"><a href="#s48">S48</a> <a href="#s22">S22</a></p>';
+    stack.prepend(card);
+  }
+
+  const governance = q('#governance');
+  if (governance && !q('[data-reform-status]', governance)) {
+    const box = document.createElement('div');
+    box.className = 'case-warning light';
+    box.dataset.reformStatus = 'true';
+    box.innerHTML = '<strong>Status pembaharuan · 3–4 Sep</strong><span>TH melaporkan 19 daripada 25 syor RCI telah selesai dan enam masih dalam tindakan. Pindaan Akta TH pula melepasi 90% di peringkat dalaman, tetapi masih perlu melalui proses kerajaan dan Parlimen. TH menyatakan SC dipilih untuk mengawal selia bahagian pelaburan, manakala Perdana Menteri turut menyebut SC dan BNM dalam kerangka pengawasan lebih ketat.</span><p class="inline-sources"><a href="#s44">S44</a> <a href="#s45">S45</a></p>';
+    const grid = q('.control-grid', governance);
+    if (grid) governance.insertBefore(box, grid);
+  }
+
+  const alRawda = qa('.investment').find((item) => q('summary strong', item)?.textContent.trim() === 'Al-Rawda');
+  if (alRawda && !q('[data-alrawda-reconcile]', alRawda)) {
+    const body = q('.investment-body', alRawda);
+    if (body) {
+      const note = document.createElement('div');
+      note.dataset.alrawdaReconcile = 'true';
+      note.innerHTML = '<h4>Disputed metric · impairment</h4><p>Rekod awam menggunakan sekurang-kurangnya dua angka bagi impairment/kerugian Al-Rawda: sekitar RM1.0b dalam satu penerangan rasmi dan sekitar RM1.86b dalam laporan lain terhadap ucapan Dewan Rakyat. RAVEN-Trace tidak menyatukan kedua-duanya sehingga definisi, tarikh ukuran atau pecahan perakaunan dapat dijelaskan.</p>';
+      body.insertBefore(note, body.lastElementChild);
+    }
+  }
+
   const cards = [
     {
       tone: 'amber', label: 'Audit ≠ penyiasatan jenayah', verdict: 'KESIMPULAN TERLALU JAUH',

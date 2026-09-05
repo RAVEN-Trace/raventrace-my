@@ -83,7 +83,7 @@
   if (!q('link[data-raven-visuals]')) {
     const sheet = document.createElement('link');
     sheet.rel = 'stylesheet';
-    sheet.href = '/raventrace-my/assets/css/raven-visuals.css?v=1.5.0';
+    sheet.href = '/raventrace-my/assets/css/raven-visuals.css?v=1.6.0';
     sheet.dataset.ravenVisuals = 'true';
     document.head.appendChild(sheet);
   }

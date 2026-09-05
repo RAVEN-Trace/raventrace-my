@@ -1,4 +1,4 @@
-/* RAVEN visual journalism layer v1.5 — mobile-first, source photos + clearly labelled editorial artwork */
+/* RAVEN visual journalism layer v1.6 — mobile-first, source photos + clearly labelled editorial artwork */
 .brand-seal{width:48px;height:48px;flex:0 0 48px;border-radius:50%;object-fit:cover;border:1px solid #34404c;box-shadow:0 0 0 3px rgba(39,211,242,.08)}
 
 html{scroll-padding-top:88px}
@@ -21,18 +21,26 @@ html{scroll-padding-top:88px}
 .investment-sector{display:inline-flex;align-items:center;gap:.35rem;margin-top:.35rem;color:var(--cyan);font:850 .67rem/1.2 var(--mono);text-transform:uppercase}.investment-sector .sector-icon{width:1.65rem;height:1.65rem;display:grid;place-items:center;border:1px solid var(--line);background:#f4f8f9;font-size:.95rem}
 .visual-source-ledger{margin:1.2rem 0 0;padding:.95rem;border-top:4px solid var(--ink);background:#f1ede4}.visual-source-ledger h3{font:900 .75rem/1.2 var(--mono);text-transform:uppercase}.visual-source-ledger p{margin:.5rem 0 0;color:var(--muted);font-size:.76rem;line-height:1.5}
 
-/* CASE MAP — desktop process rail. */
-#status .process-ladder{counter-reset:ravenstep;display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:0;margin:1.15rem 0 1.4rem;padding:0;border:1px solid #263440;background:#081018;overflow:hidden;list-style:none}
-#status .process-ladder li{position:relative;min-width:0;padding:1.05rem .95rem 1.1rem;border:0;border-right:1px solid #263440;background:linear-gradient(180deg,rgba(18,31,42,.96),rgba(8,16,24,.98));color:#fff}
-#status .process-ladder li:last-child{border-right:0}
-#status .process-ladder li::after{content:"";position:absolute;left:0;right:0;bottom:0;height:4px;background:#46515d}
-#status .process-ladder li.done::after{background:#21c78a}
-#status .process-ladder li.active::after{background:var(--cyan-bright)}
-#status .process-ladder li>span{display:grid;place-items:center;width:2.15rem;height:2.15rem;margin:0 0 .7rem;border:1px solid #4b6070;color:var(--cyan-bright);font:900 .69rem/1 var(--mono)}
-#status .process-ladder strong{display:block;color:#fff;font:850 .94rem/1.25 var(--sans);letter-spacing:-.01em}
-#status .process-ladder small{display:block;margin-top:.4rem;color:#aeb8c2;font:500 .72rem/1.42 var(--sans)}
-#status .process-ladder li:not(:last-child)::before{content:"›";position:absolute;z-index:3;right:-.45rem;top:50%;transform:translateY(-50%);display:grid;place-items:center;width:.9rem;height:1.8rem;background:#081018;color:var(--cyan-bright);font:900 1.1rem/1 var(--mono)}
-#status .note-line{margin:.8rem 0 0;padding:.8rem 1rem;border-left:3px solid var(--cyan);background:#edf7f9;color:#4e5961;font-size:.84rem;line-height:1.5}
+/* CASE JOURNEY MAP — one casefile, several files moving at different speeds. */
+#status>h2::after{content:"STATUS SEMASA · SIASATAN AKTIF + PROSIDING AWAL";display:table;margin:.85rem 0 0;padding:.5rem .72rem;border:1px solid #89d8e8;background:#eefbfe;color:#126b7d;font:900 .66rem/1.2 var(--mono);letter-spacing:.08em;text-transform:uppercase}
+#status .process-ladder{position:relative;display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:.7rem;margin:1.1rem 0 1.15rem;padding:1.15rem;border:1px solid #22313c;background:linear-gradient(145deg,#061019,#0b1721);list-style:none;overflow:hidden}
+#status .process-ladder::before{content:"";position:absolute;left:8%;right:8%;top:3.05rem;height:2px;background:linear-gradient(90deg,#27c487 0 20%,#27d3f2 20% 78%,#53616d 78% 100%);opacity:.75}
+#status .process-ladder li{position:relative;z-index:1;min-width:0;padding:.3rem .2rem .2rem;background:transparent!important;border:0!important;color:#fff;text-align:center}
+#status .process-ladder li::before{display:none!important}
+#status .process-ladder li::after{display:inline-flex;align-items:center;justify-content:center;margin-top:.72rem;padding:.3rem .5rem;border:1px solid #506170;color:#9cabb6;background:#0c1720;font:900 .56rem/1 var(--mono);letter-spacing:.07em;text-transform:uppercase}
+#status .process-ladder li:nth-child(1)::after{content:"SELESAI";border-color:#2e9d72;color:#63d7a6}
+#status .process-ladder li:nth-child(2)::after{content:"AKTIF";border-color:#2bcfea;color:#73e3f7;background:#0b2028}
+#status .process-ladder li:nth-child(3)::after{content:"SEBAHAGIAN FAIL";border-color:#2bcfea;color:#73e3f7}
+#status .process-ladder li:nth-child(4)::after{content:"PROSIDING AWAL";border-color:#2bcfea;color:#73e3f7}
+#status .process-ladder li:nth-child(5)::after{content:"BELUM"}
+#status .process-ladder li>span{position:relative;display:grid;place-items:center;width:3.15rem;height:3.15rem;margin:0 auto .95rem;border:2px solid #526471;border-radius:50%;background:#071018;color:#b4c1ca;box-shadow:0 0 0 7px #071018;font:900 .72rem/1 var(--mono)}
+#status .process-ladder li.done>span{border-color:#2ac58a;color:#9cf0c7;background:#092019}
+#status .process-ladder li.active>span{border-color:#2bcfea;color:#d9faff;background:#082631;box-shadow:0 0 0 7px #071018,0 0 22px rgba(43,207,234,.22)}
+#status .process-ladder li:nth-child(2)>span::after{content:"SEKARANG";position:absolute;left:50%;top:-1.55rem;transform:translateX(-50%);padding:.24rem .42rem;background:#27d3f2;color:#041015;font:900 .48rem/1 var(--mono);letter-spacing:.06em}
+#status .process-ladder strong{display:block;color:#fff;font:850 .9rem/1.23 var(--sans);letter-spacing:-.01em}
+#status .process-ladder small{display:block;max-width:18ch;margin:.4rem auto 0;color:#aab6bf;font:500 .7rem/1.4 var(--sans)}
+#status .note-line{margin:.75rem 0 0;padding:.78rem .95rem;border:1px solid #cfdadd;border-left:4px solid #e0a339;background:#f3f6f7;color:#4d5961;font-size:.83rem;line-height:1.5}
+#status .note-line::before{content:"PENTING · ";color:#9a6500;font:900 .63rem/1 var(--mono);letter-spacing:.08em}
 
 #status .subhead{margin-top:2rem!important;margin-bottom:.8rem!important;font:900 .82rem/1.2 var(--mono)!important;letter-spacing:.1em!important;text-transform:uppercase}
 #status .institution-grid{position:relative;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:.8rem;padding:4.8rem 1rem 1rem;border:1px solid #263440;background:radial-gradient(circle at 50% 0,rgba(39,211,242,.10),transparent 34%),#071018}
@@ -63,18 +71,24 @@ html{scroll-padding-top:88px}
   .brand-seal{width:42px;height:42px;flex-basis:42px}
   .timeline-visual{max-width:none}.timeline-visual .source-story-frame{height:220px}.trace-visual .source-story-frame{height:220px}.person-source-visual .source-story-frame{height:220px}
 
-  /* Mobile: vertical connected flow is easier to understand than a hidden horizontal carousel. */
-  #status .process-ladder{display:block;margin:1rem 0 1.25rem;border:1px solid #263440;background:#071018;overflow:visible}
-  #status .process-ladder li{display:grid!important;grid-template-columns:3rem minmax(0,1fr)!important;gap:.7rem;align-items:start;min-height:84px;padding:.85rem .9rem .9rem 1rem;border-right:0!important;border-bottom:1px solid #263440!important;background:#0a141d!important}
-  #status .process-ladder li:last-child{border-bottom:0!important}
-  #status .process-ladder li::after{left:0;right:auto;top:0;bottom:0;width:4px;height:auto;background:#46515d}
-  #status .process-ladder li.done::after{background:#21c78a}
-  #status .process-ladder li.active::after{background:var(--cyan-bright)}
-  #status .process-ladder li:not(:last-child)::before{content:"";left:2.05rem;right:auto;top:2.75rem;bottom:-.7rem;width:1px;height:auto;transform:none;background:#35505f}
-  #status .process-ladder li>span{grid-column:1;grid-row:1;width:2.05rem;height:2.05rem;margin:0;border-color:#3c6575;background:#071018}
-  #status .process-ladder li>div{grid-column:2;grid-row:1}
-  #status .process-ladder strong{font-size:.9rem}
-  #status .process-ladder small{font-size:.76rem;line-height:1.45}
+  /* Mobile journey: connected nodes, not a list. */
+  #status .process-ladder{display:block;margin:1rem 0 1.15rem;padding:1rem .85rem 1rem 4.8rem;border:1px solid #d4dde0;background:linear-gradient(180deg,#f7fafb,#eef4f6);overflow:visible}
+  #status .process-ladder::before{left:2.55rem;right:auto;top:2.35rem;bottom:2.55rem;width:3px;height:auto;background:linear-gradient(180deg,#27c487 0 18%,#27d3f2 18% 76%,#b5c0c6 76% 100%);opacity:1}
+  #status .process-ladder li{position:relative;display:block!important;min-height:112px;padding:.85rem .8rem .9rem 1rem;margin:0 0 .35rem;border:0!important;border-radius:0;background:transparent!important;color:#171a1f!important;text-align:left}
+  #status .process-ladder li:nth-child(2){background:#e8fbff!important;border:1px solid #a6e6f1!important;box-shadow:0 8px 20px rgba(12,92,111,.08)}
+  #status .process-ladder li:nth-child(3),#status .process-ladder li:nth-child(4){background:rgba(255,255,255,.62)!important;border:1px solid #dbe3e6!important}
+  #status .process-ladder li:nth-child(5){opacity:.72}
+  #status .process-ladder li>span{position:absolute;left:-4.12rem;top:.78rem;width:3.25rem;height:3.25rem;margin:0;border:3px solid #9baab3;border-radius:50%;background:#f7fafb;color:#65737c;box-shadow:0 0 0 7px #f1f6f7;font-size:.75rem}
+  #status .process-ladder li.done>span{border-color:#28bd82;background:#dff8ed;color:#137550}
+  #status .process-ladder li.active>span{border-color:#27cce8;background:#dff9fe;color:#07677a;box-shadow:0 0 0 7px #eff7f8,0 0 0 10px rgba(39,204,232,.09)}
+  #status .process-ladder li:nth-child(2)>span{background:#27d3f2;color:#061318;border-color:#27d3f2}
+  #status .process-ladder li:nth-child(2)>span::after{left:50%;top:auto;bottom:-1.55rem;transform:translateX(-50%);padding:.22rem .38rem;background:#0d2029;color:#8beafa;font-size:.45rem;white-space:nowrap}
+  #status .process-ladder strong{color:#15191e;font-size:1.04rem;line-height:1.25}
+  #status .process-ladder small{max-width:none;margin:.38rem 0 0;color:#68747d;font-size:.84rem;line-height:1.45}
+  #status .process-ladder li::after{position:static;display:inline-flex;margin:.72rem 0 0;padding:.28rem .46rem;background:#fff;color:#66747d;border-color:#b9c6cc;font-size:.52rem}
+  #status .process-ladder li:nth-child(1)::after{color:#15754f;border-color:#75caa7;background:#effbf6}
+  #status .process-ladder li:nth-child(2)::after{color:#05687c;border-color:#79dce9;background:#e9fbfe}
+  #status .process-ladder li:nth-child(3)::after,#status .process-ladder li:nth-child(4)::after{color:#0a6c80;border-color:#8cdbe8;background:#f4fcfe}
 
   #status .institution-grid{grid-template-columns:repeat(2,minmax(0,1fr));padding:4.6rem .8rem .8rem}
   #investments .investment-list{grid-template-columns:1fr}
@@ -103,7 +117,14 @@ html{scroll-padding-top:88px}
   .source-image-policy{font-size:.71rem}
   .front-docket{margin-top:1.5rem!important}
 
-  #status .note-line{font-size:.8rem;padding:.7rem .8rem}
+  #status>h2::after{font-size:.59rem;line-height:1.35;margin-top:.72rem;padding:.45rem .58rem}
+  #status .process-ladder{padding-left:4.35rem}
+  #status .process-ladder::before{left:2.25rem}
+  #status .process-ladder li{min-height:106px;padding:.75rem .62rem .82rem .88rem}
+  #status .process-ladder li>span{left:-3.72rem;width:3rem;height:3rem}
+  #status .process-ladder strong{font-size:1rem}
+  #status .process-ladder small{font-size:.81rem}
+  #status .note-line{font-size:.8rem;padding:.72rem .8rem}
   #status .subhead{margin-top:1.55rem!important;padding-top:1.1rem;border-top:4px solid var(--ink)}
   #status .institution-grid{grid-template-columns:1fr;padding:4.2rem .65rem .65rem;gap:.55rem}
   #status .institution-grid::before{top:.75rem;min-width:220px;font-size:.64rem;padding:.6rem .75rem}
@@ -123,6 +144,7 @@ html{scroll-padding-top:88px}
   .case-section>h2{font-size:2.12rem!important}
   .person-card h3{font-size:1.5rem!important}
   .brand-seal{width:36px;height:36px;flex-basis:36px}
-  #status .process-ladder li{grid-template-columns:2.8rem minmax(0,1fr)!important;padding:.78rem .78rem .82rem .9rem}
-  #status .process-ladder li:not(:last-child)::before{left:1.88rem}
+  #status .process-ladder{padding-left:4.15rem;padding-right:.7rem}
+  #status .process-ladder::before{left:2.12rem}
+  #status .process-ladder li>span{left:-3.55rem;width:2.88rem;height:2.88rem}
 }

@@ -34,8 +34,8 @@ Deploy from the `main` branch and repository root (`/`). The project-site path i
 
 ## Status
 
-V2 editorial rebuild: 5 September 2026.
+V3 public evidence room: 5 September 2026.
 
-All supplied artworks used on the site are labeled as editorial illustrations and must not be treated as evidence.
+The RCI Tabung Haji investigation now contains the full v14 dataset, revised to the RAVEN CASEFILE structure. The primary newsroom and investigation views use evidence-led typography and data components instead of illustrative hero artwork.
 
 > Lie wins by speed. Truth wins by audit.

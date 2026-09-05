@@ -1,4 +1,4 @@
-/* RAVEN visual journalism layer v1.3 — mobile-first, source photos + clearly labelled editorial artwork */
+/* RAVEN visual journalism layer v1.4 — mobile-first, source photos + clearly labelled editorial artwork */
 .brand-seal{width:48px;height:48px;flex:0 0 48px;border-radius:50%;object-fit:cover;border:1px solid #34404c;box-shadow:0 0 0 3px rgba(39,211,242,.08)}
 
 .editorial-art,.source-story-visual{position:relative;overflow:hidden;margin:0;border:1px solid var(--line);background:#05070a}.dark .editorial-art,.dark .source-story-visual{border-color:#34404c}.editorial-art-frame,.source-story-frame{display:block;overflow:hidden;background:#05070a}.editorial-art img,.source-story-visual img{display:block;width:100%;height:100%;object-fit:cover}.editorial-art img{filter:saturate(.96) contrast(1.02)}
@@ -18,10 +18,50 @@
 .investment-sector{display:inline-flex;align-items:center;gap:.35rem;margin-top:.35rem;color:var(--cyan);font:850 .67rem/1.2 var(--mono);text-transform:uppercase}.investment-sector .sector-icon{width:1.65rem;height:1.65rem;display:grid;place-items:center;border:1px solid var(--line);background:#f4f8f9;font-size:.95rem}
 .visual-source-ledger{margin:1.2rem 0 0;padding:.95rem;border-top:4px solid var(--ink);background:#f1ede4}.visual-source-ledger h3{font:900 .75rem/1.2 var(--mono);text-transform:uppercase}.visual-source-ledger p{margin:.5rem 0 0;color:var(--muted);font-size:.76rem;line-height:1.5}
 
-/* Desktop keeps editorial scale. Mobile reduces giant headline blocks so evidence appears sooner. */
+/* CASE MAP presentation — existing verified content, redesigned as a visual process map. */
+#status .process-ladder{counter-reset:ravenstep;display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:0;margin:1.4rem 0 2rem;border:1px solid #263440;background:#081018;overflow:hidden}
+#status .process-ladder li{position:relative;min-width:0;padding:1.15rem 1rem 1.2rem;border:0;border-right:1px solid #263440;background:linear-gradient(180deg,rgba(18,31,42,.9),rgba(8,16,24,.96));color:#fff}
+#status .process-ladder li:last-child{border-right:0}
+#status .process-ladder li::after{content:"";position:absolute;left:0;right:0;bottom:0;height:4px;background:#46515d}
+#status .process-ladder li.done::after{background:#21c78a}
+#status .process-ladder li.active::after{background:var(--cyan-bright)}
+#status .process-ladder li>span{display:grid;place-items:center;width:2.15rem;height:2.15rem;margin:0 0 .75rem;border:1px solid #4b6070;color:var(--cyan-bright);font:900 .69rem/1 var(--mono)}
+#status .process-ladder strong{display:block;color:#fff;font-size:.94rem;line-height:1.25}
+#status .process-ladder small{display:block;margin-top:.45rem;color:#aeb8c2;font-size:.72rem;line-height:1.42}
+#status .process-ladder li:not(:last-child)::before{content:"›";position:absolute;z-index:3;right:-.45rem;top:50%;transform:translateY(-50%);display:grid;place-items:center;width:.9rem;height:1.8rem;background:#081018;color:var(--cyan-bright);font:900 1.1rem/1 var(--mono)}
+
+#status .subhead{margin-top:2.3rem!important;margin-bottom:.8rem!important}
+#status .institution-grid{position:relative;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:.8rem;padding:4.8rem 1rem 1rem;border:1px solid #263440;background:radial-gradient(circle at 50% 0,rgba(39,211,242,.09),transparent 34%),#071018}
+#status .institution-grid::before{content:"TABUNG HAJI · CASE PROCESS MAP";position:absolute;left:50%;top:1rem;transform:translateX(-50%);min-width:240px;padding:.7rem 1rem;border:1px solid var(--cyan);background:#09131c;color:#fff;text-align:center;font:900 .72rem/1.15 var(--mono);letter-spacing:.08em;box-shadow:0 0 0 5px rgba(39,211,242,.04)}
+#status .institution-grid article{position:relative!important;min-height:150px;padding:1rem!important;border:1px solid #304251!important;background:linear-gradient(180deg,#0d1923,#091119)!important;color:#dfe7ed!important}
+#status .institution-grid article::before{content:"";position:absolute;left:50%;top:-.82rem;width:1px;height:.82rem;background:#365160}
+#status .institution-grid article::after{position:absolute;right:.65rem;top:.6rem;color:#68808f;font:900 .55rem/1 var(--mono);letter-spacing:.08em}
+#status .institution-grid article:nth-child(1)::after{content:"DAPATAN"}
+#status .institution-grid article:nth-child(2)::after{content:"SIASATAN"}
+#status .institution-grid article:nth-child(3)::after{content:"JENAYAH KOMERSIAL"}
+#status .institution-grid article:nth-child(4)::after{content:"PENDAKWAAN"}
+#status .institution-grid article:nth-child(5)::after{content:"KEHAKIMAN"}
+#status .institution-grid article:nth-child(6)::after{content:"PARLIMEN"}
+#status .institution-grid article b{padding-right:3.5rem;color:#fff!important}
+#status .institution-grid article p{margin-top:.75rem;color:#b8c3cb!important;font-size:.82rem;line-height:1.52}
+#status .institution-mark{border-color:#2bcfea!important;color:#2bcfea!important;background:#071018}
+
+/* Investment ledger becomes a scan-friendly case-map rail instead of a wall of accordion rows. */
+#investments .investment-list{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:.65rem}
+#investments .investment{border:1px solid #d8d2c7!important;background:#fff!important}
+#investments .investment summary{min-height:104px;padding:1rem!important;align-items:center}
+#investments .investment summary>span:first-child{display:grid;place-items:center;width:2.4rem;height:2.4rem;border:1px solid var(--cyan);color:var(--cyan);font:900 .65rem/1 var(--mono)}
+#investments .investment summary strong{font-size:1rem!important;line-height:1.18!important}
+#investments .investment summary em{font-size:.71rem!important}
+#investments .investment[open]{box-shadow:0 10px 24px rgba(9,20,28,.08)}
+
 @media(max-width:820px){
   .brand-seal{width:42px;height:42px;flex-basis:42px}
   .timeline-visual{max-width:none}.timeline-visual .source-story-frame{height:220px}.trace-visual .source-story-frame{height:220px}.person-source-visual .source-story-frame{height:220px}
+  #status .process-ladder{display:flex;overflow-x:auto;scroll-snap-type:x mandatory;overscroll-behavior-inline:contain}
+  #status .process-ladder li{flex:0 0 72%;scroll-snap-align:start;border-right:1px solid #263440}
+  #status .institution-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+  #investments .investment-list{grid-template-columns:1fr}
 }
 
 @media(max-width:620px){
@@ -45,6 +85,14 @@
   .timeline-visual .source-story-frame,.trace-visual .source-story-frame,.person-source-visual .source-story-frame{height:190px}
   .source-image-policy{font-size:.71rem}
   .front-docket{margin-top:1.5rem!important}
+  #status .process-ladder{margin-top:1rem;margin-bottom:1.4rem}
+  #status .process-ladder li{flex-basis:84%;padding:1rem}
+  #status .institution-grid{grid-template-columns:1fr;padding:4.3rem .7rem .7rem}
+  #status .institution-grid::before{top:.8rem;min-width:220px;font-size:.66rem}
+  #status .institution-grid article{min-height:auto!important;padding:.9rem!important}
+  #status .institution-grid article::before{display:none}
+  #status .institution-grid article p{font-size:.8rem!important}
+  #investments .investment summary{min-height:94px;padding:.85rem!important}
 }
 
 @media(max-width:420px){

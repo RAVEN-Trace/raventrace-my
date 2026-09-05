@@ -1,6 +1,9 @@
 (() => {
-  const navToggle = document.querySelector('[data-nav-toggle]');
-  const nav = document.querySelector('[data-nav]');
+  const q = (s, r = document) => r.querySelector(s);
+  const qa = (s, r = document) => [...r.querySelectorAll(s)];
+
+  const navToggle = q('[data-nav-toggle]');
+  const nav = q('[data-nav]');
   if (navToggle && nav) {
     navToggle.addEventListener('click', () => {
       const open = nav.classList.toggle('open');
@@ -17,23 +20,29 @@
     });
   }
 
-  document.querySelectorAll('[data-share]').forEach((button) => {
+  qa('[data-share]').forEach((button) => {
     button.addEventListener('click', async () => {
-      const payload = { title: button.dataset.shareTitle || document.title, text: button.dataset.shareText || 'Semak laporan berasaskan bukti ini.', url: window.location.href };
+      const payload = {
+        title: button.dataset.shareTitle || document.title,
+        text: button.dataset.shareText || 'Semak laporan berasaskan bukti ini.',
+        url: window.location.href
+      };
       try {
         if (navigator.share) await navigator.share(payload);
         else {
           await navigator.clipboard.writeText(`${payload.text} ${payload.url}`);
           const original = button.textContent;
           button.textContent = 'Pautan disalin';
-          window.setTimeout(() => { button.textContent = original; }, 1800);
+          setTimeout(() => { button.textContent = original; }, 1800);
         }
-      } catch (error) { if (error.name !== 'AbortError') button.textContent = 'Salin gagal'; }
+      } catch (error) {
+        if (error.name !== 'AbortError') button.textContent = 'Salin gagal';
+      }
     });
   });
 
-  const filters = document.querySelectorAll('[data-filter]');
-  const items = document.querySelectorAll('[data-topic]');
+  const filters = qa('[data-filter]');
+  const topics = qa('[data-topic]');
   filters.forEach((button) => {
     button.setAttribute('aria-pressed', String(button.classList.contains('active')));
     button.addEventListener('click', () => {
@@ -43,52 +52,44 @@
         item.classList.toggle('active', active);
         item.setAttribute('aria-pressed', String(active));
       });
-      items.forEach((item) => { item.hidden = selected !== 'all' && item.dataset.topic !== selected; });
+      topics.forEach((item) => { item.hidden = selected !== 'all' && item.dataset.topic !== selected; });
     });
   });
 
-  const expandButton = document.querySelector('[data-expand-investments]');
-  const investmentList = document.querySelector('[data-investment-list]');
+  const expandButton = q('[data-expand-investments]');
+  const investmentList = q('[data-investment-list]');
   if (expandButton && investmentList) {
-    const records = [...investmentList.querySelectorAll('details')];
+    const records = qa('details', investmentList);
     expandButton.addEventListener('click', () => {
-      const shouldOpen = !records.every((record) => record.open);
-      records.forEach((record) => { record.open = shouldOpen; });
-      expandButton.setAttribute('aria-expanded', String(shouldOpen));
-      expandButton.textContent = shouldOpen ? 'Tutup semua rekod' : 'Buka semua rekod';
+      const open = !records.every((record) => record.open);
+      records.forEach((record) => { record.open = open; });
+      expandButton.setAttribute('aria-expanded', String(open));
+      expandButton.textContent = open ? 'Tutup semua rekod' : 'Buka semua rekod';
     });
-    records.forEach((record) => record.addEventListener('toggle', () => {
-      const allOpen = records.every((item) => item.open);
-      const allClosed = records.every((item) => !item.open);
-      if (allOpen || allClosed) {
-        expandButton.setAttribute('aria-expanded', String(allOpen));
-        expandButton.textContent = allOpen ? 'Tutup semua rekod' : 'Buka semua rekod';
-      }
-    }));
   }
 
-  const caseNav = document.querySelector('[data-case-nav]');
+  const caseNav = q('[data-case-nav]');
   if (caseNav && 'IntersectionObserver' in window) {
-    const links = [...caseNav.querySelectorAll('a[href^="#"]')];
-    const sections = links.map((link) => document.querySelector(link.getAttribute('href'))).filter(Boolean);
+    const links = qa('a[href^="#"]', caseNav);
+    const sections = links.map((link) => q(link.getAttribute('href'))).filter(Boolean);
     const observer = new IntersectionObserver((entries) => {
       const visible = entries.filter((entry) => entry.isIntersecting).sort((a, b) => b.intersectionRatio - a.intersectionRatio)[0];
       if (!visible) return;
       links.forEach((link) => link.classList.toggle('active', link.getAttribute('href') === `#${visible.target.id}`));
-    }, { rootMargin: '-18% 0px -70% 0px', threshold: [0, 0.15, 0.35] });
+    }, { rootMargin: '-16% 0px -72% 0px', threshold: [0, .12, .3] });
     sections.forEach((section) => observer.observe(section));
   }
 
-  if (!document.querySelector('link[data-raven-visuals]')) {
+  if (!q('link[data-raven-visuals]')) {
     const sheet = document.createElement('link');
     sheet.rel = 'stylesheet';
-    sheet.href = '/raventrace-my/assets/css/raven-visuals.css?v=1.2.0';
+    sheet.href = '/raventrace-my/assets/css/raven-visuals.css?v=1.3.0';
     sheet.dataset.ravenVisuals = 'true';
     document.head.appendChild(sheet);
   }
 
-  document.querySelectorAll('.brand').forEach((brand) => {
-    if (brand.querySelector('.brand-seal')) return;
+  qa('.brand').forEach((brand) => {
+    if (q('.brand-seal', brand)) return;
     const img = document.createElement('img');
     img.className = 'brand-seal';
     img.src = '/raventrace-my/assets/art/raven-trace-seal.webp';
@@ -125,7 +126,11 @@
   };
 
   const metaCache = new Map();
-  const preferredDomains = ['freemalaysiatoday.com','thestar.com.my','sinarharian.com.my','astroawani.com','malaysiagazette.com','theedgemalaysia.com','malaymail.com','berita.rtm.gov.my','bernama.com','web26.bernama.com','islam.gov.my'];
+  const preferredDomains = [
+    'freemalaysiatoday.com','thestar.com.my','sinarharian.com.my','astroawani.com',
+    'malaysiagazette.com','theedgemalaysia.com','malaymail.com','berita.rtm.gov.my',
+    'bernama.com','web26.bernama.com','islam.gov.my','maccfm.my'
+  ];
   const isExternal = (href) => /^https?:\/\//i.test(href || '');
   const hostname = (url) => { try { return new URL(url).hostname.replace(/^www\./, ''); } catch { return 'sumber asal'; } };
   const chooseSource = (urls) => {
@@ -137,16 +142,17 @@
     }
     return clean[0];
   };
-  const externalUrlsIn = (root) => [...root.querySelectorAll('a[href]')].map((link) => link.href).filter(isExternal).filter((url) => !url.includes('raven-trace.github.io'));
+  const externalUrlsIn = (root) => qa('a[href]', root).map((link) => link.href).filter(isExternal).filter((url) => !url.includes('raven-trace.github.io'));
   const sourceUrlsFromCaseRefs = (root) => {
     const urls = [];
-    root.querySelectorAll('a[href^="#s"]').forEach((ref) => {
-      const target = document.querySelector(ref.getAttribute('href'));
-      const source = target?.querySelector('a[href^="http"]');
+    qa('a[href^="#s"]', root).forEach((ref) => {
+      const target = q(ref.getAttribute('href'));
+      const source = target ? q('a[href^="http"]', target) : null;
       if (source) urls.push(source.href);
     });
     return urls;
   };
+
   const resolveSourceMeta = async (sourceUrl) => {
     if (!sourceUrl) return null;
     if (metaCache.has(sourceUrl)) return metaCache.get(sourceUrl);
@@ -163,6 +169,7 @@
     metaCache.set(sourceUrl, task);
     return task;
   };
+
   const createSourceFigure = async (sourceUrl, className = '', storyTitle = '') => {
     const meta = await resolveSourceMeta(sourceUrl);
     if (!meta?.image) return null;
@@ -175,7 +182,7 @@
     frameLink.setAttribute('aria-label', `Buka sumber asal: ${storyTitle || meta.title || meta.publisher}`);
     const img = document.createElement('img');
     img.src = meta.image;
-    img.alt = storyTitle ? `Gambar berkaitan berita: ${storyTitle}` : 'Gambar daripada artikel sumber asal';
+    img.alt = storyTitle ? `Gambar berkaitan: ${storyTitle}` : 'Gambar daripada artikel sumber asal';
     img.loading = 'lazy';
     img.decoding = 'async';
     img.referrerPolicy = 'no-referrer';
@@ -188,26 +195,41 @@
     const source = document.createElement('a');
     source.href = sourceUrl;
     source.rel = 'noopener noreferrer';
-    source.textContent = `Sumber gambar/berita: ${meta.publisher || hostname(sourceUrl)} →`;
+    source.textContent = `Sumber foto/berita: ${meta.publisher || hostname(sourceUrl)} →`;
     caption.appendChild(source);
     figure.append(frameLink, badge, caption);
     return figure;
   };
+
   const attachSourceFigure = async (container, sourceUrls, className) => {
-    if (!container || container.querySelector(':scope > .source-story-visual')) return;
+    if (!container || q(':scope > .source-story-visual', container)) return true;
     const sourceUrl = chooseSource(sourceUrls);
-    if (!sourceUrl) return;
-    const title = container.querySelector('h1, h2, h3')?.textContent.trim() || '';
+    if (!sourceUrl) return false;
+    const title = q('h1, h2, h3', container)?.textContent.trim() || '';
     const figure = await createSourceFigure(sourceUrl, className, title);
-    if (!figure) { container.classList.add('source-image-unavailable'); return; }
+    if (!figure) return false;
     container.classList.add('has-source-visual');
     container.prepend(figure);
+    return true;
   };
+
+  const addAvatar = (card) => {
+    if (q('.person-avatar', card)) return;
+    const name = q('h3', card)?.textContent.trim() || '';
+    const initials = name.split(/\s+/).filter(Boolean).slice(0, 3).map((part) => part[0]).join('').toUpperCase();
+    const avatar = document.createElement('div');
+    avatar.className = 'person-avatar';
+    avatar.setAttribute('aria-hidden', 'true');
+    avatar.textContent = initials || '•';
+    const meta = q(':scope > div', card);
+    if (meta) meta.insertAdjacentElement('afterend', avatar);
+  };
+
   const addVisualPolicy = (container) => {
-    if (!container || container.querySelector('.source-image-policy')) return;
+    if (!container || q('.source-image-policy', container)) return;
     const note = document.createElement('p');
     note.className = 'source-image-policy';
-    note.textContent = 'Foto pada berita datang daripada artikel sumber asal apabila tersedia. Ilustrasi RAVEN-Trace digunakan hanya sebagai pembuka bab atau penerangan visual dan dilabel jelas — bukan bukti atau foto kejadian.';
+    note.textContent = 'Foto berita datang daripada sumber asal apabila tersedia. Ilustrasi RAVEN-Trace dilabel jelas dan tidak dianggap sebagai bukti atau foto kejadian.';
     container.appendChild(note);
   };
 
@@ -217,35 +239,51 @@
   const isCase = path.includes('/raventrace-my/investigations/rci-tabung-haji');
 
   if (isHome && !document.body.dataset.ravenVisualized) {
-    const dek = document.querySelector('.front-lead .front-dek');
-    injectArtAfter(dek, '/raventrace-my/assets/art/rci-tabung-haji-hero.webp', 'Ilustrasi editorial RAVEN-Trace bagi CASEFILE RCI Tabung Haji', 'Ilustrasi editorial RAVEN-Trace. Bukan dokumen, bukti atau foto kejadian. Fakta dan angka semasa datang daripada teks serta pautan sumber di halaman.', 'home-case-art');
-    document.querySelectorAll('.update-card').forEach((card) => attachSourceFigure(card, externalUrlsIn(card), 'raven-card-visual'));
-    addVisualPolicy(document.querySelector('#latest .section-head'));
+    injectArtAfter(
+      q('.front-lead .front-dek'),
+      '/raventrace-my/assets/art/rci-tabung-haji-hero.webp',
+      'Ilustrasi editorial RAVEN-Trace bagi CASEFILE RCI Tabung Haji',
+      'Ilustrasi editorial — bukan bukti atau foto kejadian.',
+      'home-case-art'
+    );
+    qa('.update-card').forEach((card) => attachSourceFigure(card, externalUrlsIn(card), 'raven-card-visual'));
+    addVisualPolicy(q('#latest .section-head'));
     document.body.dataset.ravenVisualized = 'home';
   }
 
   if (isNews && !document.body.dataset.ravenVisualized) {
-    document.querySelectorAll('.timeline-item').forEach((item) => {
+    qa('.timeline-item').forEach((item) => {
       const content = item.children[1];
       if (!content) return;
       attachSourceFigure(content, externalUrlsIn(item), 'timeline-visual');
       item.classList.add('news-visual-ready');
     });
-    addVisualPolicy(document.querySelector('.article-header .container'));
+    addVisualPolicy(q('.article-header .container'));
     document.body.dataset.ravenVisualized = 'news';
   }
 
   if (isCase && !document.body.dataset.ravenVisualized) {
-    const heroDek = document.querySelector('.case-hero-grid .case-dek');
-    injectArtAfter(heroDek, '/raventrace-my/assets/art/rci-tabung-haji-hero.webp', 'Ilustrasi editorial RAVEN-Trace bagi siasatan RCI Tabung Haji', 'Ilustrasi editorial RAVEN-Trace. Ia membantu orientasi pembaca dan bukan bukti. Rujuk Source Room untuk rekod yang menyokong setiap dakwaan.', 'case-hero-art');
-    injectArtAfter(document.querySelector('#status > h2'), '/raventrace-my/assets/art/court-enforcement-watch.webp', 'Ilustrasi editorial bab mahkamah dan penguatkuasaan RCI Tabung Haji', 'Ilustrasi editorial RAVEN-Trace — bukan foto kejadian dan bukan gambaran individu tertentu. Status reman, pertuduhan dan prosiding dirujuk kepada rekod berita serta mahkamah di bawah.', 'enforcement-chapter-art');
+    injectArtAfter(
+      q('.case-hero-grid .case-dek'),
+      '/raventrace-my/assets/art/rci-tabung-haji-hero.webp',
+      'Ilustrasi editorial RAVEN-Trace bagi siasatan RCI Tabung Haji',
+      'Ilustrasi editorial — bukan bukti. Rujuk Source Room untuk rekod sokongan.',
+      'case-hero-art'
+    );
+    injectArtAfter(
+      q('#status > h2'),
+      '/raventrace-my/assets/art/court-enforcement-watch.webp',
+      'Ilustrasi editorial bab mahkamah dan penguatkuasaan RCI Tabung Haji',
+      'Ilustrasi editorial — bukan foto kejadian atau gambaran individu tertentu.',
+      'enforcement-chapter-art'
+    );
 
-    const institutionGrid = document.querySelector('.institution-grid');
+    const institutionGrid = q('.institution-grid');
     if (institutionGrid) {
-      const marks = { 'RCI': 'RCI', 'SPRM': 'SPRM', 'PDRM / JSJK': 'PDRM', 'AGC': 'AGC', 'Mahkamah': 'COURT', 'PAC': 'PAC' };
-      institutionGrid.querySelectorAll('article').forEach((article) => {
-        const label = article.querySelector('b');
-        if (!label || label.querySelector('.institution-mark')) return;
+      const marks = { 'RCI':'RCI','SPRM':'SPRM','PDRM / JSJK':'PDRM','AGC':'AGC','Mahkamah':'COURT','PAC':'PAC' };
+      qa('article', institutionGrid).forEach((article) => {
+        const label = q('b', article);
+        if (!label || q('.institution-mark', label)) return;
         const mark = document.createElement('span');
         mark.className = 'institution-mark';
         mark.textContent = marks[label.textContent.trim()] || label.textContent.trim().slice(0, 5);
@@ -254,23 +292,16 @@
       });
     }
 
-    document.querySelectorAll('.trace-card').forEach((card) => attachSourceFigure(card, sourceUrlsFromCaseRefs(card), 'trace-visual'));
+    qa('.trace-card').forEach((card) => attachSourceFigure(card, sourceUrlsFromCaseRefs(card), 'trace-visual'));
 
-    document.querySelectorAll('.person-card').forEach((card) => {
-      if (card.querySelector('.person-avatar')) return;
-      const name = card.querySelector('h3')?.textContent.trim() || '';
-      const initials = name.split(/\s+/).filter(Boolean).slice(0, 3).map((part) => part[0]).join('').toUpperCase();
-      const avatar = document.createElement('div');
-      avatar.className = 'person-avatar';
-      avatar.setAttribute('aria-hidden', 'true');
-      avatar.textContent = initials || '•';
-      const meta = card.querySelector(':scope > div');
-      if (meta) meta.insertAdjacentElement('afterend', avatar);
+    qa('.person-card').forEach(async (card) => {
+      const ok = await attachSourceFigure(card, sourceUrlsFromCaseRefs(card), 'person-source-visual');
+      if (!ok) addAvatar(card);
     });
 
     const sectorMap = [[/Perladangan|sawit|ladang/i,['🌿','Perladangan']],[/rel/i,['🚆','Rel']],[/hotel|hospitaliti/i,['🏨','Hospitaliti']],[/pembinaan|hartanah/i,['🏗','Pembinaan / hartanah']],[/marin|O&G|kapal/i,['⚓','Marin / O&G']],[/saham/i,['📈','Pasaran modal']],[/dana/i,['▦','Dana']],[/korporat/i,['▣','Korporat']]];
-    document.querySelectorAll('.investment summary > div').forEach((block) => {
-      if (block.querySelector('.investment-sector')) return;
+    qa('.investment summary > div').forEach((block) => {
+      if (q('.investment-sector', block)) return;
       const hit = sectorMap.find(([pattern]) => pattern.test(block.textContent || ''));
       if (!hit) return;
       const sector = document.createElement('div');
@@ -285,13 +316,12 @@
       block.appendChild(sector);
     });
 
-    const sources = document.querySelector('#sources');
-    if (sources && !sources.querySelector('.visual-source-ledger')) {
+    const sources = q('#sources');
+    if (sources && !q('.visual-source-ledger', sources)) {
       const ledger = document.createElement('aside');
       ledger.className = 'visual-source-ledger';
-      ledger.innerHTML = '<h3>Polisi visual</h3><p><b>FOTO SUMBER</b> datang daripada metadata artikel yang dipautkan. <b>ILUSTRASI EDITORIAL</b> ialah artwork RAVEN-Trace untuk membantu pembaca memahami bab, bukan bukti dan bukan foto kejadian. Jika sumber berita tidak menyediakan imej yang boleh dimuatkan, kami tidak menggantikannya dengan gambar generik yang tidak berkaitan.</p>';
-      const lead = sources.querySelector('.section-lead');
-      if (lead) lead.insertAdjacentElement('afterend', ledger);
+      ledger.innerHTML = '<h3>Polisi visual</h3><p><b>FOTO SUMBER</b> datang daripada artikel yang dipautkan. <b>ILUSTRASI EDITORIAL</b> membantu menerangkan bab tetapi bukan bukti atau foto kejadian. Jika sumber tidak menyediakan imej, RAVEN-Trace tidak menggantikannya dengan gambar generik yang mengelirukan.</p>';
+      q('.section-lead', sources)?.insertAdjacentElement('afterend', ledger);
     }
     document.body.dataset.ravenVisualized = 'case';
   }

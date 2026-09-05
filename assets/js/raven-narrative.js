@@ -13,6 +13,14 @@
     document.head.appendChild(css);
   }
 
+  if (!q('link[data-raven-transplant]')) {
+    const css = document.createElement('link');
+    css.rel = 'stylesheet';
+    css.href = '/raventrace-my/assets/css/raven-case-transplant.css?v=1.0.0';
+    css.dataset.ravenTransplant = 'true';
+    document.head.appendChild(css);
+  }
+
   const cards = [
     {
       tone: 'amber', label: 'Audit ≠ penyiasatan jenayah', verdict: 'KESIMPULAN TERLALU JAUH',
@@ -62,7 +70,7 @@
   section.className = 'case-section';
   section.id = 'narrative-audit';
   section.innerHTML = `
-    <div class="section-marker"><span>10</span><p>Narrative forensics · Lexicon</p></div>
+    <div class="section-marker"><span>N1</span><p>Narrative forensics · Lexicon</p></div>
     <h2>Orang kata. Ini rekodnya.</h2>
     <p class="section-lead">Raven semak ayat yang nampak meyakinkan, kemudian asingkan apa yang benar, apa yang hilang daripada konteks, dan di mana kesimpulan melompat lebih jauh daripada bukti.</p>
     <div class="narrative-intro"><span>Dakwaan</span><i>→</i><span>Rekod</span><i>→</i><span>Konteks hilang</span><i>→</i><span>Verdict</span></div>

@@ -23,7 +23,7 @@
   qa('.footer-nav').forEach((footerNav) => {
     if (q('a[href*="/investigations/"]', footerNav)) return;
     const link = document.createElement('a');
-    link.href = '/raventrace-my/investigations/rci-tabung-haji/';
+    link.href = '/raventrace-my/investigations/';
     link.textContent = 'Siasatan';
     const newsroom = q('a[href*="/news/"]', footerNav);
     if (newsroom) newsroom.insertAdjacentElement('afterend', link);
@@ -100,10 +100,18 @@
 
   if (!q('script[data-raven-share]')) {
     const share = document.createElement('script');
-    share.src = '/raventrace-my/assets/js/raven-share.js?v=1.0.0';
+    share.src = '/raventrace-my/assets/js/raven-share.js?v=2.1.0';
     share.defer = true;
     share.dataset.ravenShare = 'true';
     document.head.appendChild(share);
+  }
+
+  if (!q('script[data-raven-publication]')) {
+    const publication = document.createElement('script');
+    publication.src = '/raventrace-my/assets/js/raven-publication.js?v=1.1.0';
+    publication.defer = true;
+    publication.dataset.ravenPublication = 'true';
+    document.head.appendChild(publication);
   }
 
   if (window.location.pathname.includes('/raventrace-my/investigations/rci-tabung-haji') && !q('script[data-raven-narrative]')) {

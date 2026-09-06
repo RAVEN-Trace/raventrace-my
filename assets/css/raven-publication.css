@@ -1,4 +1,4 @@
-/* RAVEN publication architecture v1.0 — story first, evidence one click away */
+/* RAVEN publication architecture v1.1 — story first, evidence one click away */
 
 /* Public investigation desk */
 .investigation-desk-hero{padding:clamp(3rem,7vw,6.2rem) 0;background:#080b0f;color:#f6f8fa;border-bottom:1px solid #28333d}
@@ -38,6 +38,12 @@
 /* Publisher framing */
 .publication-disclosure{margin-top:1rem;padding:.85rem 1rem;border-left:4px solid var(--cyan-bright);background:#101820;color:#c6d0d7;font-size:.82rem;line-height:1.55}
 .publication-disclosure strong{color:#fff}
+
+/* Paint long evidence/news lists only when they approach the viewport. No content is removed. */
+@supports(content-visibility:auto){
+  .timeline-item,.update-card,.trace-card,.person-card,details.investment,.narrative-card,#sources [id^="s"]{content-visibility:auto;contain-intrinsic-size:auto 260px}
+  .case-section{contain:layout style paint}
+}
 
 @media(max-width:860px){
   .investigation-grid{grid-template-columns:1fr}

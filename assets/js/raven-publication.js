@@ -1,15 +1,16 @@
 (() => {
-  if (window.__RAVEN_PUBLICATION_V1__) return;
-  window.__RAVEN_PUBLICATION_V1__ = true;
+  if (window.__RAVEN_PUBLICATION_V1_1__) return;
+  window.__RAVEN_PUBLICATION_V1_1__ = true;
 
   const q = (s, r = document) => r.querySelector(s);
   const qa = (s, r = document) => [...r.querySelectorAll(s)];
   const investigationIndex = '/raventrace-my/investigations/';
+  document.documentElement.dataset.ravenRelease = 'publication-1.1';
 
   if (!q('link[data-raven-publication]')) {
     const css = document.createElement('link');
     css.rel = 'stylesheet';
-    css.href = '/raventrace-my/assets/css/raven-publication.css?v=1.0.0';
+    css.href = '/raventrace-my/assets/css/raven-publication.css?v=1.1.0';
     css.dataset.ravenPublication = 'true';
     document.head.appendChild(css);
   }
@@ -39,6 +40,14 @@
   }
 
   if (isCase) {
+    if (!q('script[data-raven-source-room]')) {
+      const sourceRoom = document.createElement('script');
+      sourceRoom.src = '/raventrace-my/assets/js/raven-source-room.js?v=1.0.0';
+      sourceRoom.defer = true;
+      sourceRoom.dataset.ravenSourceRoom = 'true';
+      document.head.appendChild(sourceRoom);
+    }
+
     const row = q('.case-hero .btn-row');
     if (row && !q('.raven-quick-read', row)) {
       const quick = document.createElement('a');

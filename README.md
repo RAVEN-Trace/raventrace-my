@@ -10,29 +10,19 @@ Investigate deeply, separate fact from claim and political narrative, then expla
 
 Public-facing output should be understandable to teenagers, older readers and people without specialist legal, financial or technical knowledge.
 
-## Site structure
+## Publication architecture
 
-- `/` — lead investigation and newsroom front page
+**Story first → evidence one click away → full CASEFILE for audit.**
+
+- `/` — lead investigation and publication front page
 - `/news/` — latest verified development desk
 - `/news/YYYY/MM/DD/<story>/` — dedicated static story pages for material updates and social sharing
-- `/investigations/` — Investigation Desk / index of active CASEFILEs
-- `/investigations/rci-tabung-haji/` — auditable CASEFILE for the current lead investigation
+- `/investigations/` — Investigation Desk containing current and future CASEFILEs
+- `/investigations/rci-tabung-haji/` — auditable RCI Tabung Haji CASEFILE
 - `/methodology/` — evidence labels, source grading, human-clarity rules and source-link standard
 - `/tips/` — source-safety guidance and channel status
 - `/corrections/` — public correction ledger
-- `/about/` — mission, editorial identity, publisher disclosure and principles
-
-## Publication architecture
-
-RAVEN-Trace follows a **story first → evidence one click away → full CASEFILE for audit** model.
-
-- **Homepage / Newsroom** — what changed and why it matters.
-- **Dedicated story** — one development explained in public-readable language with status, limits and source links.
-- **Investigation Desk** — index of active long-form investigations.
-- **CASEFILE** — timeline, people/status ledger, financial records, disputed points, unknowns and evidence controls.
-- **Source Room** — direct route back to material public sources.
-
-The public site should not force a casual reader to understand the full forensic framework before they can understand a story.
+- `/about/` — mission, editorial identity and accountability framing
 
 ## Editorial method
 
@@ -50,6 +40,16 @@ Public explanation: **Apa berlaku → apa buktinya → apa yang belum tahu → k
 - If no public source is available, say so. Do not invent a source link.
 - Source protection, privacy and safety override public-link requirements for confidential material.
 
+## Source Room Navigator
+
+The active CASEFILE Source Room includes a client-side navigator that leaves the underlying evidence ledger intact while making it easier to use on mobile.
+
+- Search by source ID, name, organisation, keyword or URL/domain.
+- Filter by **Primer / rasmi**, **Mahkamah**, **Penguatkuasaan**, **Media** or **Analisis**.
+- Filter by evidence grade when the row exposes an A–X grade.
+- Direct links such as `#s31` automatically reveal the relevant source even when a filter is active.
+- Source-type tags are navigation aids only. They do not replace the A–X evidence grade and do not expand what a source can prove.
+
 ## Share System v2.1
 
 Material story cards receive a compact share toolbar.
@@ -59,11 +59,16 @@ Material story cards receive a compact share toolbar.
 - **Salin** copies headline, summary, status, original source when available, and the Raven URL.
 - **Artikel** appears when that update has a dedicated static story page.
 - **Sumber** opens the original reporting/source rather than a social-share service.
-- Dedicated story pages now also expose direct **WhatsApp / Salin ringkasan / Sumber asal** controls below the main share action.
-- Story pages use dedicated canonical URLs plus `og:title`, `og:description`, `og:image`, `og:type=article`, Twitter card metadata and article timestamps where relevant.
-- The share map routes matching Homepage and Newsroom cards to the dedicated story URL; other evidence items keep stable deep anchors.
+- Story pages use dedicated canonical URLs plus article-level Open Graph metadata and timestamps where relevant.
+- Matching Homepage and Newsroom cards route to the dedicated story URL; other evidence items keep stable deep anchors.
 
 Initial dedicated story pages cover the 6 September Jamil Khir remand checkpoint, 5 September transparency vox-pop, Madinah–Rashid disputed record, THP Bina RM72,000 court case, and governance-reform progress.
+
+## Performance policy
+
+Long lists use progressive rendering hints so off-screen cards and evidence rows do not need to be fully painted immediately. This reduces rendering work without removing content, changing source order or weakening deep-link access.
+
+Source-photo enrichment remains editorial context only and is not evidence. The longer-term performance target is to move source-image metadata resolution from reader-time requests to publication-time metadata wherever practical.
 
 ## Evidence-reconciliation rule
 
@@ -87,7 +92,9 @@ Deploy from the `main` branch and repository root (`/`). The project-site path i
 
 Public evidence room revised **6 September 2026**.
 
-The RCI Tabung Haji investigation is at **CASEFILE v16**, with the rendered evidence layer reconciled through **6 September 2026 MYT**. Current work includes the 6 September Jamil Khir remand checkpoint, 5 September public-transparency reporting, governance reform progress, disputed Al-Rawda impairment metrics, the public correction ledger, dedicated article-level social metadata, the Investigation Desk, and the publication-architecture pass.
+RAVEN-Trace now operates as a publication rather than a single-case dashboard: Newsroom for developments, dedicated story pages for readers and sharing, an Investigation Desk for CASEFILE discovery, and the CASEFILE/Source Room layer for audit.
+
+The RCI Tabung Haji investigation remains at **CASEFILE v16**, reconciled through **6 September 2026 MYT**. Current work includes the Jamil Khir remand checkpoint, transparency reporting, governance reform progress, disputed Al-Rawda metrics, the public correction ledger, Share System v2.1, and the Source Room Navigator.
 
 The site records reconciliation corrections including **211 pages rather than 252** for the public RCI report, **30 July rather than 31 July** for announcement of the MACC special task force, and separation of expected/proposed charges from charges actually read in court.
 

@@ -9,12 +9,12 @@ STORIES = [
     {
         'path': 'news/2026/09/06/jamil-khir-reman-checkpoint/index.html',
         'image': 'jamil-khir-reman-20260906-v1.jpg',
-        'headline': 'Reman Jamil Khir tamat 6 Sep — status seterusnya belum disahkan',
-        'description': 'Reman lima hari dijadual berakhir 6 September. Setakat semakan RAVEN-Trace, belum ada rekod awam yang mengesahkan pembebasan, lanjutan reman atau pertuduhan.',
-        'alt': 'RAVEN-Trace News Card: reman Jamil Khir tamat 6 September, status seterusnya belum disahkan',
+        'headline': 'Reman Jamil Khir disambung dua hari hingga 8 Sep',
+        'description': 'Mahkamah Majistret Putrajaya membenarkan permohonan SPRM menyambung reman dua hari lagi, dari 7 hingga 8 September 2026. Reman bukan pertuduhan atau sabitan.',
+        'alt': 'RAVEN-Trace News Card: reman Jamil Khir disambung hingga 8 September, belum didakwa',
         'canonical': 'https://raven-trace.github.io/raventrace-my/news/2026/09/06/jamil-khir-reman-checkpoint/',
         'published': '2026-09-06T06:00:00+08:00',
-        'modified': '2026-09-06T14:20:00+08:00',
+        'modified': '2026-09-07T01:55:00+08:00',
     },
     {
         'path': 'news/2026/09/05/ketelusan-siasatan-tabung-haji/index.html',

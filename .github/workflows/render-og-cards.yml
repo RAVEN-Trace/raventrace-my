@@ -4,6 +4,7 @@ on:
   push:
     paths:
       - 'scripts/render_og_cards.py'
+      - 'scripts/apply_og_metadata.py'
       - '.github/workflows/render-og-cards.yml'
   workflow_dispatch:
 
@@ -28,11 +29,16 @@ jobs:
       - name: Render 1200x630 cards
         run: python scripts/render_og_cards.py
 
-      - name: Verify generated assets
+      - name: Apply static OG metadata
+        run: python scripts/apply_og_metadata.py
+
+      - name: Verify Phase 2B outputs
         run: |
           python - <<'PY'
           from PIL import Image
           from pathlib import Path
+          import re
+
           out = Path('assets/og')
           files = sorted(out.glob('*.jpg'))
           assert len(files) == 5, f'expected 5 cards, got {len(files)}'
@@ -41,16 +47,35 @@ jobs:
               assert im.size == (1200, 630), (p, im.size)
               assert p.stat().st_size < 300_000, (p, p.stat().st_size)
               print(p, im.size, p.stat().st_size)
+
+          pages = sorted(Path('news/2026/09').glob('**/index.html'))
+          phase2b = [p for p in pages if '/'.join(p.parts[-3:-1]) in {
+              '06/jamil-khir-reman-checkpoint',
+              '05/ketelusan-siasatan-tabung-haji',
+              '04/madinah-rashid-rekod-bercanggah',
+              '03/reformasi-tadbir-urus-tabung-haji',
+              '03/thp-bina-rm72000',
+          }]
+          assert len(phase2b) == 5, len(phase2b)
+          for p in phase2b:
+              text = p.read_text(encoding='utf-8')
+              assert 'og:image:width" content="1200' in text
+              assert 'og:image:height" content="630' in text
+              assert 'twitter:image' in text
+              assert 'application/ld+json' in text
+              assert '/assets/og/' in text
+              assert len(re.findall(r'property=["\']og:image["\']', text)) == 1, p
+              print('metadata ok', p)
           PY
 
-      - name: Commit generated cards
+      - name: Commit generated cards and metadata
         run: |
           git config user.name "RAVEN-Trace Bot"
           git config user.email "actions@users.noreply.github.com"
-          git add assets/og/*.jpg
+          git add assets/og/*.jpg news/2026/09/*/*/index.html
           if git diff --cached --quiet; then
-            echo "No OG changes"
+            echo "No Phase 2B changes"
             exit 0
           fi
-          git commit -m "Render Phase 2B social news cards"
+          git commit -m "Publish Phase 2B social news cards"
           git push

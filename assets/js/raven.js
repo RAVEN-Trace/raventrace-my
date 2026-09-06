@@ -100,9 +100,17 @@
     document.head.appendChild(sheet);
   }
 
+  if (!q('script[data-raven-analytics]')) {
+    const analytics = document.createElement('script');
+    analytics.src = '/raventrace-my/assets/js/raven-analytics.js?v=1.0.0';
+    analytics.defer = true;
+    analytics.dataset.ravenAnalytics = 'true';
+    document.head.appendChild(analytics);
+  }
+
   if (!q('script[data-raven-share]')) {
     const share = document.createElement('script');
-    share.src = '/raventrace-my/assets/js/raven-share.js?v=2.1.0';
+    share.src = '/raventrace-my/assets/js/raven-share.js?v=2.2.0';
     share.defer = true;
     share.dataset.ravenShare = 'true';
     document.head.appendChild(share);

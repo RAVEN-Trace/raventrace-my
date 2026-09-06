@@ -161,9 +161,12 @@
       event.preventDefault();
       event.stopPropagation();
       const payload = payloadFor(item);
+      const nativeText = [payload.summary];
+      if (payload.status) nativeText.push(`Status: ${payload.status}`);
+      if (payload.source) nativeText.push(`Sumber asal: ${payload.source}`);
       try {
         if (navigator.share) {
-          await navigator.share({ title: payload.title, text: `${payload.summary}${payload.status ? `\n\nStatus: ${payload.status}` : ''}`, url: payload.url });
+          await navigator.share({ title: payload.title, text: nativeText.join('\n\n'), url: payload.url });
           feedback(bar, 'Share sheet dibuka');
         } else {
           await copyText(payload.text);
@@ -176,11 +179,16 @@
 
     const wa = document.createElement('a');
     wa.className = 'raven-share-link';
-    wa.href = `https://wa.me/?text=${encodeURIComponent(payloadFor(item).text)}`;
+    wa.href = '#';
     wa.target = '_blank';
     wa.rel = 'noopener noreferrer';
     wa.innerHTML = `${icon('wa')}<span>WhatsApp</span>`;
-    wa.addEventListener('click', (event) => event.stopPropagation());
+    wa.addEventListener('click', (event) => {
+      event.preventDefault();
+      event.stopPropagation();
+      const payload = payloadFor(item);
+      window.open(`https://wa.me/?text=${encodeURIComponent(payload.text)}`, '_blank', 'noopener,noreferrer');
+    });
 
     const copy = document.createElement('button');
     copy.type = 'button';

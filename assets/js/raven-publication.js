@@ -15,7 +15,6 @@
     document.head.appendChild(css);
   }
 
-  /* Siasatan is a desk, not a synonym for one case. */
   qa('.site-nav a, .footer-nav a').forEach((link) => {
     const label = (link.textContent || '').trim().toLowerCase();
     if (label !== 'siasatan') return;
@@ -42,7 +41,7 @@
   if (isCase) {
     if (!q('script[data-raven-source-room]')) {
       const sourceRoom = document.createElement('script');
-      sourceRoom.src = '/raventrace-my/assets/js/raven-source-room.js?v=1.0.0';
+      sourceRoom.src = '/raventrace-my/assets/js/raven-source-room.js?v=1.1.0';
       sourceRoom.defer = true;
       sourceRoom.dataset.ravenSourceRoom = 'true';
       document.head.appendChild(sourceRoom);
@@ -78,7 +77,6 @@
     }
   }
 
-  /* Late source-image failures should restore the person fallback instead of leaving a blank card. */
   const restorePersonFallback = (img) => {
     const figure = img.closest('.person-source-visual');
     const card = img.closest('.person-card');

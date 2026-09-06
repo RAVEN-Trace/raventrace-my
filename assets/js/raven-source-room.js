@@ -1,6 +1,6 @@
 (() => {
-  if (window.__RAVEN_SOURCE_ROOM_V1_1__) return;
-  window.__RAVEN_SOURCE_ROOM_V1_1__ = true;
+  if (window.__RAVEN_SOURCE_ROOM_V1_1_1__) return;
+  window.__RAVEN_SOURCE_ROOM_V1_1_1__ = true;
 
   if (!document.querySelector('link[data-raven-source-room]')) {
     const sheet = document.createElement('link');
@@ -52,8 +52,9 @@
     if (/rci|royal commission|suruhanjaya siasatan diraja|hansard|parlimen|akta|kementerian|kerajaan|minister|menteri/.test(text) && isOfficialHost(host)) tags.add('government');
 
     const gradeNode = q('.source-grade, [data-grade]', entry);
-    const gradeText = clean(gradeNode?.textContent || entry.getAttribute('data-grade') || '');
-    const gradeMatch = gradeText.match(/\b([A-E]|X)\b/i) || clean(entry.textContent).match(/\bGred\s*([A-E]|X)\b/i);
+    const firstSpan = q(':scope > span', entry);
+    const gradeText = clean(gradeNode?.textContent || entry.getAttribute('data-grade') || firstSpan?.textContent || '');
+    const gradeMatch = gradeText.match(/^([A-E]|X)$/i) || clean(entry.textContent).match(/\bGred\s*([A-E]|X)\b/i);
     const grade = gradeMatch ? gradeMatch[1].toUpperCase() : '';
 
     entry.dataset.ravenSourceEntry = 'true';

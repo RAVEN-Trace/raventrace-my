@@ -1,6 +1,6 @@
 (() => {
-  if (window.__RAVEN_SHARE_V2__) return;
-  window.__RAVEN_SHARE_V2__ = true;
+  if (window.__RAVEN_SHARE_V2_1__) return;
+  window.__RAVEN_SHARE_V2_1__ = true;
 
   const q = (s, r = document) => r.querySelector(s);
   const qa = (s, r = document) => [...r.querySelectorAll(s)];
@@ -8,9 +8,17 @@
   if (!q('link[data-raven-share]')) {
     const css = document.createElement('link');
     css.rel = 'stylesheet';
-    css.href = '/raventrace-my/assets/css/raven-share.css?v=1.0.0';
+    css.href = '/raventrace-my/assets/css/raven-share.css?v=1.1.0';
     css.dataset.ravenShare = 'true';
     document.head.appendChild(css);
+  }
+
+  if (!q('script[data-raven-publication]')) {
+    const publication = document.createElement('script');
+    publication.src = '/raventrace-my/assets/js/raven-publication.js?v=1.0.0';
+    publication.defer = true;
+    publication.dataset.ravenPublication = 'true';
+    document.head.appendChild(publication);
   }
 
   const selectors = [
@@ -82,6 +90,19 @@
     return { title, summary, status, source, url, storyUrl, text: lines.join('\n\n') };
   };
 
+  const storyPagePayload = () => {
+    const title = cleanText(q('.story-hero h1')?.textContent || document.title);
+    const summary = trimText(q('.story-dek')?.textContent || q('meta[name="description"]')?.content || '', 300);
+    const status = cleanText(q('.story-hero .status')?.textContent || '');
+    const source = q('.story-source-list a[href^="http"]')?.href || '';
+    const url = canonicalBase();
+    const lines = [`RAVEN-Trace | ${title}`, summary];
+    if (status) lines.push(`Status: ${status}`);
+    if (source) lines.push(`Sumber asal: ${source}`);
+    lines.push(`Baca artikel: ${url}`);
+    return { title, summary, status, source, url, text: lines.join('\n\n') };
+  };
+
   const icon = (name) => {
     if (name === 'share') return '<svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M18 16a3 3 0 0 0-2.4 1.2L8.9 13.8a3 3 0 0 0 0-3.6l6.7-3.4A3 3 0 1 0 15 5c0 .2 0 .4.1.6L8.4 9A3 3 0 1 0 8 15l7.1 3.6A3 3 0 1 0 18 16Z"/></svg>';
     if (name === 'copy') return '<svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M8 7V4h10v12h-3v3H5V7h3Zm2 0h5v7h1V6h-6v1Zm3 4H7v6h6v-6Z"/></svg>';
@@ -113,9 +134,57 @@
     else item.appendChild(bar);
   };
 
+  const buildStoryBar = () => {
+    if (!document.body.classList.contains('story-page') || q('.story-actions .raven-story-sharebar')) return;
+    const actions = q('.story-actions');
+    if (!actions) return;
+    const bar = document.createElement('div');
+    bar.className = 'raven-sharebar raven-story-sharebar';
+    bar.setAttribute('aria-label', 'Kongsi artikel ini');
+
+    const wa = document.createElement('a');
+    wa.className = 'raven-share-link';
+    wa.href = '#';
+    wa.target = '_blank';
+    wa.rel = 'noopener noreferrer';
+    wa.innerHTML = `${icon('wa')}<span>WhatsApp</span>`;
+    wa.addEventListener('click', (event) => {
+      event.preventDefault();
+      const payload = storyPagePayload();
+      window.open(`https://wa.me/?text=${encodeURIComponent(payload.text)}`, '_blank', 'noopener,noreferrer');
+    });
+
+    const copy = document.createElement('button');
+    copy.type = 'button';
+    copy.className = 'raven-share-btn';
+    copy.innerHTML = `${icon('copy')}<span>Salin ringkasan</span>`;
+    copy.addEventListener('click', async () => {
+      try { await copyText(storyPagePayload().text); feedback(bar, 'Ringkasan + link disalin'); }
+      catch { feedback(bar, 'Salin gagal'); }
+    });
+
+    bar.append(wa, copy);
+    const source = storyPagePayload().source;
+    if (source) {
+      const sourceLink = document.createElement('a');
+      sourceLink.className = 'raven-share-link';
+      sourceLink.href = source;
+      sourceLink.target = '_blank';
+      sourceLink.rel = 'noopener noreferrer';
+      sourceLink.textContent = 'Sumber asal';
+      bar.appendChild(sourceLink);
+    }
+    const status = document.createElement('span');
+    status.className = 'raven-share-feedback';
+    status.setAttribute('aria-live', 'polite');
+    bar.appendChild(status);
+    actions.appendChild(bar);
+  };
+
   const decorateAll = () => {
     const seen = new Set();
     selectors.forEach((selector) => qa(selector).forEach((item, index) => { if (seen.has(item)) return; seen.add(item); stableIdFor(item, index); buildBar(item); }));
+    buildStoryBar();
     const hash = decodeURIComponent(location.hash.replace(/^#/, ''));
     if (hash) { const target = document.getElementById(hash); if (target) { if (target.matches('details')) target.open = true; target.classList.add('raven-share-target'); setTimeout(() => target.scrollIntoView({ behavior: 'smooth', block: 'start' }), 80); } }
   };

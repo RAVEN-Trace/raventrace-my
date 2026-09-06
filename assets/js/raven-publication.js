@@ -41,7 +41,7 @@
   if (isCase) {
     if (!q('script[data-raven-source-room]')) {
       const sourceRoom = document.createElement('script');
-      sourceRoom.src = '/raventrace-my/assets/js/raven-source-room.js?v=1.1.0';
+      sourceRoom.src = '/raventrace-my/assets/js/raven-source-room.js?v=1.1.1';
       sourceRoom.defer = true;
       sourceRoom.dataset.ravenSourceRoom = 'true';
       document.head.appendChild(sourceRoom);

@@ -1,0 +1,48 @@
+name: Enable RAVEN analytics loader
+
+on:
+  push:
+    paths:
+      - '.github/workflows/enable-raven-analytics.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Patch runtime loader
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          p = Path('assets/js/raven.js')
+          text = p.read_text(encoding='utf-8')
+          text = text.replace('/raventrace-my/assets/js/raven-share.js?v=2.1.0', '/raventrace-my/assets/js/raven-share.js?v=2.2.0')
+          marker = "  if (!q('script[data-raven-share]')) {\n"
+          analytics = """  if (!q('script[data-raven-analytics]')) {\n    const analytics = document.createElement('script');\n    analytics.src = '/raventrace-my/assets/js/raven-analytics.js?v=1.0.0';\n    analytics.defer = true;\n    analytics.dataset.ravenAnalytics = 'true';\n    document.head.appendChild(analytics);\n  }\n\n"""
+          if analytics not in text:
+              if marker not in text:
+                  raise SystemExit('share loader marker not found')
+              text = text.replace(marker, analytics + marker, 1)
+          p.write_text(text, encoding='utf-8')
+          print('raven.js analytics loader enabled')
+          PY
+      - name: Verify runtime markers
+        run: |
+          grep -q 'raven-analytics.js?v=1.0.0' assets/js/raven.js
+          grep -q 'raven-share.js?v=2.2.0' assets/js/raven.js
+          grep -q 'RAVEN_ANALYTICS_V1' assets/js/raven-analytics.js
+          grep -q 'RAVEN_SHARE_V2_2' assets/js/raven-share.js
+      - name: Commit runtime update
+        run: |
+          git config user.name "RAVEN-Trace Bot"
+          git config user.email "actions@users.noreply.github.com"
+          git add assets/js/raven.js
+          if git diff --cached --quiet; then
+            echo "No runtime changes"
+            exit 0
+          fi
+          git commit -m "Load RAVEN analytics and Share System v2.2"
+          git push

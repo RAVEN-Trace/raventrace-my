@@ -98,6 +98,14 @@
     document.head.appendChild(sheet);
   }
 
+  if (!q('script[data-raven-share]')) {
+    const share = document.createElement('script');
+    share.src = '/raventrace-my/assets/js/raven-share.js?v=1.0.0';
+    share.defer = true;
+    share.dataset.ravenShare = 'true';
+    document.head.appendChild(share);
+  }
+
   if (window.location.pathname.includes('/raventrace-my/investigations/rci-tabung-haji') && !q('script[data-raven-narrative]')) {
     const specialist = document.createElement('script');
     specialist.src = '/raventrace-my/assets/js/raven-narrative.js?v=1.1.0';

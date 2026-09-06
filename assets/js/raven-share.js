@@ -20,10 +20,15 @@
     '.person-card',
     'details.investment',
     '.narrative-card',
+    '#briefing .confidence-grid > article',
+    '#briefing .brief-grid > article',
+    '#status .institution-grid > article',
+    '#timeline .history-line > article',
     '#governance .control-grid > article',
     '#money .metric-grid > article',
     '#tracks .control-grid > article',
-    '#disputed-record .control-grid > article'
+    '#disputed-record .control-grid > article',
+    '#controls .control-grid > article'
   ];
 
   const cleanText = (value = '') => value.replace(/\s+/g, ' ').trim();
@@ -47,6 +52,7 @@
     q('h2', item)?.textContent ||
     q('summary strong', item)?.textContent ||
     q('strong', item)?.textContent ||
+    q('b', item)?.textContent ||
     'Kemas kini RAVEN-Trace'
   );
 

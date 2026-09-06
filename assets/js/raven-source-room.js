@@ -1,6 +1,6 @@
 (() => {
-  if (window.__RAVEN_SOURCE_ROOM_V1__) return;
-  window.__RAVEN_SOURCE_ROOM_V1__ = true;
+  if (window.__RAVEN_SOURCE_ROOM_V1_1__) return;
+  window.__RAVEN_SOURCE_ROOM_V1_1__ = true;
 
   if (!document.querySelector('link[data-raven-source-room]')) {
     const sheet = document.createElement('link');
@@ -24,10 +24,11 @@
     'sc.com.my'
   ];
 
-  const entries = qa('[id]', section).filter((node) => {
+  const findEntries = () => qa('[id]', section).filter((node) => {
     if (!/^s\d+$/i.test(node.id)) return false;
     return Boolean(q('a[href^="http"]', node));
   });
+  let entries = findEntries();
   if (!entries.length) return;
 
   const hostOf = (url) => {
@@ -161,6 +162,22 @@
     target.classList.add('raven-source-focus');
     setTimeout(() => target.classList.remove('raven-source-focus'), 2400);
   };
+
+  const refreshEntries = () => {
+    const found = findEntries();
+    if (found.length === entries.length && found.every((entry, index) => entry === entries[index])) return;
+    found.forEach((entry) => { if (entry.dataset.ravenSourceEntry !== 'true') classify(entry); });
+    entries = found;
+    apply();
+  };
+
+  let refreshTimer = null;
+  const sourceObserver = new MutationObserver((mutations) => {
+    if (!mutations.some((mutation) => mutation.addedNodes.length || mutation.removedNodes.length)) return;
+    clearTimeout(refreshTimer);
+    refreshTimer = setTimeout(refreshEntries, 80);
+  });
+  sourceObserver.observe(section, { childList: true, subtree: true });
 
   window.addEventListener('hashchange', revealHashTarget);
   apply();

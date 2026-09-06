@@ -34,14 +34,16 @@
   addSourceRow('s45','B','https://berita.rtm.gov.my/nasional/senarai-berita-nasional/senarai-artikel/pengurusan-tabung-haji-wajar-dikawal-selia-lebih-ketat-pm/','PM sokong kawal selia TH lebih ketat','RTM / Bernama · 4 Sep');
   addSourceRow('s46','B','https://berita.rtm.gov.my/nasional/senarai-berita-nasional/senarai-artikel/isu-th-rakyat-mahu-siasatan-sprm-dilaksana-secara-telus/','Beberapa responden mahu siasatan lebih telus','RTM · 5 Sep');
   addSourceRow('s47','E','https://www.malaymail.com/news/what-you-think/2026/09/05/what-happens-when-too-few-people-say-no-noor-adwa-sulaiman/233962','Analisis tadbir urus: semak dan imbang','Malay Mail · komentar · 5 Sep');
-  addSourceRow('s48','B','https://www.malaysiakini.com/news/783373','Reman Jamil Khir hingga 6 Sep','Malaysiakini · prosiding reman');
+  addSourceRow('s48','B','https://www.malaysiakini.com/news/783373','Reman awal Jamil Khir lima hari','Malaysiakini · 2 Sep');
+  addSourceRow('s49','B','https://web26.bernama.com/bm/jenayah_mahkamah/news.php?id=2603643','Reman bekas menteri disambung dua hari','Bernama · 6 Sep · Mahkamah Majistret Putrajaya');
+  addSourceRow('s50','B','https://bernama.com/radio/news.php?id=2602611','RM11.5b sukuk UJSB ialah pembiayaan semula','Bernama · 3 Sep');
 
   const heroDate = q('.case-hero .date-chip');
-  if (heroDate) heroDate.textContent = 'Data cut-off · 6 Sep 2026 · awal pagi MYT';
+  if (heroDate) heroDate.textContent = 'Data cut-off · 7 Sep 2026 · awal pagi MYT';
   const description = q('meta[name="description"]');
-  if (description) description.content = 'CASEFILE RCI Tabung Haji v16: RCI, penguatkuasaan, individu, 14 pelaburan, tadbir urus, UJSB, pertikaian rekod, jurang bukti dan sumber awam hingga 6 September 2026.';
+  if (description) description.content = 'CASEFILE RCI Tabung Haji v16: RCI, penguatkuasaan, individu, 14 pelaburan, tadbir urus, UJSB, pertikaian rekod, jurang bukti dan sumber awam hingga 7 September 2026.';
   const sourceNote = q('#sources .source-note');
-  if (sourceNote) sourceNote.innerHTML = '<strong>Data cut-off:</strong> 6 September 2026 · awal pagi MYT. <strong>Semakan laman:</strong> 6 September 2026. Kompilasi penyelidikan digunakan sebagai indeks kerja dan disemak silang dengan rekod awam; jika kompilasi bercanggah dengan rekod primer atau mahkamah, status dikekalkan sebagai disputed atau unknown sehingga disahkan.';
+  if (sourceNote) sourceNote.innerHTML = '<strong>Data cut-off:</strong> 7 September 2026 · awal pagi MYT. <strong>Semakan laman:</strong> 7 September 2026. Kompilasi penyelidikan digunakan sebagai indeks kerja dan disemak silang dengan rekod awam; jika kompilasi bercanggah dengan rekod primer atau mahkamah, status dikekalkan sebagai disputed atau unknown sehingga disahkan.';
 
   const docket = q('.case-rail section dl');
   if (docket && !q('[data-rci-pages]', docket)) {
@@ -54,12 +56,12 @@
   const jamil = qa('.person-card').find((card) => q('h3', card)?.textContent.includes('Jamil Khir'));
   if (jamil) {
     const status = q(':scope > div .status', jamil);
-    if (status) { status.className = 'status unknown'; status.textContent = 'Reman tamat · 6 Sep · outcome belum diumumkan'; }
+    if (status) { status.className = 'status process'; status.textContent = 'Reman disambung · hingga 8 Sep'; }
     const body = qa(':scope > p', jamil).find((p) => !p.classList.contains('role'));
-    if (body) body.textContent = 'Direman lima hari bagi membantu siasatan isu pajakan hotel TH di Arab Saudi. Tempoh reman dijadual berakhir 6 September. Setakat semakan awal pagi, belum ada rekod awam yang mengesahkan sama ada beliau dibebaskan, reman dilanjutkan atau akan didakwa.';
+    if (body) body.textContent = 'Selepas reman lima hari bermula 2 September, Mahkamah Majistret Putrajaya membenarkan sambungan dua hari bagi 7–8 September. SPRM menyatakan kes disiasat di bawah Seksyen 16(a)(A) Akta SPRM 2009. Reman bukan pertuduhan atau dapatan kesalahan.';
     const refs = qa('a[href^="#s"]', jamil);
-    if (!refs.some((a) => a.getAttribute('href') === '#s48')) {
-      const a = document.createElement('a'); a.href = '#s48'; a.textContent = 'S48'; jamil.append(' ', a);
+    if (!refs.some((a) => a.getAttribute('href') === '#s49')) {
+      const a = document.createElement('a'); a.href = '#s49'; a.textContent = 'S49'; jamil.append(' ', a);
     }
   }
 
@@ -71,7 +73,7 @@
     const card = document.createElement('article');
     card.className = 'trace-card';
     card.dataset.sep6Update = 'true';
-    card.innerHTML = '<div class="trace-head"><span>JEJAK / 00</span><time datetime="2026-09-06">6 Sep 2026 · awal pagi</time></div><div class="meta-row"><span class="status unknown">Checkpoint hari ini</span><span class="source-grade">Gred B</span></div><h3>Tempoh reman Jamil Khir berakhir hari ini; status seterusnya belum diumumkan.</h3><dl><div><dt>Apa diketahui?</dt><dd>Reman lima hari bermula 2 September dan dijadual berakhir 6 September.</dd></div><div><dt>Apa belum diketahui?</dt><dd>Belum ada rekod awam yang mengesahkan pembebasan, lanjutan reman atau pertuduhan.</dd></div><div><dt>Kenapa penting?</dt><dd>Tamat tempoh reman tidak boleh diterjemah secara automatik sebagai bebas daripada siasatan atau sebagai bakal didakwa.</dd></div></dl><p class="inline-sources"><a href="#s48">S48</a> <a href="#s22">S22</a></p>';
+    card.innerHTML = '<div class="trace-head"><span>JEJAK / 00</span><time datetime="2026-09-06">6 Sep 2026 · awal pagi</time></div><div class="meta-row"><span class="status unknown">Checkpoint hari ini</span><span class="source-grade">Gred B</span></div><h3>Mahkamah membenarkan sambungan reman bekas menteri dua hari hingga 8 September.</h3><dl><div><dt>Apa diketahui?</dt><dd>Reman disambung bagi 7–8 September selepas permohonan SPRM.</dd></div><div><dt>Asas siasatan?</dt><dd>SPRM menyatakan kes disiasat di bawah Seksyen 16(a)(A) Akta SPRM 2009.</dd></div><div><dt>Had</dt><dd>Reman bukan pertuduhan atau sabitan; tindakan selepas 8 September masih belum diketahui.</dd></div></dl><p class="inline-sources"><a href="#s49">S49</a> <a href="#s22">S22</a></p>';
     stack.prepend(card);
   }
 

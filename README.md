@@ -113,11 +113,11 @@ Deploy from the `main` branch and repository root (`/`). The project-site path i
 
 ## Status
 
-Public evidence room revised **6 September 2026**.
+Public evidence room revised **7 September 2026**.
 
 RAVEN-Trace now operates as a publication rather than a single-case dashboard: Newsroom for developments, dedicated story pages for readers and sharing, an Investigation Desk for CASEFILE discovery, and the CASEFILE/Source Room layer for audit.
 
-The RCI Tabung Haji investigation remains at **CASEFILE v16**, reconciled through **6 September 2026 MYT**. Current publication infrastructure includes the Jamil Khir remand checkpoint, transparency reporting, governance reform progress, disputed Al-Rawda metrics, the public correction ledger, Share System v2.1, Source Room Navigator and **Phase 2B dedicated social news cards**.
+The RCI Tabung Haji investigation is now at **CASEFILE v17**, reconciled through **7 September 2026 · early morning MYT**. Current publication infrastructure includes the Jamil Khir remand extension through 8 September, transparency reporting, governance reform progress, UJSB refinancing context, disputed Al-Rawda metrics, the public correction ledger, Share System v2.1, Source Room Navigator and **Phase 2B dedicated social news cards**.
 
 The site records reconciliation corrections including **211 pages rather than 252** for the public RCI report, **30 July rather than 31 July** for announcement of the MACC special task force, and separation of expected/proposed charges from charges actually read in court.
 

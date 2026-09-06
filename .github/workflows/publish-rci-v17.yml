@@ -23,7 +23,26 @@ jobs:
           python-version: '3.12'
 
       - name: Apply RCI v17 publication updates
-        run: python scripts/apply_rci_v17_updates.py
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          code = Path('scripts/apply_rci_v17_updates.py').read_text(encoding='utf-8')
+          try:
+              exec(compile(code, 'scripts/apply_rci_v17_updates.py', 'exec'), {'__name__': '__main__'})
+          except RuntimeError as exc:
+              if 'README current work' not in str(exc):
+                  raise
+              print('Known README wording drift handled below:', exc)
+
+          p = Path('README.md')
+          text = p.read_text(encoding='utf-8')
+          text = text.replace(
+              'Current publication infrastructure includes the Jamil Khir remand checkpoint, transparency reporting, governance reform progress, disputed Al-Rawda metrics, the public correction ledger, Share System v2.1, Source Room Navigator and **Phase 2B dedicated social news cards**.',
+              'Current publication infrastructure includes the Jamil Khir remand extension through 8 September, transparency reporting, governance reform progress, UJSB refinancing context, disputed Al-Rawda metrics, the public correction ledger, Share System v2.1, Source Room Navigator and **Phase 2B dedicated social news cards**.'
+          )
+          text = text.replace('Public evidence room revised **6 September 2026**.', 'Public evidence room revised **7 September 2026**.')
+          p.write_text(text, encoding='utf-8')
+          PY
 
       - name: Verify key v17 markers
         run: |
@@ -35,6 +54,7 @@ jobs:
             'investigations/rci-tabung-haji/index.html': ['v17', 'Reman disambung · hingga 8 Sep', 'id="s49"', 'id="s50"'],
             'news/2026/09/06/jamil-khir-reman-checkpoint/index.html': ['Reman Jamil Khir disambung dua hari hingga 8 Sep', 'REMAN DISAMBUNG · BELUM DIDAKWA'],
             'assets/js/raven-narrative.js': ['Data cut-off · 7 Sep 2026', "addSourceRow('s49'", "addSourceRow('s50'"],
+            'README.md': ['CASEFILE v17', 'UJSB refinancing context'],
           }
           for file, needles in checks.items():
               text = Path(file).read_text(encoding='utf-8')

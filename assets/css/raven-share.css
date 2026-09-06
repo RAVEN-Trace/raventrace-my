@@ -1,4 +1,4 @@
-/* RAVEN Share System v1.0 — compact, mobile-first, evidence-aware */
+/* RAVEN Share System v2.1 — compact, mobile-first, evidence-aware */
 .raven-sharebar{display:flex;flex-wrap:wrap;align-items:center;gap:.45rem;margin-top:1rem;padding-top:.75rem;border-top:1px solid rgba(91,110,124,.22)}
 .raven-sharebar.compact{margin-top:.75rem;padding-top:.6rem}
 .raven-share-btn,.raven-share-link{appearance:none;display:inline-flex;align-items:center;justify-content:center;gap:.35rem;min-height:34px;padding:.45rem .68rem;border:1px solid #b7c6cf;background:#fff;color:#17232b;text-decoration:none;font:800 .68rem/1 var(--sans);letter-spacing:.01em;cursor:pointer}
@@ -20,8 +20,13 @@
 .trace-card>.raven-sharebar,.person-card>.raven-sharebar,.update-card>.raven-sharebar,.narrative-card>.raven-sharebar{margin-top:auto}
 .investment-body>.raven-sharebar{grid-column:1/-1}
 
+/* Dedicated story page: the primary native-share button remains, with direct WhatsApp/copy/source controls underneath. */
+.story-actions .raven-story-sharebar{flex:1 0 100%;margin-top:.45rem;padding-top:.65rem;border-top:1px solid #d1ccc3}
+.story-actions .raven-story-sharebar .raven-share-feedback{margin-left:.15rem}
+
 @media(max-width:620px){
   .raven-sharebar{gap:.38rem;margin-top:.8rem;padding-top:.62rem}
   .raven-share-btn,.raven-share-link{min-height:32px;padding:.4rem .58rem;font-size:.64rem}
   .raven-share-feedback{font-size:.61rem}
+  .story-actions .raven-story-sharebar{margin-top:.3rem}
 }

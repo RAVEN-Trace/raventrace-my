@@ -15,11 +15,24 @@ Public-facing output should be understandable to teenagers, older readers and pe
 - `/` — lead investigation and newsroom front page
 - `/news/` — latest verified development desk
 - `/news/YYYY/MM/DD/<story>/` — dedicated static story pages for material updates and social sharing
-- `/investigations/rci-tabung-haji/` — auditable CASEFILE
+- `/investigations/` — Investigation Desk / index of active CASEFILEs
+- `/investigations/rci-tabung-haji/` — auditable CASEFILE for the current lead investigation
 - `/methodology/` — evidence labels, source grading, human-clarity rules and source-link standard
 - `/tips/` — source-safety guidance and channel status
 - `/corrections/` — public correction ledger
-- `/about/` — mission, identity and editorial principles
+- `/about/` — mission, editorial identity, publisher disclosure and principles
+
+## Publication architecture
+
+RAVEN-Trace follows a **story first → evidence one click away → full CASEFILE for audit** model.
+
+- **Homepage / Newsroom** — what changed and why it matters.
+- **Dedicated story** — one development explained in public-readable language with status, limits and source links.
+- **Investigation Desk** — index of active long-form investigations.
+- **CASEFILE** — timeline, people/status ledger, financial records, disputed points, unknowns and evidence controls.
+- **Source Room** — direct route back to material public sources.
+
+The public site should not force a casual reader to understand the full forensic framework before they can understand a story.
 
 ## Editorial method
 
@@ -37,7 +50,7 @@ Public explanation: **Apa berlaku → apa buktinya → apa yang belum tahu → k
 - If no public source is available, say so. Do not invent a source link.
 - Source protection, privacy and safety override public-link requirements for confidential material.
 
-## Share System v2
+## Share System v2.1
 
 Material story cards receive a compact share toolbar.
 
@@ -46,6 +59,7 @@ Material story cards receive a compact share toolbar.
 - **Salin** copies headline, summary, status, original source when available, and the Raven URL.
 - **Artikel** appears when that update has a dedicated static story page.
 - **Sumber** opens the original reporting/source rather than a social-share service.
+- Dedicated story pages now also expose direct **WhatsApp / Salin ringkasan / Sumber asal** controls below the main share action.
 - Story pages use dedicated canonical URLs plus `og:title`, `og:description`, `og:image`, `og:type=article`, Twitter card metadata and article timestamps where relevant.
 - The share map routes matching Homepage and Newsroom cards to the dedicated story URL; other evidence items keep stable deep anchors.
 
@@ -73,7 +87,7 @@ Deploy from the `main` branch and repository root (`/`). The project-site path i
 
 Public evidence room revised **6 September 2026**.
 
-The RCI Tabung Haji investigation is at **CASEFILE v16**, with the rendered evidence layer reconciled through **6 September 2026 MYT**. Current work includes the 6 September Jamil Khir remand checkpoint, 5 September public-transparency reporting, governance reform progress, disputed Al-Rawda impairment metrics, the public correction ledger, and Share System v2 with dedicated article-level social metadata.
+The RCI Tabung Haji investigation is at **CASEFILE v16**, with the rendered evidence layer reconciled through **6 September 2026 MYT**. Current work includes the 6 September Jamil Khir remand checkpoint, 5 September public-transparency reporting, governance reform progress, disputed Al-Rawda impairment metrics, the public correction ledger, dedicated article-level social metadata, the Investigation Desk, and the publication-architecture pass.
 
 The site records reconciliation corrections including **211 pages rather than 252** for the public RCI report, **30 July rather than 31 July** for announcement of the MACC special task force, and separation of expected/proposed charges from charges actually read in court.
 

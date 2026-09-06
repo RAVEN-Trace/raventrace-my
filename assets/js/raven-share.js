@@ -1,6 +1,6 @@
 (() => {
-  if (window.__RAVEN_SHARE_V1__) return;
-  window.__RAVEN_SHARE_V1__ = true;
+  if (window.__RAVEN_SHARE_V2__) return;
+  window.__RAVEN_SHARE_V2__ = true;
 
   const q = (s, r = document) => r.querySelector(s);
   const qa = (s, r = document) => [...r.querySelectorAll(s)];
@@ -14,71 +14,39 @@
   }
 
   const selectors = [
-    '.update-card',
-    '.timeline-item',
-    '.trace-card',
-    '.person-card',
-    'details.investment',
-    '.narrative-card',
-    '#briefing .confidence-grid > article',
-    '#briefing .brief-grid > article',
-    '#status .institution-grid > article',
-    '#timeline .history-line > article',
-    '#governance .control-grid > article',
-    '#money .metric-grid > article',
-    '#tracks .control-grid > article',
-    '#disputed-record .control-grid > article',
-    '#controls .control-grid > article'
+    '.update-card', '.timeline-item', '.trace-card', '.person-card', 'details.investment',
+    '.narrative-card', '#governance .control-grid > article', '#money .metric-grid > article',
+    '#tracks .control-grid > article', '#disputed-record .control-grid > article'
   ];
 
-  const cleanText = (value = '') => value.replace(/\s+/g, ' ').trim();
-  const trimText = (value, max = 260) => {
-    const text = cleanText(value);
-    if (text.length <= max) return text;
-    const cut = text.slice(0, max - 1);
-    const lastSpace = cut.lastIndexOf(' ');
-    return `${lastSpace > max - 35 ? cut.slice(0, lastSpace) : cut}…`;
+  const storyMap = {
+    'home-2026-09-06-jamil-reman-checkpoint':'/raventrace-my/news/2026/09/06/jamil-khir-reman-checkpoint/',
+    'news-2026-09-06-jamil-reman-checkpoint':'/raventrace-my/news/2026/09/06/jamil-khir-reman-checkpoint/',
+    'home-2026-09-05-ketelusan-rtm':'/raventrace-my/news/2026/09/05/ketelusan-siasatan-tabung-haji/',
+    'news-2026-09-05-ketelusan-rtm':'/raventrace-my/news/2026/09/05/ketelusan-siasatan-tabung-haji/',
+    'home-2026-09-04-madinah-rashid':'/raventrace-my/news/2026/09/04/madinah-rashid-rekod-bercanggah/',
+    'news-2026-09-04-madinah-rashid':'/raventrace-my/news/2026/09/04/madinah-rashid-rekod-bercanggah/',
+    'home-2026-09-03-reformasi-rci':'/raventrace-my/news/2026/09/03/reformasi-tadbir-urus-tabung-haji/',
+    'news-2026-09-03-reformasi-rci':'/raventrace-my/news/2026/09/03/reformasi-tadbir-urus-tabung-haji/',
+    'news-2026-09-03-thp-bina-rm72000':'/raventrace-my/news/2026/09/03/thp-bina-rm72000/'
   };
-  const slugify = (value = '') => cleanText(value)
-    .toLowerCase()
-    .normalize('NFKD')
-    .replace(/[\u0300-\u036f]/g, '')
-    .replace(/[^a-z0-9]+/g, '-')
-    .replace(/^-+|-+$/g, '')
-    .slice(0, 58) || 'item';
 
-  const getTitle = (item) => cleanText(
-    q('h3', item)?.textContent ||
-    q('h2', item)?.textContent ||
-    q('summary strong', item)?.textContent ||
-    q('strong', item)?.textContent ||
-    q('b', item)?.textContent ||
-    'Kemas kini RAVEN-Trace'
-  );
+  const cleanText = (value = '') => value.replace(/\s+/g, ' ').trim();
+  const trimText = (value, max = 260) => { const text = cleanText(value); if (text.length <= max) return text; const cut = text.slice(0, max - 1); const lastSpace = cut.lastIndexOf(' '); return `${lastSpace > max - 35 ? cut.slice(0, lastSpace) : cut}…`; };
+  const slugify = (value = '') => cleanText(value).toLowerCase().normalize('NFKD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '').slice(0, 58) || 'item';
 
+  const getTitle = (item) => cleanText(q('h3', item)?.textContent || q('h2', item)?.textContent || q('summary strong', item)?.textContent || q('strong', item)?.textContent || 'Kemas kini RAVEN-Trace');
   const getSummary = (item) => {
-    const candidates = qa('p, dd', item).filter((node) => {
-      if (node.closest('.raven-sharebar, figcaption')) return false;
-      if (node.classList.contains('role') || node.classList.contains('inline-sources')) return false;
-      return cleanText(node.textContent).length >= 35;
-    });
+    const candidates = qa('p, dd', item).filter((node) => !node.closest('.raven-sharebar, figcaption') && !node.classList.contains('role') && !node.classList.contains('inline-sources') && cleanText(node.textContent).length >= 35);
     return trimText(candidates[0]?.textContent || 'Semak konteks, status bukti dan sumber dalam RAVEN-Trace.', 280);
   };
-
-  const getStatus = (item) => {
-    const status = q('.status', item);
-    return status ? cleanText(status.textContent) : '';
-  };
+  const getStatus = (item) => { const status = q('.status', item); return status ? cleanText(status.textContent) : ''; };
 
   const isRavenUrl = (href = '') => href.includes('raven-trace.github.io') || href.startsWith('/raventrace-my/');
   const isShareService = (href = '') => /(?:wa\.me|whatsapp\.com|facebook\.com\/sharer|twitter\.com\/intent|x\.com\/intent)/i.test(href);
   const getSourceUrl = (item) => {
-    const direct = qa('a[href]', item)
-      .filter((a) => !a.closest('.raven-sharebar'))
-      .map((a) => a.href)
-      .find((href) => /^https?:\/\//i.test(href) && !isRavenUrl(href) && !isShareService(href));
+    const direct = qa('a[href]', item).filter((a) => !a.closest('.raven-sharebar')).map((a) => a.href).find((href) => /^https?:\/\//i.test(href) && !isRavenUrl(href) && !isShareService(href));
     if (direct) return direct;
-
     for (const ref of qa('a[href^="#s"]', item)) {
       if (ref.closest('.raven-sharebar')) continue;
       const row = q(ref.getAttribute('href'));
@@ -91,37 +59,27 @@
   const stableIdFor = (item, index) => {
     if (item.id) return item.id;
     const explicit = item.dataset.shareId;
-    if (explicit) {
-      item.id = explicit;
-      return explicit;
-    }
+    if (explicit) { item.id = explicit; return explicit; }
     const section = item.closest('section[id]')?.id || (location.pathname.includes('/news') ? 'news' : 'story');
     const date = q('time[datetime]', item)?.getAttribute('datetime') || '';
     const base = `${section}-${date ? `${date}-` : ''}${slugify(getTitle(item))}`;
-    let id = base;
-    let n = 2;
+    let id = base, n = 2;
     while (document.getElementById(id) && document.getElementById(id) !== item) id = `${base}-${n++}`;
     item.id = id || `raven-share-${index + 1}`;
     return item.id;
   };
 
-  const canonicalBase = () => {
-    const canonical = q('link[rel="canonical"]')?.href;
-    if (canonical) return canonical.split('#')[0];
-    return `${location.origin}${location.pathname}`;
-  };
-
+  const canonicalBase = () => q('link[rel="canonical"]')?.href?.split('#')[0] || `${location.origin}${location.pathname}`;
+  const storyUrlFor = (item) => storyMap[item.id] ? new URL(storyMap[item.id], location.origin).href : '';
   const payloadFor = (item) => {
-    const title = getTitle(item);
-    const summary = getSummary(item);
-    const status = getStatus(item);
-    const source = getSourceUrl(item);
-    const url = `${canonicalBase()}#${encodeURIComponent(item.id)}`;
+    const title = getTitle(item), summary = getSummary(item), status = getStatus(item), source = getSourceUrl(item);
+    const storyUrl = storyUrlFor(item);
+    const url = storyUrl || `${canonicalBase()}#${encodeURIComponent(item.id)}`;
     const lines = [`RAVEN-Trace | ${title}`, summary];
     if (status) lines.push(`Status: ${status}`);
     if (source) lines.push(`Sumber asal: ${source}`);
     lines.push(`Baca konteks penuh: ${url}`);
-    return { title, summary, status, source, url, text: lines.join('\n\n') };
+    return { title, summary, status, source, url, storyUrl, text: lines.join('\n\n') };
   };
 
   const icon = (name) => {
@@ -131,145 +89,39 @@
     return '';
   };
 
-  const feedback = (bar, message) => {
-    const node = q('.raven-share-feedback', bar);
-    if (!node) return;
-    node.textContent = message;
-    clearTimeout(node._ravenTimer);
-    node._ravenTimer = setTimeout(() => { node.textContent = ''; }, 2200);
-  };
-
-  const copyText = async (text) => {
-    if (navigator.clipboard?.writeText) return navigator.clipboard.writeText(text);
-    const textarea = document.createElement('textarea');
-    textarea.value = text;
-    textarea.style.position = 'fixed';
-    textarea.style.opacity = '0';
-    document.body.appendChild(textarea);
-    textarea.select();
-    document.execCommand('copy');
-    textarea.remove();
-  };
+  const feedback = (bar, message) => { const node = q('.raven-share-feedback', bar); if (!node) return; node.textContent = message; clearTimeout(node._ravenTimer); node._ravenTimer = setTimeout(() => { node.textContent = ''; }, 2200); };
+  const copyText = async (text) => { if (navigator.clipboard?.writeText) return navigator.clipboard.writeText(text); const textarea = document.createElement('textarea'); textarea.value = text; textarea.style.position = 'fixed'; textarea.style.opacity = '0'; document.body.appendChild(textarea); textarea.select(); document.execCommand('copy'); textarea.remove(); };
 
   const buildBar = (item) => {
     if (item.dataset.ravenShareReady === 'true') return;
     item.dataset.ravenShareReady = 'true';
-
-    const bar = document.createElement('div');
-    bar.className = 'raven-sharebar compact';
-    bar.setAttribute('aria-label', 'Pilihan perkongsian');
-
-    const share = document.createElement('button');
-    share.type = 'button';
-    share.className = 'raven-share-btn primary';
-    share.innerHTML = `${icon('share')}<span>Kongsi</span>`;
-    share.addEventListener('click', async (event) => {
-      event.preventDefault();
-      event.stopPropagation();
-      const payload = payloadFor(item);
-      const nativeText = [payload.summary];
-      if (payload.status) nativeText.push(`Status: ${payload.status}`);
-      if (payload.source) nativeText.push(`Sumber asal: ${payload.source}`);
-      try {
-        if (navigator.share) {
-          await navigator.share({ title: payload.title, text: nativeText.join('\n\n'), url: payload.url });
-          feedback(bar, 'Share sheet dibuka');
-        } else {
-          await copyText(payload.text);
-          feedback(bar, 'Ringkasan + link disalin');
-        }
-      } catch (error) {
-        if (error?.name !== 'AbortError') feedback(bar, 'Tidak dapat dikongsi');
-      }
-    });
-
-    const wa = document.createElement('a');
-    wa.className = 'raven-share-link';
-    wa.href = '#';
-    wa.target = '_blank';
-    wa.rel = 'noopener noreferrer';
-    wa.innerHTML = `${icon('wa')}<span>WhatsApp</span>`;
-    wa.addEventListener('click', (event) => {
-      event.preventDefault();
-      event.stopPropagation();
-      const payload = payloadFor(item);
-      window.open(`https://wa.me/?text=${encodeURIComponent(payload.text)}`, '_blank', 'noopener,noreferrer');
-    });
-
-    const copy = document.createElement('button');
-    copy.type = 'button';
-    copy.className = 'raven-share-btn';
-    copy.innerHTML = `${icon('copy')}<span>Salin</span>`;
-    copy.addEventListener('click', async (event) => {
-      event.preventDefault();
-      event.stopPropagation();
-      try {
-        await copyText(payloadFor(item).text);
-        feedback(bar, 'Ringkasan + link disalin');
-      } catch {
-        feedback(bar, 'Salin gagal');
-      }
-    });
-
+    const bar = document.createElement('div'); bar.className = 'raven-sharebar compact'; bar.setAttribute('aria-label', 'Pilihan perkongsian');
+    const share = document.createElement('button'); share.type = 'button'; share.className = 'raven-share-btn primary'; share.innerHTML = `${icon('share')}<span>Kongsi</span>`;
+    share.addEventListener('click', async (event) => { event.preventDefault(); event.stopPropagation(); const payload = payloadFor(item); const nativeText = [payload.summary]; if (payload.status) nativeText.push(`Status: ${payload.status}`); if (payload.source) nativeText.push(`Sumber asal: ${payload.source}`); try { if (navigator.share) { await navigator.share({ title: payload.title, text: nativeText.join('\n\n'), url: payload.url }); feedback(bar, 'Share sheet dibuka'); } else { await copyText(payload.text); feedback(bar, 'Ringkasan + link disalin'); } } catch (error) { if (error?.name !== 'AbortError') feedback(bar, 'Tidak dapat dikongsi'); } });
+    const wa = document.createElement('a'); wa.className = 'raven-share-link'; wa.href = '#'; wa.target = '_blank'; wa.rel = 'noopener noreferrer'; wa.innerHTML = `${icon('wa')}<span>WhatsApp</span>`;
+    wa.addEventListener('click', (event) => { event.preventDefault(); event.stopPropagation(); const payload = payloadFor(item); window.open(`https://wa.me/?text=${encodeURIComponent(payload.text)}`, '_blank', 'noopener,noreferrer'); });
+    const copy = document.createElement('button'); copy.type = 'button'; copy.className = 'raven-share-btn'; copy.innerHTML = `${icon('copy')}<span>Salin</span>`;
+    copy.addEventListener('click', async (event) => { event.preventDefault(); event.stopPropagation(); try { await copyText(payloadFor(item).text); feedback(bar, 'Ringkasan + link disalin'); } catch { feedback(bar, 'Salin gagal'); } });
     bar.append(share, wa, copy);
-
+    const storyUrl = storyUrlFor(item);
+    if (storyUrl) { const story = document.createElement('a'); story.className = 'raven-share-link'; story.href = storyUrl; story.textContent = 'Artikel'; story.addEventListener('click', (event) => event.stopPropagation()); bar.appendChild(story); }
     const source = getSourceUrl(item);
-    if (source) {
-      const sourceLink = document.createElement('a');
-      sourceLink.className = 'raven-share-link';
-      sourceLink.href = source;
-      sourceLink.target = '_blank';
-      sourceLink.rel = 'noopener noreferrer';
-      sourceLink.textContent = 'Sumber';
-      sourceLink.addEventListener('click', (event) => event.stopPropagation());
-      bar.appendChild(sourceLink);
-    }
-
-    const status = document.createElement('span');
-    status.className = 'raven-share-feedback';
-    status.setAttribute('aria-live', 'polite');
-    bar.appendChild(status);
-
-    if (item.matches('details.investment')) {
-      const body = q('.investment-body', item);
-      if (body) body.appendChild(bar); else item.appendChild(bar);
-    } else if (item.matches('.timeline-item')) {
-      const content = item.children[1];
-      if (content) content.appendChild(bar); else item.appendChild(bar);
-    } else {
-      item.appendChild(bar);
-    }
+    if (source) { const sourceLink = document.createElement('a'); sourceLink.className = 'raven-share-link'; sourceLink.href = source; sourceLink.target = '_blank'; sourceLink.rel = 'noopener noreferrer'; sourceLink.textContent = 'Sumber'; sourceLink.addEventListener('click', (event) => event.stopPropagation()); bar.appendChild(sourceLink); }
+    const status = document.createElement('span'); status.className = 'raven-share-feedback'; status.setAttribute('aria-live', 'polite'); bar.appendChild(status);
+    if (item.matches('details.investment')) { const body = q('.investment-body', item); if (body) body.appendChild(bar); else item.appendChild(bar); }
+    else if (item.matches('.timeline-item')) { const content = item.children[1]; if (content) content.appendChild(bar); else item.appendChild(bar); }
+    else item.appendChild(bar);
   };
 
   const decorateAll = () => {
     const seen = new Set();
-    selectors.forEach((selector) => {
-      qa(selector).forEach((item, index) => {
-        if (seen.has(item)) return;
-        seen.add(item);
-        stableIdFor(item, index);
-        buildBar(item);
-      });
-    });
-
+    selectors.forEach((selector) => qa(selector).forEach((item, index) => { if (seen.has(item)) return; seen.add(item); stableIdFor(item, index); buildBar(item); }));
     const hash = decodeURIComponent(location.hash.replace(/^#/, ''));
-    if (hash) {
-      const target = document.getElementById(hash);
-      if (target) {
-        if (target.matches('details')) target.open = true;
-        target.classList.add('raven-share-target');
-        setTimeout(() => target.scrollIntoView({ behavior: 'smooth', block: 'start' }), 80);
-      }
-    }
+    if (hash) { const target = document.getElementById(hash); if (target) { if (target.matches('details')) target.open = true; target.classList.add('raven-share-target'); setTimeout(() => target.scrollIntoView({ behavior: 'smooth', block: 'start' }), 80); } }
   };
 
   let mutationTimer = null;
-  const observer = new MutationObserver((mutations) => {
-    if (!mutations.some((m) => m.addedNodes.length)) return;
-    clearTimeout(mutationTimer);
-    mutationTimer = setTimeout(decorateAll, 80);
-  });
-
+  const observer = new MutationObserver((mutations) => { if (!mutations.some((m) => m.addedNodes.length)) return; clearTimeout(mutationTimer); mutationTimer = setTimeout(decorateAll, 80); });
   decorateAll();
   const root = q('main') || document.body;
   if (root) observer.observe(root, { childList: true, subtree: true });

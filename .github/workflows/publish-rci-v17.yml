@@ -1,0 +1,56 @@
+name: Publish RCI v17 updates
+
+on:
+  push:
+    paths:
+      - 'scripts/apply_rci_v17_updates.py'
+      - '.github/workflows/publish-rci-v17.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Apply RCI v17 publication updates
+        run: python scripts/apply_rci_v17_updates.py
+
+      - name: Verify key v17 markers
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          checks = {
+            'index.html': ['7 Sep 2026', 'Mahkamah sambung reman bekas menteri dua hari', 'RM11.5 bilion sukuk UJSB'],
+            'news/index.html': ['7 Sep 2026', 'Reman disambung · hingga 8 Sep', 'RM11.5 bilion sukuk UJSB bukan bailout baharu'],
+            'investigations/rci-tabung-haji/index.html': ['v17', 'Reman disambung · hingga 8 Sep', 'id="s49"', 'id="s50"'],
+            'news/2026/09/06/jamil-khir-reman-checkpoint/index.html': ['Reman Jamil Khir disambung dua hari hingga 8 Sep', 'REMAN DISAMBUNG · BELUM DIDAKWA'],
+            'assets/js/raven-narrative.js': ['Data cut-off · 7 Sep 2026', "addSourceRow('s49'", "addSourceRow('s50'"],
+          }
+          for file, needles in checks.items():
+              text = Path(file).read_text(encoding='utf-8')
+              for needle in needles:
+                  assert needle in text, (file, needle)
+              print('ok', file)
+          PY
+
+      - name: Commit v17 publication update
+        run: |
+          git config user.name "RAVEN-Trace Bot"
+          git config user.email "actions@users.noreply.github.com"
+          git add index.html news/index.html investigations/rci-tabung-haji/index.html news/2026/09/06/jamil-khir-reman-checkpoint/index.html assets/js/raven-narrative.js README.md
+          if git diff --cached --quiet; then
+            echo "No v17 changes"
+            exit 0
+          fi
+          git commit -m "Publish RCI Tabung Haji CASEFILE v17"
+          git push

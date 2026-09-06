@@ -28,7 +28,7 @@ jobs:
           from pathlib import Path
           code = Path('scripts/apply_rci_v17_updates.py').read_text(encoding='utf-8')
           try:
-              exec(compile(code, 'scripts/apply_rci_v17_updates.py', 'exec'), {'__name__': '__main__'})
+              exec(compile(code, 'scripts/apply_rci_v17_updates.py', 'exec'), {'__name__': '__main__', '__file__': 'scripts/apply_rci_v17_updates.py'})
           except RuntimeError as exc:
               if 'README current work' not in str(exc):
                   raise

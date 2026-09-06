@@ -15,7 +15,7 @@
 
   if (!q('script[data-raven-publication]')) {
     const publication = document.createElement('script');
-    publication.src = '/raventrace-my/assets/js/raven-publication.js?v=1.0.0';
+    publication.src = '/raventrace-my/assets/js/raven-publication.js?v=1.1.0';
     publication.defer = true;
     publication.dataset.ravenPublication = 'true';
     document.head.appendChild(publication);

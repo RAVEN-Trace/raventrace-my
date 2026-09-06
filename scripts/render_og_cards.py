@@ -12,7 +12,7 @@ FONT_MONO = '/usr/share/fonts/truetype/dejavu/DejaVuSansMono.ttf'
 FONT_MONO_BOLD = '/usr/share/fonts/truetype/dejavu/DejaVuSansMono-Bold.ttf'
 
 CARDS = [
-    dict(file='jamil-khir-reman-20260906-v1.jpg', accent='#f3b33d', case='RCI-TH-2026', date='6 SEP 2026', kicker='RCI TABUNG HAJI · PENGUATKUASAAN', headline='REMAN TAMAT 6 SEP.\nSTATUS SETERUSNYA\nBELUM DISAHKAN.', status='UNKNOWN · OUTCOME BELUM DISAHKAN', marker='WATCH'),
+    dict(file='jamil-khir-reman-20260906-v1.jpg', accent='#f3b33d', case='RCI-TH-2026', date='6 SEP 2026', kicker='RCI TABUNG HAJI · PENGUATKUASAAN', headline='REMAN DISAMBUNG.\nHINGGA 8 SEP.', status='REMAN · BELUM DIDAKWA', marker='WATCH'),
     dict(file='ketelusan-siasatan-th-20260905-v1.jpg', accent='#32d4ef', case='RCI-TH-2026', date='5 SEP 2026', kicker='RCI TABUNG HAJI · KONTEKS AWAM', headline='BEBERAPA RESPONDEN\nMAHU SIASATAN TH\nLEBIH TELUS.', status='CONTEXT · VOX-POP BUKAN TINJAUAN NASIONAL', marker='CONTEXT'),
     dict(file='madinah-rashid-disputed-20260904-v1.jpg', accent='#ed6b67', case='RCI-TH-2026', date='4 SEP 2026', kicker='RCI TABUNG HAJI · DISPUTED RECORD', headline='DUA VERSI.\nSATU REKOD YANG\nBELUM LENGKAP.', status='DISPUTED · REKOD AWAM BERCANGGAH', marker='DISPUTED'),
     dict(file='reformasi-th-20260903-v1.jpg', accent='#6fd19a', case='RCI-TH-2026', date='3 SEP 2026', kicker='RCI TABUNG HAJI · REFORMASI INSTITUSI', headline='19 DARIPADA 25 SYOR\nDILAPOR SELESAI.\nAKTA BELUM MUKTAMAD.', status='PROCESS · REFORMASI BERJALAN', marker='REFORM'),

@@ -36,11 +36,15 @@ jobs:
 
           p = Path('README.md')
           text = p.read_text(encoding='utf-8')
+          text = text.replace('Public evidence room revised **6 September 2026**.', 'Public evidence room revised **7 September 2026**.')
+          text = text.replace(
+              'The RCI Tabung Haji investigation remains at **CASEFILE v16**, reconciled through **6 September 2026 MYT**.',
+              'The RCI Tabung Haji investigation is now at **CASEFILE v17**, reconciled through **7 September 2026 · early morning MYT**.'
+          )
           text = text.replace(
               'Current publication infrastructure includes the Jamil Khir remand checkpoint, transparency reporting, governance reform progress, disputed Al-Rawda metrics, the public correction ledger, Share System v2.1, Source Room Navigator and **Phase 2B dedicated social news cards**.',
               'Current publication infrastructure includes the Jamil Khir remand extension through 8 September, transparency reporting, governance reform progress, UJSB refinancing context, disputed Al-Rawda metrics, the public correction ledger, Share System v2.1, Source Room Navigator and **Phase 2B dedicated social news cards**.'
           )
-          text = text.replace('Public evidence room revised **6 September 2026**.', 'Public evidence room revised **7 September 2026**.')
           p.write_text(text, encoding='utf-8')
           PY
 

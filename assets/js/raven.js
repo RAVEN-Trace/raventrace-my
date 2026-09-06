@@ -1,6 +1,8 @@
 (() => {
   const q = (s, r = document) => r.querySelector(s);
   const qa = (s, r = document) => [...r.querySelectorAll(s)];
+  const connection = navigator.connection || navigator.mozConnection || navigator.webkitConnection;
+  const reduceData = Boolean(connection?.saveData || /(?:^|-)2g$/.test(connection?.effectiveType || ''));
 
   const navToggle = q('[data-nav-toggle]');
   const nav = q('[data-nav]');
@@ -187,18 +189,48 @@
     return urls;
   };
 
+  const META_TTL = 30 * 60 * 1000;
+  const metaStorageKey = (url) => `raven-source-meta:${url}`;
+  const readStoredMeta = (url) => {
+    try {
+      const raw = sessionStorage.getItem(metaStorageKey(url));
+      if (!raw) return null;
+      const parsed = JSON.parse(raw);
+      if (!parsed?.image || !parsed?.storedAt || Date.now() - parsed.storedAt > META_TTL) {
+        sessionStorage.removeItem(metaStorageKey(url));
+        return null;
+      }
+      return parsed;
+    } catch { return null; }
+  };
+  const storeMeta = (url, meta) => {
+    try { sessionStorage.setItem(metaStorageKey(url), JSON.stringify({ ...meta, storedAt: Date.now() })); }
+    catch { /* storage is optional */ }
+  };
+
   const resolveSourceMeta = async (sourceUrl) => {
-    if (!sourceUrl) return null;
+    if (!sourceUrl || reduceData) return null;
     if (metaCache.has(sourceUrl)) return metaCache.get(sourceUrl);
+    const stored = readStoredMeta(sourceUrl);
+    if (stored) {
+      const cached = Promise.resolve(stored);
+      metaCache.set(sourceUrl, cached);
+      return cached;
+    }
     const task = (async () => {
+      const controller = 'AbortController' in window ? new AbortController() : null;
+      const timer = controller ? setTimeout(() => controller.abort(), 4500) : null;
       try {
         const endpoint = `https://api.microlink.io?url=${encodeURIComponent(sourceUrl)}&palette=false&audio=false&video=false&screenshot=false`;
-        const response = await fetch(endpoint, { mode: 'cors', credentials: 'omit' });
+        const response = await fetch(endpoint, { mode: 'cors', credentials: 'omit', signal: controller?.signal });
         if (!response.ok) return null;
         const data = (await response.json())?.data;
         if (!data?.image?.url) return null;
-        return { image: data.image.url, title: data.title || '', publisher: data.publisher || hostname(sourceUrl), url: sourceUrl };
+        const meta = { image: data.image.url, title: data.title || '', publisher: data.publisher || hostname(sourceUrl), url: sourceUrl };
+        storeMeta(sourceUrl, meta);
+        return meta;
       } catch { return null; }
+      finally { if (timer) clearTimeout(timer); }
     })();
     metaCache.set(sourceUrl, task);
     return task;
@@ -247,6 +279,28 @@
     return true;
   };
 
+  const sourceVisualObserver = !reduceData && 'IntersectionObserver' in window
+    ? new IntersectionObserver((entries) => {
+        entries.forEach((entry) => {
+          if (!entry.isIntersecting) return;
+          sourceVisualObserver.unobserve(entry.target);
+          const task = entry.target._ravenSourceTask;
+          entry.target._ravenSourceTask = null;
+          if (typeof task === 'function') task();
+        });
+      }, { rootMargin: '520px 0px', threshold: 0.01 })
+    : null;
+
+  const scheduleSourceFigure = (container, sourceUrls, className) => {
+    if (!container || reduceData || container.dataset.ravenSourceScheduled === 'true') return;
+    container.dataset.ravenSourceScheduled = 'true';
+    const task = () => attachSourceFigure(container, sourceUrls, className);
+    if (sourceVisualObserver) {
+      container._ravenSourceTask = task;
+      sourceVisualObserver.observe(container);
+    } else task();
+  };
+
   const addAvatar = (card) => {
     if (q('.person-avatar', card)) return;
     const name = q('h3', card)?.textContent.trim() || '';
@@ -280,7 +334,7 @@
       'Ilustrasi editorial — bukan bukti atau foto kejadian.',
       'home-case-art'
     );
-    qa('.update-card').forEach((card) => attachSourceFigure(card, externalUrlsIn(card), 'raven-card-visual'));
+    qa('.update-card').forEach((card) => scheduleSourceFigure(card, externalUrlsIn(card), 'raven-card-visual'));
     addVisualPolicy(q('#latest .section-head'));
     document.body.dataset.ravenVisualized = 'home';
   }
@@ -289,7 +343,7 @@
     qa('.timeline-item').forEach((item) => {
       const content = item.children[1];
       if (!content) return;
-      attachSourceFigure(content, externalUrlsIn(item), 'timeline-visual');
+      scheduleSourceFigure(content, externalUrlsIn(item), 'timeline-visual');
       item.classList.add('news-visual-ready');
     });
     addVisualPolicy(q('.article-header .container'));
@@ -326,11 +380,11 @@
       });
     }
 
-    qa('.trace-card').forEach((card) => attachSourceFigure(card, sourceUrlsFromCaseRefs(card), 'trace-visual'));
+    qa('.trace-card').forEach((card) => scheduleSourceFigure(card, sourceUrlsFromCaseRefs(card), 'trace-visual'));
 
-    qa('.person-card').forEach(async (card) => {
-      const ok = await attachSourceFigure(card, sourceUrlsFromCaseRefs(card), 'person-source-visual');
-      if (!ok) addAvatar(card);
+    qa('.person-card').forEach((card) => {
+      addAvatar(card);
+      scheduleSourceFigure(card, sourceUrlsFromCaseRefs(card), 'person-source-visual');
     });
 
     const sectorMap = [[/Perladangan|sawit|ladang/i,['🌿','Perladangan']],[/rel/i,['🚆','Rel']],[/hotel|hospitaliti/i,['🏨','Hospitaliti']],[/pembinaan|hartanah/i,['🏗','Pembinaan / hartanah']],[/marin|O&G|kapal/i,['⚓','Marin / O&G']],[/saham/i,['📈','Pasaran modal']],[/dana/i,['▦','Dana']],[/korporat/i,['▣','Korporat']]];

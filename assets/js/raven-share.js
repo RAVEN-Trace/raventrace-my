@@ -31,8 +31,8 @@
     const text = cleanText(value);
     if (text.length <= max) return text;
     const cut = text.slice(0, max - 1);
-    const safe = cut.slice(0, Math.max(cut.lastIndexOf(' '), max - 35));
-    return `${safe || cut}…`;
+    const lastSpace = cut.lastIndexOf(' ');
+    return `${lastSpace > max - 35 ? cut.slice(0, lastSpace) : cut}…`;
   };
   const slugify = (value = '') => cleanText(value)
     .toLowerCase()
@@ -54,8 +54,7 @@
     const candidates = qa('p, dd', item).filter((node) => {
       if (node.closest('.raven-sharebar, figcaption')) return false;
       if (node.classList.contains('role') || node.classList.contains('inline-sources')) return false;
-      const text = cleanText(node.textContent);
-      return text.length >= 35;
+      return cleanText(node.textContent).length >= 35;
     });
     return trimText(candidates[0]?.textContent || 'Semak konteks, status bukti dan sumber dalam RAVEN-Trace.', 280);
   };
@@ -66,22 +65,30 @@
   };
 
   const isRavenUrl = (href = '') => href.includes('raven-trace.github.io') || href.startsWith('/raventrace-my/');
+  const isShareService = (href = '') => /(?:wa\.me|whatsapp\.com|facebook\.com\/sharer|twitter\.com\/intent|x\.com\/intent)/i.test(href);
   const getSourceUrl = (item) => {
     const direct = qa('a[href]', item)
+      .filter((a) => !a.closest('.raven-sharebar'))
       .map((a) => a.href)
-      .find((href) => /^https?:\/\//i.test(href) && !isRavenUrl(href));
+      .find((href) => /^https?:\/\//i.test(href) && !isRavenUrl(href) && !isShareService(href));
     if (direct) return direct;
 
     for (const ref of qa('a[href^="#s"]', item)) {
+      if (ref.closest('.raven-sharebar')) continue;
       const row = q(ref.getAttribute('href'));
       const source = row ? q('a[href^="http"]', row) : null;
-      if (source?.href) return source.href;
+      if (source?.href && !isShareService(source.href)) return source.href;
     }
     return '';
   };
 
   const stableIdFor = (item, index) => {
     if (item.id) return item.id;
+    const explicit = item.dataset.shareId;
+    if (explicit) {
+      item.id = explicit;
+      return explicit;
+    }
     const section = item.closest('section[id]')?.id || (location.pathname.includes('/news') ? 'news' : 'story');
     const date = q('time[datetime]', item)?.getAttribute('datetime') || '';
     const base = `${section}-${date ? `${date}-` : ''}${slugify(getTitle(item))}`;
@@ -139,7 +146,7 @@
   };
 
   const buildBar = (item) => {
-    if (q(':scope > .raven-sharebar', item) || item.dataset.ravenShareReady === 'true') return;
+    if (item.dataset.ravenShareReady === 'true') return;
     item.dataset.ravenShareReady = 'true';
 
     const bar = document.createElement('div');

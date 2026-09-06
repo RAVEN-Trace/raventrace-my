@@ -64,6 +64,21 @@ Material story cards receive a compact share toolbar.
 
 Initial dedicated story pages cover the 6 September Jamil Khir remand checkpoint, 5 September transparency vox-pop, Madinah–Rashid disputed record, THP Bina RM72,000 court case, and governance-reform progress.
 
+## Phase 2B social news cards
+
+Material stories now receive a dedicated **1200×630 JPEG RAVEN News Card** for social-link previews rather than reusing one generic investigation artwork.
+
+- Cards live in `assets/og/` and are generated deterministically by `scripts/render_og_cards.py`.
+- Each card carries the story date, CASEFILE ID, a short evidence-bounded headline, an explicit status label and RAVEN-Trace publisher branding.
+- Status language remains part of the evidence discipline: examples include **UNKNOWN**, **DISPUTED**, **CONTEXT** and **DIDAKWA · BELUM SABIT**.
+- Cards are editorial graphics for distribution and identification. They are **not evidence, source photographs or proof of an event**.
+- Dedicated story HTML contains static absolute `og:image` and Twitter image metadata, including explicit `1200×630` dimensions, image type and accessible alt text.
+- Each material story also exposes one `NewsArticle` JSON-LD block whose image points to the same dedicated card.
+- `.github/workflows/render-og-cards.yml` renders, validates and commits the cards plus their static metadata. Verification fails if a card is not 1200×630, exceeds the configured size ceiling or a target story loses its required static social metadata.
+- Social platforms may cache previews. RAVEN-Trace does not treat an immediately visible WhatsApp/Facebook/X preview as guaranteed proof that the latest metadata has already been re-fetched by that platform.
+
+The social card and the article's in-page editorial/source imagery are deliberately separate. The social card identifies the story; source imagery and evidence remain governed by the visual evidence policy inside the publication.
+
 ## Performance policy
 
 Long lists use progressive rendering hints so off-screen cards and evidence rows do not need to be fully painted immediately. This reduces rendering work without removing content, changing source order or weakening deep-link access.
@@ -84,6 +99,14 @@ python3 -m http.server 8000
 
 Then open `http://localhost:8000/raventrace-my/`.
 
+To regenerate Phase 2B cards locally:
+
+```bash
+python -m pip install pillow
+python scripts/render_og_cards.py
+python scripts/apply_og_metadata.py
+```
+
 ## GitHub Pages
 
 Deploy from the `main` branch and repository root (`/`). The project-site path is `/raventrace-my/`.
@@ -94,7 +117,7 @@ Public evidence room revised **6 September 2026**.
 
 RAVEN-Trace now operates as a publication rather than a single-case dashboard: Newsroom for developments, dedicated story pages for readers and sharing, an Investigation Desk for CASEFILE discovery, and the CASEFILE/Source Room layer for audit.
 
-The RCI Tabung Haji investigation remains at **CASEFILE v16**, reconciled through **6 September 2026 MYT**. Current work includes the Jamil Khir remand checkpoint, transparency reporting, governance reform progress, disputed Al-Rawda metrics, the public correction ledger, Share System v2.1, and the Source Room Navigator.
+The RCI Tabung Haji investigation remains at **CASEFILE v16**, reconciled through **6 September 2026 MYT**. Current publication infrastructure includes the Jamil Khir remand checkpoint, transparency reporting, governance reform progress, disputed Al-Rawda metrics, the public correction ledger, Share System v2.1, Source Room Navigator and **Phase 2B dedicated social news cards**.
 
 The site records reconciliation corrections including **211 pages rather than 252** for the public RCI report, **30 July rather than 31 July** for announcement of the MACC special task force, and separation of expected/proposed charges from charges actually read in court.
 

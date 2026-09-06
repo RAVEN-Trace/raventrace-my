@@ -112,14 +112,12 @@ def patch(story):
     for name in ['twitter:card', 'twitter:title', 'twitter:description', 'twitter:image', 'twitter:image:alt']:
         text = remove_meta(text, 'name', name)
 
-    # Put explicit image dimensions next to the article's OG URL so social crawlers see static tags.
     marker = re.search(r'<meta\s+property=["\']og:url["\'][^>]*>', text, flags=re.I)
     if not marker:
         raise RuntimeError(f'og:url missing: {story["path"]}')
     insert_at = marker.end()
     text = text[:insert_at] + image_meta(story) + twitter_meta(story) + text[insert_at:]
 
-    # One deterministic NewsArticle block per story.
     text = re.sub(r'<script\s+type=["\']application/ld\+json["\']>.*?</script>', '', text, flags=re.I | re.S)
     text = text.replace('</head>', json_ld(story) + '</head>', 1)
 
@@ -127,9 +125,34 @@ def patch(story):
     print(f'patched {story["path"]} -> {story["image"]}')
 
 
+def patch_runtime_versions():
+    raven = ROOT / 'assets/js/raven.js'
+    text = raven.read_text(encoding='utf-8')
+    old = '/raventrace-my/assets/js/raven-share.js?v=1.0.0'
+    new = '/raventrace-my/assets/js/raven-share.js?v=2.1.0'
+    if old in text:
+        text = text.replace(old, new)
+        raven.write_text(text, encoding='utf-8')
+        print('bumped raven-share loader to v2.1.0')
+    elif new not in text:
+        raise RuntimeError('unexpected raven-share loader version')
+
+    share = ROOT / 'assets/js/raven-share.js'
+    text = share.read_text(encoding='utf-8')
+    old = '/raventrace-my/assets/js/raven-publication.js?v=1.0.0'
+    new = '/raventrace-my/assets/js/raven-publication.js?v=1.1.0'
+    if old in text:
+        text = text.replace(old, new)
+        share.write_text(text, encoding='utf-8')
+        print('bumped publication loader to v1.1.0')
+    elif new not in text:
+        raise RuntimeError('unexpected publication loader version')
+
+
 def main():
     for story in STORIES:
         patch(story)
+    patch_runtime_versions()
 
 
 if __name__ == '__main__':

@@ -48,16 +48,15 @@ jobs:
               assert p.stat().st_size < 300_000, (p, p.stat().st_size)
               print(p, im.size, p.stat().st_size)
 
-          pages = sorted(Path('news/2026/09').glob('**/index.html'))
-          phase2b = [p for p in pages if '/'.join(p.parts[-3:-1]) in {
-              '06/jamil-khir-reman-checkpoint',
-              '05/ketelusan-siasatan-tabung-haji',
-              '04/madinah-rashid-rekod-bercanggah',
-              '03/reformasi-tadbir-urus-tabung-haji',
-              '03/thp-bina-rm72000',
-          }]
-          assert len(phase2b) == 5, len(phase2b)
-          for p in phase2b:
+          targets = {
+              'news/2026/09/06/jamil-khir-reman-checkpoint/index.html',
+              'news/2026/09/05/ketelusan-siasatan-tabung-haji/index.html',
+              'news/2026/09/04/madinah-rashid-rekod-bercanggah/index.html',
+              'news/2026/09/03/reformasi-tadbir-urus-tabung-haji/index.html',
+              'news/2026/09/03/thp-bina-rm72000/index.html',
+          }
+          for item in sorted(targets):
+              p = Path(item)
               text = p.read_text(encoding='utf-8')
               assert 'og:image:width" content="1200' in text
               assert 'og:image:height" content="630' in text
@@ -66,13 +65,19 @@ jobs:
               assert '/assets/og/' in text
               assert len(re.findall(r'property=["\']og:image["\']', text)) == 1, p
               print('metadata ok', p)
+
+          raven = Path('assets/js/raven.js').read_text(encoding='utf-8')
+          share = Path('assets/js/raven-share.js').read_text(encoding='utf-8')
+          assert '/assets/js/raven-share.js?v=2.1.0' in raven
+          assert '/assets/js/raven-publication.js?v=1.1.0' in share
+          print('share runtime versions ok')
           PY
 
       - name: Commit generated cards and metadata
         run: |
           git config user.name "RAVEN-Trace Bot"
           git config user.email "actions@users.noreply.github.com"
-          git add assets/og/*.jpg news/2026/09/*/*/index.html
+          git add assets/og/*.jpg assets/js/raven.js assets/js/raven-share.js news/2026/09/*/*/index.html
           if git diff --cached --quiet; then
             echo "No Phase 2B changes"
             exit 0

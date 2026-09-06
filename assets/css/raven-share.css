@@ -1,0 +1,27 @@
+/* RAVEN Share System v1.0 — compact, mobile-first, evidence-aware */
+.raven-sharebar{display:flex;flex-wrap:wrap;align-items:center;gap:.45rem;margin-top:1rem;padding-top:.75rem;border-top:1px solid rgba(91,110,124,.22)}
+.raven-sharebar.compact{margin-top:.75rem;padding-top:.6rem}
+.raven-share-btn,.raven-share-link{appearance:none;display:inline-flex;align-items:center;justify-content:center;gap:.35rem;min-height:34px;padding:.45rem .68rem;border:1px solid #b7c6cf;background:#fff;color:#17232b;text-decoration:none;font:800 .68rem/1 var(--sans);letter-spacing:.01em;cursor:pointer}
+.raven-share-btn:hover,.raven-share-link:hover{border-color:var(--cyan);color:#087f96;background:#f2fbfd}
+.raven-share-btn.primary{border-color:#0b9db7;background:#0c1820;color:#fff}
+.raven-share-btn.primary:hover{background:#10232e;color:#7cecff}
+.raven-share-btn svg,.raven-share-link svg{width:14px;height:14px;flex:0 0 14px}
+.raven-share-feedback{display:inline-flex;align-items:center;min-height:34px;color:#61717b;font:700 .64rem/1.2 var(--sans)}
+.raven-share-target{animation:ravenSharePulse 1.8s ease-out 1;scroll-margin-top:96px}
+@keyframes ravenSharePulse{0%{box-shadow:0 0 0 0 rgba(39,211,242,.42)}55%{box-shadow:0 0 0 8px rgba(39,211,242,.08)}100%{box-shadow:0 0 0 0 rgba(39,211,242,0)}}
+
+.dark .raven-sharebar,.case-hero .raven-sharebar{border-top-color:#31424e}
+.dark .raven-share-btn,.dark .raven-share-link,.case-hero .raven-share-btn,.case-hero .raven-share-link{border-color:#3d5665;background:#0d171e;color:#dbe7ee}
+.dark .raven-share-btn:hover,.dark .raven-share-link:hover,.case-hero .raven-share-btn:hover,.case-hero .raven-share-link:hover{border-color:var(--cyan-bright);color:var(--cyan-bright);background:#0a2029}
+.dark .raven-share-feedback,.case-hero .raven-share-feedback{color:#93a7b3}
+
+.timeline-item>.raven-sharebar{grid-column:2;margin-top:.7rem}
+.timeline-item>div>.raven-sharebar{margin-top:.75rem}
+.trace-card>.raven-sharebar,.person-card>.raven-sharebar,.update-card>.raven-sharebar,.narrative-card>.raven-sharebar{margin-top:auto}
+.investment-body>.raven-sharebar{grid-column:1/-1}
+
+@media(max-width:620px){
+  .raven-sharebar{gap:.38rem;margin-top:.8rem;padding-top:.62rem}
+  .raven-share-btn,.raven-share-link{min-height:32px;padding:.4rem .58rem;font-size:.64rem}
+  .raven-share-feedback{font-size:.61rem}
+}

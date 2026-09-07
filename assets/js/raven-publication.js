@@ -1,11 +1,11 @@
 (() => {
-  if (window.__RAVEN_PUBLICATION_V2__) return;
-  window.__RAVEN_PUBLICATION_V2__ = true;
+  if (window.__RAVEN_PUBLICATION_V2_1__) return;
+  window.__RAVEN_PUBLICATION_V2_1__ = true;
 
   const q = (s, r = document) => r.querySelector(s);
   const qa = (s, r = document) => [...r.querySelectorAll(s)];
   const investigationIndex = '/raventrace-my/investigations/';
-  document.documentElement.dataset.ravenRelease = 'publication-2.0';
+  document.documentElement.dataset.ravenRelease = 'publication-2.1';
 
   if (!q('link[data-raven-publication]')) {
     const css = document.createElement('link');
@@ -62,7 +62,7 @@
           <div class="raven-boundary-grid">
             <article><b>KNOWN</b><p>RCI merekodkan kelemahan tadbir urus, pelaburan dan pelaporan; penguatkuasaan serta prosiding susulan masih berjalan.</p></article>
             <article><b>DISPUTED</b><p>Rekod Madinah Mohamad dan Rashid Hussain mengenai sebahagian prosiding RCI masih bercanggah pada rekod awam.</p></article>
-            <article><b>UNKNOWN</b><p>Liabiliti akhir individu, keputusan semua kertas siasatan dan hasil selepas checkpoint reman semasa belum diketahui.</p></article>
+            <article><b>UNKNOWN</b><p>Liabiliti akhir individu, keputusan semua kertas siasatan dan sama ada laporan jangkaan pendakwaan 7 September akan disahkan secara rasmi masih belum diketahui.</p></article>
           </div>
         </div>`;
       signal.insertAdjacentElement('afterend', section);
@@ -143,7 +143,7 @@
       <div class="raven-evidence-boundary-grid">
         <article><b>FACT</b><p>RCI merekodkan kelemahan serius; SPRM menyatakan 14 kertas siasatan dan empat NFA setakat 2 Sep; dua bekas pengurus THP Bina telah didakwa dan mengaku tidak bersalah.</p></article>
         <article><b>DISPUTED</b><p>Versi Madinah Mohamad dan Rashid Hussain mengenai sebahagian proses RCI tidak selari pada rekod awam yang tersedia.</p></article>
-        <article><b>UNKNOWN</b><p>Butiran empat NFA, keputusan fail lain, liabiliti akhir individu dan hasil selepas sambungan reman hingga 8 Sep masih belum diketahui.</p></article>
+        <article><b>UNKNOWN</b><p>Butiran empat NFA, hasil selepas reman hingga 8 Sep dan dakwaan tarikh pendakwaan 10/11/17 Sep masih belum disahkan secara rasmi.</p></article>
         <article><b>DO NOT CONCLUDE</b><p>Reman atau pertuduhan bukan bukti bersalah. RM13 bilion juga bukan label automatik untuk “wang dicuri”.</p></article>
       </div>`;
     lead.insertAdjacentElement('afterend', box);
@@ -179,14 +179,14 @@
     const anchor = q('h2', updates);
     if (!anchor) return;
     const box = make('aside', 'raven-change-log');
-    box.setAttribute('aria-label', 'Apa yang berubah dalam CASEFILE v17');
+    box.setAttribute('aria-label', 'Apa yang berubah dalam CASEFILE v18');
     box.innerHTML = `
-      <h3>What changed · v17</h3>
+      <h3>What changed · v18</h3>
       <div class="raven-change-grid">
-        <div><b>NEW</b><p>Mahkamah membenarkan sambungan reman dua hari hingga 8 September.</p></div>
-        <div><b>UPDATED</b><p>Konteks RM11.5b sukuk UJSB dikunci sebagai refinancing, bukan kerugian baharu.</p></div>
+        <div><b>NEW</b><p>Dua laporan 7 September menamakan Azeez, Jamil dan Azmi dalam jangkaan pendakwaan; status kekal CLAIM sehingga disahkan rasmi.</p></div>
+        <div><b>UPDATED</b><p>Checkpoint Jamil kini bergerak ke tamat reman 8 September; laporan Malaysia Corporate dan Suara.TV ditambah sebagai developing evidence.</p></div>
         <div><b>UNCHANGED</b><p>Tiada asas untuk menyimpulkan guilt daripada reman, siasatan atau pertuduhan.</p></div>
-        <div><b>NEXT</b><p>Semak apa berlaku selepas checkpoint 8 September dan sebarang tindakan AGC/mahkamah baharu.</p></div>
+        <div><b>NEXT</b><p>Semak status selepas reman 8 September dan sahkan atau gugurkan claim tarikh 10/11/17 September melalui SPRM, AGC atau rekod mahkamah.</p></div>
       </div>`;
     anchor.insertAdjacentElement('afterend', box);
   };

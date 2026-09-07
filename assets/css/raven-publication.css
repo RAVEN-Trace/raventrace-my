@@ -1,8 +1,22 @@
-/* RAVEN publication architecture v1.1 — story first, evidence one click away */
+/* RAVEN publication architecture v2.0 — editorial newsroom + evidence UX */
+
+:root{
+  --raven-paper:#f4f1e9;
+  --raven-paper-2:#ece8de;
+  --raven-ink:#0a1117;
+  --raven-muted:#5d6870;
+  --raven-rule:#c9c4b8;
+  --raven-night:#080b0f;
+  --raven-night-2:#0e151b;
+  --raven-cyan:#66d9ef;
+  --raven-amber:#f0bf65;
+  --raven-red:#e97979;
+  --raven-green:#7fca9f;
+}
 
 /* Public investigation desk */
 .investigation-desk-hero{padding:clamp(3rem,7vw,6.2rem) 0;background:#080b0f;color:#f6f8fa;border-bottom:1px solid #28333d}
-.investigation-desk-hero h1{max-width:980px;font-size:clamp(3rem,8vw,6.8rem);line-height:.9;letter-spacing:-.045em}
+.investigation-desk-hero h1{max-width:980px;font-family:Georgia,'Times New Roman',serif;font-size:clamp(3rem,8vw,6.8rem);line-height:.9;letter-spacing:-.045em;font-weight:700}
 .investigation-desk-hero .lede{max-width:780px;color:#c1cbd4}
 .investigation-status-line{display:flex;flex-wrap:wrap;gap:.5rem;margin-top:1.2rem}
 .investigation-grid{display:grid;grid-template-columns:minmax(0,1.35fr) minmax(280px,.65fr);gap:clamp(1.2rem,4vw,3rem);align-items:start}
@@ -11,7 +25,7 @@
 .investigation-lead-media img{display:block;width:100%;aspect-ratio:16/9;object-fit:cover}
 .investigation-lead-media span{position:absolute;left:.8rem;top:.8rem;padding:.35rem .55rem;border:1px solid var(--cyan-bright);background:rgba(5,9,13,.88);color:var(--cyan-bright);font:900 .62rem/1 var(--mono);letter-spacing:.08em;text-transform:uppercase}
 .investigation-lead-body{padding:clamp(1.2rem,3vw,2rem)}
-.investigation-lead-body h2{font-size:clamp(2.2rem,5vw,4rem)}
+.investigation-lead-body h2{font-family:Georgia,'Times New Roman',serif;font-size:clamp(2.2rem,5vw,4rem)}
 .investigation-lead-body .case-summary{max-width:70ch;margin:1rem 0;color:#4d565e;font-size:1rem;line-height:1.65}
 .investigation-meta-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:.55rem;margin:1.2rem 0}
 .investigation-meta-grid div{padding:.8rem;border-top:3px solid #101820;background:#f3f0e8}
@@ -27,6 +41,39 @@
 .investigation-rule b{display:block;margin-bottom:.55rem;color:var(--cyan);font:900 .66rem/1.2 var(--mono);letter-spacing:.08em;text-transform:uppercase}
 .investigation-rule p{margin:0;color:#59646c;font-size:.86rem;line-height:1.55}
 
+/* Editorial front page */
+.raven-editorial-home .front-hero{position:relative;overflow:hidden;background:linear-gradient(135deg,#070b0f 0%,#0d151b 62%,#111d24 100%)}
+.raven-editorial-home .front-hero::after{content:"";position:absolute;inset:auto -12vw -20vw auto;width:46vw;height:46vw;border:1px solid rgba(102,217,239,.12);border-radius:50%;pointer-events:none}
+.raven-editorial-home .front-grid{gap:clamp(2rem,6vw,5.5rem)}
+.raven-editorial-home .front-lead{position:relative;z-index:1}
+.raven-editorial-home .front-lead h1{max-width:16ch;margin:.7rem 0 1.2rem;font-family:Georgia,'Times New Roman',serif;font-size:clamp(3rem,7vw,6.7rem);line-height:.92;letter-spacing:-.045em;font-weight:700}
+.raven-editorial-home .front-lead h1 em{font-weight:400;color:#c7d4dc}
+.raven-editorial-home .front-dek{max-width:72ch;font-size:clamp(1rem,1.5vw,1.15rem);line-height:1.72;color:#cad3d9}
+.raven-editorial-home .front-docket{border:0;border-top:1px solid #50606b;background:transparent;box-shadow:none}
+.raven-editorial-home .docket-stat{display:grid;grid-template-columns:76px 1fr;align-items:start;padding:.9rem 0;border-bottom:1px solid rgba(255,255,255,.13)}
+.raven-editorial-home .docket-stat strong{font-family:Georgia,'Times New Roman',serif;font-size:2.5rem;line-height:1;color:#fff}
+.raven-editorial-home .docket-stat span{padding-top:.25rem;color:#b8c4cb;line-height:1.35}
+.raven-editorial-home .signal-strip{border-top:1px solid #1e2a32;border-bottom:1px solid #1e2a32}
+.raven-editorial-home .section-head h2,.raven-editorial-home .newsroom-board h2{font-family:Georgia,'Times New Roman',serif;letter-spacing:-.03em}
+.raven-editorial-home .update-grid{display:grid;grid-template-columns:minmax(0,1.25fr) minmax(280px,.75fr);gap:0 clamp(2rem,5vw,4rem)}
+.raven-editorial-home .update-card{margin:0;padding:1.35rem 0;background:transparent!important;border:0!important;border-top:1px solid var(--raven-rule)!important;box-shadow:none!important;border-radius:0!important}
+.raven-editorial-home .update-card.lead-update{grid-row:span 3;padding:1.5rem 2rem 2rem 0;border-top:4px solid var(--raven-ink)!important}
+.raven-editorial-home .update-card.lead-update h3{font-family:Georgia,'Times New Roman',serif;font-size:clamp(2rem,4vw,3.5rem);line-height:1.02;letter-spacing:-.035em}
+.raven-editorial-home .update-card:not(.lead-update) h3{font-family:Georgia,'Times New Roman',serif;font-size:clamp(1.25rem,2vw,1.7rem);line-height:1.12}
+.raven-editorial-home .update-index{font-family:var(--mono);font-size:.66rem;letter-spacing:.12em}
+
+.raven-front-boundary{background:var(--raven-paper);color:var(--raven-ink);border-bottom:1px solid var(--raven-rule)}
+.raven-front-boundary .container{padding-top:1rem;padding-bottom:1rem}
+.raven-boundary-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:0;border-top:1px solid var(--raven-ink)}
+.raven-boundary-grid article{padding:1rem 1.25rem 1rem 0;border-right:1px solid var(--raven-rule)}
+.raven-boundary-grid article+article{padding-left:1.25rem}
+.raven-boundary-grid article:last-child{border-right:0}
+.raven-boundary-grid b{display:block;margin-bottom:.45rem;font:900 .65rem/1 var(--mono);letter-spacing:.11em;text-transform:uppercase}
+.raven-boundary-grid article:nth-child(1) b{color:#176c46}
+.raven-boundary-grid article:nth-child(2) b{color:#9a3e3e}
+.raven-boundary-grid article:nth-child(3) b{color:#765d16}
+.raven-boundary-grid p{margin:0;color:#47525a;font-size:.88rem;line-height:1.52}
+
 /* CASEFILE primary navigation: fewer choices first, deeper sections still accessible. */
 .reading-nav .raven-nav-secondary{display:none}
 .reading-nav .container.raven-nav-show-all .raven-nav-secondary{display:inline-flex}
@@ -34,6 +81,70 @@
 .raven-case-nav-toggle:hover{border-color:var(--cyan-bright);color:var(--cyan-bright)}
 .raven-quick-read{border-color:var(--cyan-bright)!important;color:var(--cyan-bright)!important}
 .raven-quick-read:hover{background:var(--cyan-bright)!important;color:#061015!important}
+
+/* Raven Lens */
+.raven-lens-shell{background:#0b1116;color:#eef4f7;border-bottom:1px solid #29343d}
+.raven-lens-shell .container{display:grid;grid-template-columns:minmax(220px,.7fr) minmax(0,1.3fr);gap:clamp(1.2rem,4vw,3.5rem);padding-top:1.25rem;padding-bottom:1.25rem}
+.raven-lens-intro .eyebrow{margin:0 0 .35rem;color:var(--raven-cyan)}
+.raven-lens-intro h2{margin:0;font-family:Georgia,'Times New Roman',serif;font-size:clamp(1.55rem,2.8vw,2.35rem);line-height:1.02}
+.raven-lens-intro p:last-child{margin:.65rem 0 0;color:#aebbc3;font-size:.82rem;line-height:1.45}
+.raven-lens-panel{min-width:0}
+.raven-lens-tabs{display:flex;gap:.45rem;overflow-x:auto;padding-bottom:.55rem;scrollbar-width:thin}
+.raven-lens-tab{appearance:none;flex:0 0 auto;border:1px solid #3e4b55;background:#101920;color:#d6e0e5;padding:.62rem .78rem;font:900 .66rem/1 var(--mono);letter-spacing:.08em;text-transform:uppercase;cursor:pointer}
+.raven-lens-tab:hover,.raven-lens-tab[aria-selected="true"]{border-color:var(--raven-cyan);background:#11252d;color:#fff}
+.raven-lens-readout{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:1rem;align-items:end;padding-top:.8rem;border-top:1px solid #26323a}
+.raven-lens-readout strong{display:block;font-family:Georgia,'Times New Roman',serif;font-size:1.25rem;color:#fff}
+.raven-lens-readout p{margin:.35rem 0 0;color:#aebbc3;font-size:.84rem;line-height:1.5}
+.raven-lens-open{white-space:nowrap;color:var(--raven-cyan);font-weight:850;text-decoration:none}
+
+/* Evidence boundary — the signature Raven panel */
+.raven-evidence-boundary{margin:1.5rem 0 2rem;border-top:5px solid #101820;background:#f4f1e9;color:#101820}
+.raven-evidence-boundary-head{display:flex;align-items:end;justify-content:space-between;gap:1rem;padding:1rem 1.1rem;border-bottom:1px solid #c9c4b8}
+.raven-evidence-boundary-head h3{margin:0;font-family:Georgia,'Times New Roman',serif;font-size:clamp(1.5rem,3vw,2.15rem)}
+.raven-evidence-boundary-head p{max-width:48ch;margin:0;color:#5b666d;font-size:.8rem;line-height:1.45}
+.raven-evidence-boundary-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr))}
+.raven-evidence-boundary-grid article{padding:1rem;border-right:1px solid #d0cbc0}
+.raven-evidence-boundary-grid article:last-child{border-right:0}
+.raven-evidence-boundary-grid b{display:block;margin-bottom:.5rem;font:900 .66rem/1 var(--mono);letter-spacing:.09em;text-transform:uppercase}
+.raven-evidence-boundary-grid article:nth-child(1) b{color:#176c46}
+.raven-evidence-boundary-grid article:nth-child(2) b{color:#963f3f}
+.raven-evidence-boundary-grid article:nth-child(3) b{color:#725d1f}
+.raven-evidence-boundary-grid article:nth-child(4) b{color:#111820}
+.raven-evidence-boundary-grid p{margin:0;color:#455159;font-size:.84rem;line-height:1.55}
+
+/* Claim vs Record */
+.raven-claim-record{margin:2rem 0;border-top:1px solid #101820;border-bottom:1px solid #101820}
+.raven-claim-record-head{display:flex;justify-content:space-between;gap:1rem;padding:.9rem 0}
+.raven-claim-record-head h3{margin:0;font-family:Georgia,'Times New Roman',serif;font-size:1.65rem}
+.raven-claim-record-head p{max-width:52ch;margin:0;color:#667078;font-size:.82rem;line-height:1.45}
+.raven-claim-record-row{display:grid;grid-template-columns:minmax(0,.72fr) minmax(0,1.28fr);border-top:1px solid #c9c4b8}
+.raven-claim-record-row>div{padding:1rem}
+.raven-claim-record-row>div:first-child{background:#ece8de;border-right:1px solid #c9c4b8}
+.raven-claim-record-row b{display:block;margin-bottom:.45rem;font:900 .64rem/1 var(--mono);letter-spacing:.1em;text-transform:uppercase}
+.raven-claim-record-row .claim-label{color:#963f3f}
+.raven-claim-record-row .record-label{color:#176c46}
+.raven-claim-record-row p{margin:0;color:#3f4b53;font-size:.9rem;line-height:1.58}
+.raven-claim-record-row a{display:inline-block;margin-top:.55rem;font-size:.78rem;font-weight:850}
+
+/* What changed */
+.raven-change-log{margin:1.25rem 0 1.8rem;padding:0;border-top:4px solid #101820;border-bottom:1px solid #c9c4b8}
+.raven-change-log h3{margin:0;padding:1rem 0 .7rem;font-family:Georgia,'Times New Roman',serif;font-size:1.55rem}
+.raven-change-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr))}
+.raven-change-grid div{padding:.85rem 1rem;border-top:1px solid #c9c4b8;border-right:1px solid #d4cfc4}
+.raven-change-grid div:last-child{border-right:0}
+.raven-change-grid b{display:block;margin-bottom:.4rem;font:900 .62rem/1 var(--mono);letter-spacing:.1em;text-transform:uppercase}
+.raven-change-grid p{margin:0;color:#58636a;font-size:.8rem;line-height:1.48}
+
+/* CASEFILE editorial hierarchy — less dashboard, more report */
+.raven-editorial-case .case-hero h1,.raven-editorial-case .case-content>section>h2{font-family:Georgia,'Times New Roman',serif;letter-spacing:-.035em}
+.raven-editorial-case .case-hero h1{font-size:clamp(3rem,6vw,5.8rem);line-height:.93}
+.raven-editorial-case .case-content>section>h2{font-size:clamp(2rem,4.5vw,3.55rem);line-height:1.02}
+.raven-editorial-case .section-lead{font-size:1.04rem;line-height:1.7}
+.raven-editorial-case .brief-grid{gap:0}
+.raven-editorial-case .brief-grid article{background:transparent!important;border:0!important;border-top:1px solid #c9c4b8!important;border-radius:0!important;box-shadow:none!important}
+.raven-editorial-case .trace-card{border-radius:0!important;box-shadow:none!important;border-left:0!important;border-right:0!important;border-bottom:0!important;border-top:1px solid #c9c4b8!important;background:transparent!important}
+.raven-editorial-case .trace-card:first-child{border-top:4px solid #101820!important}
+.raven-editorial-case .case-rail section{border-radius:0!important;box-shadow:none!important}
 
 /* Publisher framing */
 .publication-disclosure{margin-top:1rem;padding:.85rem 1rem;border-left:4px solid var(--cyan-bright);background:#101820;color:#c6d0d7;font-size:.82rem;line-height:1.55}
@@ -45,10 +156,28 @@
   .case-section{contain:layout style paint}
 }
 
+@media(max-width:960px){
+  .raven-evidence-boundary-grid,.raven-change-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .raven-evidence-boundary-grid article:nth-child(2),.raven-change-grid div:nth-child(2){border-right:0}
+  .raven-evidence-boundary-grid article:nth-child(n+3),.raven-change-grid div:nth-child(n+3){border-top:1px solid #c9c4b8}
+}
 @media(max-width:860px){
   .investigation-grid{grid-template-columns:1fr}
   .investigation-side{grid-template-columns:repeat(2,minmax(0,1fr))}
   .investigation-meta-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .raven-editorial-home .update-grid{grid-template-columns:1fr}
+  .raven-editorial-home .update-card.lead-update{grid-row:auto;padding-right:0}
+  .raven-lens-shell .container{grid-template-columns:1fr}
+}
+@media(max-width:700px){
+  .raven-boundary-grid{grid-template-columns:1fr}
+  .raven-boundary-grid article,.raven-boundary-grid article+article{padding:1rem 0;border-right:0;border-bottom:1px solid var(--raven-rule)}
+  .raven-boundary-grid article:last-child{border-bottom:0}
+  .raven-claim-record-head{display:block}
+  .raven-claim-record-head p{margin-top:.55rem}
+  .raven-claim-record-row{grid-template-columns:1fr}
+  .raven-claim-record-row>div:first-child{border-right:0;border-bottom:1px solid #c9c4b8}
+  .raven-lens-readout{grid-template-columns:1fr}
 }
 @media(max-width:620px){
   .investigation-desk-hero{padding:2.5rem 0 2.8rem}
@@ -58,4 +187,12 @@
   .investigation-meta-grid{grid-template-columns:1fr 1fr}
   .investigation-lead-body{padding:1rem}
   .raven-case-nav-toggle{font-size:.62rem}
+  .raven-evidence-boundary-grid,.raven-change-grid{grid-template-columns:1fr}
+  .raven-evidence-boundary-grid article,.raven-change-grid div{border-right:0!important;border-top:1px solid #c9c4b8!important}
+  .raven-evidence-boundary-head{display:block}
+  .raven-evidence-boundary-head p{margin-top:.55rem}
+  .raven-editorial-home .front-lead h1{font-size:clamp(2.8rem,14vw,4.6rem)}
+}
+@media(prefers-reduced-motion:reduce){
+  html{scroll-behavior:auto!important}
 }

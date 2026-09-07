@@ -1,0 +1,61 @@
+name: Publish RCI v18 updates
+
+on:
+  push:
+    paths:
+      - 'scripts/apply_rci_v18_updates.py'
+      - '.github/workflows/publish-rci-v18.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Apply RCI v18 publication updates
+        run: python scripts/apply_rci_v18_updates.py
+
+      - name: Verify v18 markers
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          checks = {
+            'index.html': ['RCI-TH-2026 · v18', 'home-2026-09-07-expected-charges', 'raven-publication.js?v=2.1.0'],
+            'news/index.html': ['news-2026-09-07-expected-charges', 'DEVELOPING · CLAIM'],
+            'investigations/rci-tabung-haji/index.html': ['RCI-TH-2026 · v18', 'data-sep7-developing="true"', 'id="s51"', 'id="s52"'],
+            'news/2026/09/07/azeez-jamil-azmi-dijangka-didakwa/index.html': ['DEVELOPING · CLAIM', 'Malaysia Corporate', 'Suara.TV'],
+            'news/2026/09/06/jamil-khir-reman-checkpoint/index.html': ['laporan berasaskan sumber pada 7 September', 'Malaysia Corporate — jangkaan pendakwaan'],
+            'assets/js/raven-publication.js': ['What changed · v18', 'publication-2.1'],
+            'assets/js/raven.js': ['raven-publication.js?v=2.1.0'],
+          }
+          for file, needles in checks.items():
+              text = Path(file).read_text(encoding='utf-8')
+              for needle in needles:
+                  assert needle in text, (file, needle)
+              print('ok', file)
+          PY
+
+      - name: Commit v18 publication update
+        run: |
+          git config user.name "RAVEN-Trace Bot"
+          git config user.email "actions@users.noreply.github.com"
+          git add index.html news/index.html investigations/rci-tabung-haji/index.html \
+            news/2026/09/06/jamil-khir-reman-checkpoint/index.html \
+            news/2026/09/07/azeez-jamil-azmi-dijangka-didakwa/index.html \
+            assets/js/raven-publication.js assets/js/raven.js README.md
+          if git diff --cached --quiet; then
+            echo "No v18 changes"
+            exit 0
+          fi
+          git commit -m "Publish RCI Tabung Haji CASEFILE v18"
+          git push

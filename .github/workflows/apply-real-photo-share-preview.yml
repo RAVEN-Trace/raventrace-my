@@ -1,0 +1,42 @@
+name: Apply real-photo share preview
+
+on:
+  push:
+    paths:
+      - 'scripts/apply_real_photo_share_preview.py'
+      - '.github/workflows/apply-real-photo-share-preview.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  publish:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Apply share-preview patch
+        run: python scripts/apply_real_photo_share_preview.py
+
+      - name: Verify patch
+        run: |
+          grep -q "home-2026-09-07-expected-charges" assets/js/raven-share.js
+          grep -q "raven-share.js?v=2.3.0" assets/js/raven.js
+          grep -q "Photo by CEphoto, Uwe Aranas" news/2026/09/07/azeez-jamil-azmi-dijangka-didakwa/index.html
+          grep -q "CC BY-SA 3.0" assets/PHOTO_CREDITS.md
+
+      - name: Commit generated publication update
+        run: |
+          if git diff --quiet; then
+            echo "No changes required."
+            exit 0
+          fi
+          git config user.name "RAVEN-Trace Bot"
+          git config user.email "actions@users.noreply.github.com"
+          git add assets/js/raven-share.js assets/js/raven.js assets/PHOTO_CREDITS.md index.html news/index.html investigations/rci-tabung-haji/index.html news/2026/09/07/azeez-jamil-azmi-dijangka-didakwa/index.html
+          git commit -m "Use licensed real photo for RCI developing story preview"
+          git push

@@ -1,0 +1,48 @@
+name: Install Lytical tracking sitewide
+
+on:
+  push:
+    paths:
+      - '.github/workflows/install-lytical-tracking.yml'
+      - 'scripts/install_lytical_tracking.py'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  install:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Install tracking snippet in every HTML page
+        run: python scripts/install_lytical_tracking.py
+
+      - name: Verify snippet
+        shell: bash
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          files = list(Path('.').rglob('*.html'))
+          missing = [str(p) for p in files if 'lytcdn.com/lyt.js?site=7d23381ee4e5' not in p.read_text(encoding='utf-8')]
+          if missing:
+              raise SystemExit('Missing Lytical snippet in: ' + ', '.join(missing))
+          print(f'PASS: Lytical tracking present in {len(files)} HTML files')
+          PY
+
+      - name: Commit generated changes
+        shell: bash
+        run: |
+          if git diff --quiet; then
+            echo 'No HTML changes required.'
+            exit 0
+          fi
+          git config user.name 'RAVEN-Trace Bot'
+          git config user.email 'actions@users.noreply.github.com'
+          git add '*.html' '**/*.html'
+          git commit -m 'Install Lytical tracking across RAVEN-Trace pages'
+          git push

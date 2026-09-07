@@ -1,6 +1,6 @@
 (() => {
-  if (window.__RAVEN_SHARE_V2_2__) return;
-  window.__RAVEN_SHARE_V2_2__ = true;
+  if (window.__RAVEN_SHARE_V2_3__) return;
+  window.__RAVEN_SHARE_V2_3__ = true;
 
   const q = (s, r = document) => r.querySelector(s);
   const qa = (s, r = document) => [...r.querySelectorAll(s)];
@@ -44,7 +44,9 @@
     'news-2026-09-04-madinah-rashid':'/raventrace-my/news/2026/09/04/madinah-rashid-rekod-bercanggah/',
     'home-2026-09-03-reformasi-rci':'/raventrace-my/news/2026/09/03/reformasi-tadbir-urus-tabung-haji/',
     'news-2026-09-03-reformasi-rci':'/raventrace-my/news/2026/09/03/reformasi-tadbir-urus-tabung-haji/',
-    'news-2026-09-03-thp-bina-rm72000':'/raventrace-my/news/2026/09/03/thp-bina-rm72000/'
+    'news-2026-09-03-thp-bina-rm72000':'/raventrace-my/news/2026/09/03/thp-bina-rm72000/',
+    'home-2026-09-07-expected-charges':'/raventrace-my/news/2026/09/07/azeez-jamil-azmi-dijangka-didakwa/',
+    'news-2026-09-07-expected-charges':'/raventrace-my/news/2026/09/07/azeez-jamil-azmi-dijangka-didakwa/'
   };
 
   const cleanText = (value = '') => value.replace(/\s+/g, ' ').trim();

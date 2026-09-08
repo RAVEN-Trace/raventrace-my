@@ -124,6 +124,14 @@
     document.head.appendChild(publication);
   }
 
+  if (!q('script[data-raven-continuity]')) {
+    const continuity = document.createElement('script');
+    continuity.src = '/raventrace-my/assets/js/raven-continuity.js?v=1.0.0';
+    continuity.defer = true;
+    continuity.dataset.ravenContinuity = 'true';
+    document.head.appendChild(continuity);
+  }
+
   if (window.location.pathname.includes('/raventrace-my/investigations/rci-tabung-haji') && !q('script[data-raven-narrative]')) {
     const specialist = document.createElement('script');
     specialist.src = '/raventrace-my/assets/js/raven-narrative.js?v=1.1.0';

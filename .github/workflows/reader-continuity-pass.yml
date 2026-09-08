@@ -25,28 +25,25 @@ jobs:
 
           raven = Path('assets/js/raven.js')
           text = raven.read_text(encoding='utf-8')
-          marker = """  if (!q('script[data-raven-publication]')) {
-            const publication = document.createElement('script');
-            publication.src = '/raventrace-my/assets/js/raven-publication.js?v=2.1.0';
-            publication.defer = true;
-            publication.dataset.ravenPublication = 'true';
-            document.head.appendChild(publication);
-          }
-          """
-          addition = marker + """
 
-          if (!q('script[data-raven-continuity]')) {
-            const continuity = document.createElement('script');
-            continuity.src = '/raventrace-my/assets/js/raven-continuity.js?v=1.0.0';
-            continuity.defer = true;
-            continuity.dataset.ravenContinuity = 'true';
-            document.head.appendChild(continuity);
-          }
-          """
           if "data-raven-continuity" not in text:
-              if marker not in text:
-                  raise SystemExit('publication loader marker not found')
-              text = text.replace(marker, addition, 1)
+              start = text.find("  if (!q('script[data-raven-publication]')) {")
+              if start < 0:
+                  raise SystemExit('publication loader start not found')
+              end = text.find("\n  }", start)
+              if end < 0:
+                  raise SystemExit('publication loader end not found')
+              end += len("\n  }")
+              block = """
+
+  if (!q('script[data-raven-continuity]')) {
+    const continuity = document.createElement('script');
+    continuity.src = '/raventrace-my/assets/js/raven-continuity.js?v=1.0.0';
+    continuity.defer = true;
+    continuity.dataset.ravenContinuity = 'true';
+    document.head.appendChild(continuity);
+  }"""
+              text = text[:end] + block + text[end:]
               raven.write_text(text, encoding='utf-8')
 
           for html in Path('.').rglob('*.html'):

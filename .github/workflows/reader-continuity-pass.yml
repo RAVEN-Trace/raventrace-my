@@ -1,0 +1,77 @@
+name: Apply reader continuity pass
+
+on:
+  push:
+    paths:
+      - '.github/workflows/reader-continuity-pass.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  patch:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Wire continuity loader and bust cache
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import re
+
+          raven = Path('assets/js/raven.js')
+          text = raven.read_text(encoding='utf-8')
+          marker = """  if (!q('script[data-raven-publication]')) {
+            const publication = document.createElement('script');
+            publication.src = '/raventrace-my/assets/js/raven-publication.js?v=2.1.0';
+            publication.defer = true;
+            publication.dataset.ravenPublication = 'true';
+            document.head.appendChild(publication);
+          }
+          """
+          addition = marker + """
+
+          if (!q('script[data-raven-continuity]')) {
+            const continuity = document.createElement('script');
+            continuity.src = '/raventrace-my/assets/js/raven-continuity.js?v=1.0.0';
+            continuity.defer = true;
+            continuity.dataset.ravenContinuity = 'true';
+            document.head.appendChild(continuity);
+          }
+          """
+          if "data-raven-continuity" not in text:
+              if marker not in text:
+                  raise SystemExit('publication loader marker not found')
+              text = text.replace(marker, addition, 1)
+              raven.write_text(text, encoding='utf-8')
+
+          for html in Path('.').rglob('*.html'):
+              old = html.read_text(encoding='utf-8')
+              new = re.sub(r'raven\.js\?v=[0-9.]+', 'raven.js?v=3.8.0', old)
+              if new != old:
+                  html.write_text(new, encoding='utf-8')
+          PY
+
+      - name: Validate continuity assets
+        run: |
+          test -f assets/js/raven-continuity.js
+          test -f assets/css/raven-continuity.css
+          grep -q 'data-raven-continuity' assets/js/raven.js
+          grep -q 'raven.js?v=3.8.0' news/2026/09/07/azeez-jamil-azmi-dijangka-didakwa/index.html
+
+      - name: Remove one-off workflow and publish
+        run: |
+          rm -f .github/workflows/reader-continuity-pass.yml
+          git config user.name 'RAVEN-Trace Bot'
+          git config user.email 'actions@users.noreply.github.com'
+          git add -A
+          if git diff --cached --quiet; then
+            echo 'No changes to commit'
+          else
+            git commit -m 'Add reader continuity paths across story pages'
+            git push
+          fi

@@ -1,0 +1,80 @@
+name: Fix RCI social preview
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/fix-rci-social-preview.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  fix:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+      - name: Patch RCI social preview and share routing
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import re
+
+          ROOT = Path('.')
+          image = 'https://raven-trace.github.io/raventrace-my/assets/og/rci-tabung-haji-updates-v2.jpg?v=20260909d'
+
+          pages = [
+              ROOT/'investigations/rci-tabung-haji/index.html',
+              ROOT/'investigations/rci-tabung-haji/updates/index.html',
+              ROOT/'investigations/rci-tabung-haji/people/index.html',
+              ROOT/'investigations/rci-tabung-haji/timeline/index.html',
+              ROOT/'investigations/rci-tabung-haji/money/index.html',
+              ROOT/'investigations/rci-tabung-haji/sources/index.html',
+          ]
+
+          for path in pages:
+              if not path.exists():
+                  continue
+              s = path.read_text(encoding='utf-8')
+              s = re.sub(r'https://raven-trace\.github\.io/raventrace-my/assets/og/rci-tabung-haji-updates(?:-v2)?\.(?:png|jpg)(?:\?v=[^\"\']+)?', image, s)
+              # Normalize OG image metadata if present.
+              s = re.sub(r'<meta property="og:image:width" content="[^"]+">', '<meta property="og:image:width" content="1200">', s)
+              s = re.sub(r'<meta property="og:image:height" content="[^"]+">', '<meta property="og:image:height" content="630">', s)
+              if '<meta property="og:image"' in s and '<meta property="og:image:secure_url"' not in s:
+                  s = s.replace('<meta property="og:image" content="'+image+'">', '<meta property="og:image" content="'+image+'">\n  <meta property="og:image:secure_url" content="'+image+'">\n  <meta property="og:image:type" content="image/jpeg">', 1)
+              elif '<meta property="og:image:secure_url"' in s:
+                  s = re.sub(r'<meta property="og:image:secure_url" content="[^"]+">', '<meta property="og:image:secure_url" content="'+image+'">', s)
+                  s = re.sub(r'<meta property="og:image:type" content="[^"]+">', '<meta property="og:image:type" content="image/jpeg">', s)
+              s = re.sub(r'<meta name="twitter:image" content="[^"]+">', '<meta name="twitter:image" content="'+image+'">', s)
+              path.write_text(s, encoding='utf-8')
+
+          share = ROOT/'assets/js/raven-share.js'
+          s = share.read_text(encoding='utf-8')
+          s = s.replace('window.__RAVEN_SHARE_V2_3__', 'window.__RAVEN_SHARE_V2_4__')
+          if 'const sectionShareMap' not in s:
+              marker = "  const canonicalBase = () => q('link[rel=\"canonical\"]')?.href?.split('#')[0] || `${location.origin}${location.pathname}`;\n"
+              block = marker + "  const sectionShareMap = {\n    updates:'/raventrace-my/investigations/rci-tabung-haji/updates/',\n    people:'/raventrace-my/investigations/rci-tabung-haji/people/',\n    timeline:'/raventrace-my/investigations/rci-tabung-haji/timeline/',\n    money:'/raventrace-my/investigations/rci-tabung-haji/money/',\n    sources:'/raventrace-my/investigations/rci-tabung-haji/sources/'\n  };\n  const sectionUrlFor = (item) => {\n    const id = item.closest('section[id]')?.id || '';\n    return sectionShareMap[id] ? new URL(sectionShareMap[id], location.origin).href : '';\n  };\n"
+              if marker in s:
+                  s = s.replace(marker, block, 1)
+          s = s.replace('const storyUrl = storyUrlFor(item);', 'const storyUrl = storyUrlFor(item) || sectionUrlFor(item);')
+          share.write_text(s, encoding='utf-8')
+
+          raven = ROOT/'assets/js/raven.js'
+          s = raven.read_text(encoding='utf-8')
+          s = s.replace('/assets/js/raven-share.js?v=2.3.0', '/assets/js/raven-share.js?v=2.4.0')
+          raven.write_text(s, encoding='utf-8')
+          PY
+      - name: Commit fixes
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add investigations/rci-tabung-haji/index.html investigations/rci-tabung-haji/updates/index.html investigations/rci-tabung-haji/people/index.html investigations/rci-tabung-haji/timeline/index.html investigations/rci-tabung-haji/money/index.html investigations/rci-tabung-haji/sources/index.html assets/js/raven-share.js assets/js/raven.js
+          if git diff --cached --quiet; then
+            echo "No changes needed"
+          else
+            git commit -m "Fix RCI social previews and section share routing"
+            git push
+          fi

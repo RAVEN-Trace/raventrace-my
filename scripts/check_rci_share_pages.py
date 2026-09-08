@@ -1,5 +1,6 @@
 """Validate published HTML and fully decode the images crawlers actually receive."""
 from pathlib import Path
+import hashlib
 from urllib.parse import urlsplit
 from collections import Counter
 from lxml import html
@@ -21,9 +22,13 @@ def check():
   assert doc.xpath('//link[@rel="canonical"]/@href') == [url]
   assert meta('og:url') == url
   assert meta('og:image') == meta('og:image:secure_url') == meta('twitter:image')
+  if key == 'updates':
+   assert meta('og:image').endswith('/rci-tabung-haji-updates-approved-6e3de417.jpg')
   image = urlsplit(meta('og:image'))
   assert image.netloc == 'raven-trace.github.io' and not image.query
   local = ROOT / image.path.removeprefix('/raventrace-my/')
+  if key == 'updates':
+   assert hashlib.sha256(local.read_bytes()).hexdigest() == '6e3de417cb760053fae0c6f334b6f85a59b6f11d70482f5699fe36f3f01455ce', 'Approved artwork must remain byte-identical to the upload'
   with Image.open(local) as im:
    im.load()  # Header recognition/verify() alone missed the corrupt v3 JPEG.
    assert im.format == 'JPEG'

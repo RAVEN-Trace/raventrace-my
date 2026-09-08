@@ -10,7 +10,7 @@ from PIL import Image
 ROOT = Path(__file__).resolve().parents[1]
 BASE = '/raventrace-my/investigations/rci-tabung-haji/'
 ORIGIN = 'https://raven-trace.github.io'
-IMAGE_PATH = 'assets/og/rci-tabung-haji-share-v4.jpg'
+IMAGE_PATH = 'assets/og/rci-tabung-haji-share-v5.jpg'
 IMAGE_URL = ORIGIN + '/raventrace-my/' + IMAGE_PATH
 SECTIONS = {
  'updates': ('Perkembangan terkini', 'Perkembangan RCI Tabung Haji dalam rekod CASEFILE: siasatan, reman, prosiding dan batas bukti.'),
@@ -26,9 +26,8 @@ SECTIONS = {
 def serialize(node):
  return html.tostring(node, encoding='unicode', method='html')
 def build():
- with Image.open(ROOT / 'assets/images/rci-tabung-haji.webp') as original:
-  original.load()
-  original.convert('RGB').save(ROOT / IMAGE_PATH, 'JPEG', quality=90, optimize=True, progressive=False)
+ # The approved v5 editorial artwork is a canonical social asset.
+ # Validate it in place; do not regenerate or overwrite it from the legacy hero artwork.
  with Image.open(ROOT / IMAGE_PATH) as check:
   check.load()
   width, height = check.size
@@ -40,7 +39,7 @@ def build():
   original.save(ROOT / 'assets/og/rci-tabung-haji-updates.png', 'PNG')
  case_path = ROOT / 'investigations/rci-tabung-haji/index.html'
  case = case_path.read_text()
- case = re.sub(r'https://raven-trace\.github\.io/raventrace-my/assets/og/rci-tabung-haji-(?:updates(?:-v[23])?|share-v4)\.(?:jpg|png)(?:\?[^"\s]*)?', IMAGE_URL, case)
+ case = re.sub(r'https://raven-trace\.github\.io/raventrace-my/assets/og/rci-tabung-haji-(?:updates(?:-v[23])?|share-v[45])\.(?:jpg|png)(?:\?[^"\s]*)?', IMAGE_URL, case)
  for key, value in [('width', width), ('height', height)]:
   case = re.sub(r'(<meta property="og:image:' + key + r'" content=")[^"]+', lambda m: m[1] + str(value), case)
  case_path.write_text(case)
@@ -97,6 +96,6 @@ def build():
   output = ROOT / 'investigations/rci-tabung-haji' / key / 'index.html'
   output.parent.mkdir(parents=True, exist_ok=True)
   output.write_text('\n'.join(line.rstrip() for line in page.splitlines()) + '\n')
- print(f'Built {len(SECTIONS)} content pages and a validated {width}x{height} JPEG from existing artwork.')
+ print(f'Built {len(SECTIONS)} content pages and a validated {width}x{height} canonical social artwork.')
 if __name__ == '__main__':
  build()

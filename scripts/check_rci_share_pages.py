@@ -43,6 +43,10 @@ def check():
    for src in doc.xpath('//script/@src | //link[@rel="stylesheet"]/@href'):
     assert (ROOT / urlsplit(src).path.removeprefix('/raventrace-my/')).is_file(), src
   print('PASS', key)
+ for legacy in ['rci-tabung-haji-updates-v2.jpg', 'rci-tabung-haji-updates-v3.jpg', 'rci-tabung-haji-updates.png']:
+  with Image.open(ROOT / 'assets/og' / legacy) as image:
+   image.load()
+ print('PASS: legacy image URLs fully decode.')
  print('PASS: 10 pages; full image decode, metadata, content preservation, references and assets.')
 if __name__ == '__main__':
  check()

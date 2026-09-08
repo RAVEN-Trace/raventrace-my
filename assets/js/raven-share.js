@@ -1,6 +1,6 @@
 (() => {
-  if (window.__RAVEN_SHARE_V2_3__) return;
-  window.__RAVEN_SHARE_V2_3__ = true;
+  if (window.__RAVEN_SHARE_V2_4__) return;
+  window.__RAVEN_SHARE_V2_4__ = true;
 
   const q = (s, r = document) => r.querySelector(s);
   const qa = (s, r = document) => [...r.querySelectorAll(s)];
@@ -94,11 +94,22 @@
   };
 
   const canonicalBase = () => q('link[rel="canonical"]')?.href?.split('#')[0] || `${location.origin}${location.pathname}`;
+  const sectionShareMap = {
+    updates:'/raventrace-my/investigations/rci-tabung-haji/updates/',
+    people:'/raventrace-my/investigations/rci-tabung-haji/people/',
+    timeline:'/raventrace-my/investigations/rci-tabung-haji/timeline/',
+    money:'/raventrace-my/investigations/rci-tabung-haji/money/',
+    sources:'/raventrace-my/investigations/rci-tabung-haji/sources/'
+  };
+  const sectionUrlFor = (item) => {
+    const id = item.closest('section[id]')?.id || '';
+    return sectionShareMap[id] ? new URL(sectionShareMap[id], location.origin).href : '';
+  };
   const storyUrlFor = (item) => storyMap[item.id] ? new URL(storyMap[item.id], location.origin).href : '';
 
   const payloadFor = (item) => {
     const title = getTitle(item), summary = getSummary(item), status = getStatus(item), source = getSourceUrl(item);
-    const storyUrl = storyUrlFor(item);
+    const storyUrl = storyUrlFor(item) || sectionUrlFor(item);
     const url = storyUrl || `${canonicalBase()}#${encodeURIComponent(item.id)}`;
     const lines = [`RAVEN-Trace | ${title}`, summary];
     if (status) lines.push(`Status: ${status}`);
@@ -252,7 +263,7 @@
 
     bar.append(share, wa, facebook, threads, copy);
 
-    const storyUrl = storyUrlFor(item);
+    const storyUrl = storyUrlFor(item) || sectionUrlFor(item);
     if (storyUrl) {
       const story = document.createElement('a');
       story.className = 'raven-share-link';

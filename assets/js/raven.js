@@ -110,7 +110,7 @@
 
   if (!q('script[data-raven-share]')) {
     const share = document.createElement('script');
-    share.src = '/raventrace-my/assets/js/raven-share.js?v=2.3.0';
+    share.src = '/raventrace-my/assets/js/raven-share.js?v=2.4.0';
     share.defer = true;
     share.dataset.ravenShare = 'true';
     document.head.appendChild(share);

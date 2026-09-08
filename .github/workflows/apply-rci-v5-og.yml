@@ -1,0 +1,61 @@
+name: Apply RCI v5 social preview
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/apply-rci-v5-og.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Patch RCI updates OG metadata and builder
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import re
+
+          image = 'https://raven-trace.github.io/raventrace-my/assets/og/rci-tabung-haji-share-v5.jpg'
+
+          page = Path('investigations/rci-tabung-haji/updates/index.html')
+          text = page.read_text()
+          text = text.replace('https://raven-trace.github.io/raventrace-my/assets/og/rci-tabung-haji-share-v4.jpg', image)
+          text = re.sub(r'(<meta property="og:image:width" content=")[^"]+', r'\g<1>1536', text)
+          text = re.sub(r'(<meta property="og:image:height" content=")[^"]+', r'\g<1>1280', text)
+          page.write_text(text)
+
+          builder = Path('scripts/build_rci_share_pages.py')
+          text = builder.read_text()
+          text = text.replace("IMAGE_PATH = 'assets/og/rci-tabung-haji-share-v4.jpg'", "IMAGE_PATH = 'assets/og/rci-tabung-haji-share-v5.jpg'")
+          old = """ with Image.open(ROOT / 'assets/images/rci-tabung-haji.webp') as original:\n  original.load()\n  original.convert('RGB').save(ROOT / IMAGE_PATH, 'JPEG', quality=90, optimize=True, progressive=False)\n with Image.open(ROOT / IMAGE_PATH) as check:\n"""
+          new = """ # The approved v5 editorial artwork is a canonical social asset.\n # Validate it in place; do not regenerate or overwrite it from the legacy hero artwork.\n with Image.open(ROOT / IMAGE_PATH) as check:\n"""
+          if old not in text:
+              raise SystemExit('Expected legacy image-generation block not found')
+          text = text.replace(old, new)
+          text = text.replace("rci-tabung-haji-(?:updates(?:-v[23])?|share-v4)", "rci-tabung-haji-(?:updates(?:-v[23])?|share-v[45])")
+          text = text.replace('validated {width}x{height} JPEG from existing artwork.', 'validated {width}x{height} canonical social artwork.')
+          builder.write_text(text)
+
+          # Remove this one-time workflow after it has applied the patch.
+          Path('.github/workflows/apply-rci-v5-og.yml').unlink()
+          PY
+      - name: Verify patch
+        run: |
+          test -f assets/og/rci-tabung-haji-share-v5.jpg
+          grep -q 'rci-tabung-haji-share-v5.jpg' investigations/rci-tabung-haji/updates/index.html
+          ! grep -q 'rci-tabung-haji-share-v4.jpg' investigations/rci-tabung-haji/updates/index.html
+          grep -q "IMAGE_PATH = 'assets/og/rci-tabung-haji-share-v5.jpg'" scripts/build_rci_share_pages.py
+          grep -q 'og:image:width" content="1536' investigations/rci-tabung-haji/updates/index.html
+          grep -q 'og:image:height" content="1280' investigations/rci-tabung-haji/updates/index.html
+      - name: Commit persistent fix
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add -A
+          git commit -m 'Use approved RCI v5 social preview artwork'
+          git push

@@ -1,0 +1,17 @@
+.section-intro { background: #080b0f; color: #f8fafc; padding: 2.5rem 0; }
+.section-intro h1 { font-size: clamp(2rem, 6vw, 3.6rem); max-width: 22ch; margin-bottom: 1rem; }
+.section-intro p { max-width: 72ch; }
+.section-kicker { color: #22d3ee; font-weight: 800; letter-spacing: .05em; }
+.section-cutoff { color: #cbd5e1; font-size: .9rem; }
+.section-boundary { border-left: 3px solid #f59e0b; padding-left: 1rem; }
+.section-intro .btn { color: #f8fafc; border-color: #64748b; }
+.section-intro .btn-primary { color: #080b0f; background: #22d3ee; }
+.section-links { display: flex; flex-wrap: wrap; gap: .5rem; padding-top: 1.5rem; padding-bottom: 1.5rem; }
+.section-links a { padding: .4rem .65rem; font-size: .9rem; border: 1px solid var(--line); }
+.section-links a[aria-current] { background: var(--ink); color: #f8fafc; }
+.section-content { max-width: 1100px; padding-bottom: 2rem; }
+.section-content .case-section { scroll-margin-top: 1rem; }
+.section-content a { overflow-wrap: anywhere; }
+.section-content .sources-grid small, .section-content .source-note { font-size: .875rem; }
+.case-share-page .raven-sharebar { flex-wrap: wrap; }
+@media (max-width: 600px) { .section-intro { padding: 1.75rem 0; } .section-content .control-grid, .section-content .metric-grid, .section-content .sources-grid { grid-template-columns: minmax(0, 1fr); } }

@@ -1,6 +1,6 @@
 (() => {
-  if (window.__RAVEN_SHARE_V2_4__) return;
-  window.__RAVEN_SHARE_V2_4__ = true;
+  if (window.__RAVEN_SHARE_V2_5__) return;
+  window.__RAVEN_SHARE_V2_5__ = true;
 
   const q = (s, r = document) => r.querySelector(s);
   const qa = (s, r = document) => [...r.querySelectorAll(s)];
@@ -21,7 +21,7 @@
     document.head.appendChild(analytics);
   }
 
-  if (!q('script[data-raven-publication]')) {
+  if (!document.body.classList.contains('case-share-page') && !q('script[data-raven-publication]')) {
     const publication = document.createElement('script');
     publication.src = '/raventrace-my/assets/js/raven-publication.js?v=1.1.0';
     publication.defer = true;
@@ -99,6 +99,10 @@
     people:'/raventrace-my/investigations/rci-tabung-haji/people/',
     timeline:'/raventrace-my/investigations/rci-tabung-haji/timeline/',
     money:'/raventrace-my/investigations/rci-tabung-haji/money/',
+    governance:'/raventrace-my/investigations/rci-tabung-haji/governance/',
+    investments:'/raventrace-my/investigations/rci-tabung-haji/investments/',
+    tracks:'/raventrace-my/investigations/rci-tabung-haji/tracks/',
+    'disputed-record':'/raventrace-my/investigations/rci-tabung-haji/disputed-record/',
     sources:'/raventrace-my/investigations/rci-tabung-haji/sources/'
   };
   const sectionUrlFor = (item) => {
@@ -110,7 +114,7 @@
   const payloadFor = (item) => {
     const title = getTitle(item), summary = getSummary(item), status = getStatus(item), source = getSourceUrl(item);
     const storyUrl = storyUrlFor(item) || sectionUrlFor(item);
-    const url = storyUrl || `${canonicalBase()}#${encodeURIComponent(item.id)}`;
+    const url = storyUrl || canonicalBase();
     const lines = [`RAVEN-Trace | ${title}`, summary];
     if (status) lines.push(`Status: ${status}`);
     if (source) lines.push(`Sumber asal: ${source}`);
@@ -268,7 +272,7 @@
       const story = document.createElement('a');
       story.className = 'raven-share-link';
       story.href = storyUrl;
-      story.textContent = 'Artikel';
+      story.textContent = storyUrlFor(item) ? 'Artikel' : 'Buka bahagian';
       story.addEventListener('click', (event) => { event.stopPropagation(); track('article_open', { item: item.id, url: story.href }); });
       bar.appendChild(story);
     }

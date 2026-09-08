@@ -37,7 +37,7 @@
       const payload = {
         title: button.dataset.shareTitle || document.title,
         text: button.dataset.shareText || 'Semak laporan berasaskan bukti ini.',
-        url: window.location.href
+        url: q('link[rel="canonical"]')?.href || `${location.origin}${location.pathname}`
       };
       try {
         if (navigator.share) await navigator.share(payload);
@@ -110,7 +110,7 @@
 
   if (!q('script[data-raven-share]')) {
     const share = document.createElement('script');
-    share.src = '/raventrace-my/assets/js/raven-share.js?v=2.4.0';
+    share.src = '/raventrace-my/assets/js/raven-share.js?v=2.5.0';
     share.defer = true;
     share.dataset.ravenShare = 'true';
     document.head.appendChild(share);

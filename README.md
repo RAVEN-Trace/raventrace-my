@@ -122,3 +122,15 @@ The RCI Tabung Haji investigation is now at **CASEFILE v18**, reconciled through
 The site records reconciliation corrections including **211 pages rather than 252** for the public RCI report, **30 July rather than 31 July** for announcement of the MACC special task force, and separation of expected/proposed charges from charges actually read in court.
 
 > A lie wins by speed. Truth wins by audit.
+## RCI social preview maintenance
+
+The dedicated section URLs contain static casefile content and source references; they do not redirect back to hash fragments. After changing `investigations/rci-tabung-haji/index.html`, regenerate the section snapshots with:
+
+```bash
+python -m pip install Pillow lxml
+python scripts/build_rci_share_pages.py
+python scripts/check_rci_share_pages.py
+node scripts/check_raven_share.cjs
+```
+
+Commit the generated HTML and `assets/og/rci-tabung-haji-share-v4.jpg` together. The JPEG is a format conversion of the existing RCI artwork, without cropping or resizing. The checks fully decode the image (HTTP status or a readable header is insufficient), match its dimensions to metadata, preserve source content, and verify section sharing. Platform-side preview display still requires a fresh share check.

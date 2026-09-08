@@ -32,6 +32,12 @@ def build():
  with Image.open(ROOT / IMAGE_PATH) as check:
   check.load()
   width, height = check.size
+ # Repair older public image URLs too, so cached metadata can fetch valid bytes.
+ for name in ['rci-tabung-haji-updates-v2.jpg', 'rci-tabung-haji-updates-v3.jpg']:
+  (ROOT / 'assets/og' / name).write_bytes((ROOT / IMAGE_PATH).read_bytes())
+ with Image.open(ROOT / 'assets/images/rci-tabung-haji.webp') as original:
+  original.load()
+  original.save(ROOT / 'assets/og/rci-tabung-haji-updates.png', 'PNG')
  case_path = ROOT / 'investigations/rci-tabung-haji/index.html'
  case = case_path.read_text()
  case = re.sub(r'https://raven-trace\.github\.io/raventrace-my/assets/og/rci-tabung-haji-(?:updates(?:-v[23])?|share-v4)\.(?:jpg|png)(?:\?[^"\s]*)?', IMAGE_URL, case)
@@ -90,7 +96,7 @@ def build():
 </body></html>'''
   output = ROOT / 'investigations/rci-tabung-haji' / key / 'index.html'
   output.parent.mkdir(parents=True, exist_ok=True)
-  output.write_text(page)
+  output.write_text('\n'.join(line.rstrip() for line in page.splitlines()) + '\n')
  print(f'Built {len(SECTIONS)} content pages and a validated {width}x{height} JPEG from existing artwork.')
 if __name__ == '__main__':
  build()

@@ -12,6 +12,8 @@ BASE = '/raventrace-my/investigations/rci-tabung-haji/'
 ORIGIN = 'https://raven-trace.github.io'
 IMAGE_PATH = 'assets/og/rci-tabung-haji-share-v4.jpg'
 IMAGE_URL = ORIGIN + '/raventrace-my/' + IMAGE_PATH
+# User-selected artwork is preserved byte-for-byte and scoped to this section.
+SECTION_IMAGE_PATHS = {'updates': 'assets/og/rci-tabung-haji-updates-approved-6e3de417.jpg'}
 SECTIONS = {
  'updates': ('Perkembangan terkini', 'Perkembangan RCI Tabung Haji dalam rekod CASEFILE: siasatan, reman, prosiding dan batas bukti.'),
  'people': ('Individu dan status', 'Individu, jawatan dan status proses dalam rekod RCI Tabung Haji. Kaitan dengan kes bukan bukti kesalahan.'),
@@ -50,6 +52,11 @@ def build():
  source = document.get_element_by_id('sources')
  date = document.xpath('//*[contains(concat(" ", @class, " "), " date-chip ")]')[0].text_content()
  for key, (label, description) in SECTIONS.items():
+  image_path = SECTION_IMAGE_PATHS.get(key, IMAGE_PATH)
+  image_url = ORIGIN + '/raventrace-my/' + image_path
+  with Image.open(ROOT / image_path) as image:
+   image.load()
+   image_width, image_height = image.size
   section = deepcopy(document.get_element_by_id(key))
   content = [section] if key == 'sources' else [section, deepcopy(source)]
   local_ids = {'main', 'top'} | {n.get('id') for block in content for n in block.iter() if n.get('id')}
@@ -71,11 +78,11 @@ def build():
 <meta property="og:title" content="{escape(title, quote=True)}">
 <meta property="og:description" content="{escape(description, quote=True)}">
 <meta property="og:url" content="{url}">
-<meta property="og:image" content="{IMAGE_URL}"><meta property="og:image:secure_url" content="{IMAGE_URL}">
-<meta property="og:image:type" content="image/jpeg"><meta property="og:image:width" content="{width}"><meta property="og:image:height" content="{height}">
+<meta property="og:image" content="{image_url}"><meta property="og:image:secure_url" content="{image_url}">
+<meta property="og:image:type" content="image/jpeg"><meta property="og:image:width" content="{image_width}"><meta property="og:image:height" content="{image_height}">
 <meta property="og:image:alt" content="Ilustrasi editorial RCI Tabung Haji — RAVEN-Trace. Bukan foto bukti.">
 <meta name="twitter:card" content="summary_large_image"><meta name="twitter:title" content="{escape(title, quote=True)}">
-<meta name="twitter:description" content="{escape(description, quote=True)}"><meta name="twitter:image" content="{IMAGE_URL}">
+<meta name="twitter:description" content="{escape(description, quote=True)}"><meta name="twitter:image" content="{image_url}">
 <meta name="twitter:image:alt" content="Ilustrasi editorial RCI Tabung Haji — RAVEN-Trace. Bukan foto bukti.">
 <link rel="stylesheet" href="/raventrace-my/assets/css/raven.css?v=3.0.0">
 <link rel="stylesheet" href="/raventrace-my/assets/css/raven-section.css?v=1.0.0">
@@ -97,6 +104,6 @@ def build():
   output = ROOT / 'investigations/rci-tabung-haji' / key / 'index.html'
   output.parent.mkdir(parents=True, exist_ok=True)
   output.write_text('\n'.join(line.rstrip() for line in page.splitlines()) + '\n')
- print(f'Built {len(SECTIONS)} content pages and a validated {width}x{height} JPEG from existing artwork.')
+ print(f'Built {len(SECTIONS)} content pages with validated shared and section-specific artwork.')
 if __name__ == '__main__':
  build()

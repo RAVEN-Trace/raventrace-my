@@ -3,8 +3,18 @@
   window.__RAVEN_ANALYTICS_V1__ = true;
 
   const STORAGE_KEY = 'raven-attribution-v1';
+  const INTERNAL_KEY = 'raven-internal-traffic';
   const CAMPAIGN = 'raven_publication';
   const DNT = navigator.doNotTrack === '1' || window.doNotTrack === '1';
+  const params = new URLSearchParams(location.search);
+
+  if (params.get('raven_internal') === '1') {
+    try { localStorage.setItem(INTERNAL_KEY, '1'); } catch { /* optional */ }
+  } else if (params.get('raven_internal') === '0') {
+    try { localStorage.removeItem(INTERNAL_KEY); } catch { /* optional */ }
+  }
+  let INTERNAL = false;
+  try { INTERNAL = localStorage.getItem(INTERNAL_KEY) === '1'; } catch { /* optional */ }
 
   const clean = (value = '') => String(value || '').trim().slice(0, 180);
   const slug = (value = '') => clean(value).toLowerCase().replace(/[^a-z0-9]+/g, '_').replace(/^_+|_+$/g, '').slice(0, 80) || 'unknown';
@@ -14,7 +24,7 @@
     try {
       const host = new URL(referrer).hostname.toLowerCase().replace(/^www\./, '');
       if (host.includes('facebook.com') || host.includes('fb.com') || host.includes('fb.me')) return 'facebook';
-      if (host.includes('threads.net')) return 'threads';
+      if (host.includes('threads.net') || host.includes('threads.com')) return 'threads';
       if (host.includes('whatsapp.com') || host.includes('wa.me')) return 'whatsapp';
       if (host.includes('google.')) return 'google';
       if (host.includes('bing.com')) return 'bing';
@@ -29,7 +39,6 @@
     catch { return null; }
   };
 
-  const params = new URLSearchParams(location.search);
   const incoming = {
     source: clean(params.get('utm_source')),
     medium: clean(params.get('utm_medium')),
@@ -59,7 +68,8 @@
     medium: attribution?.medium || '',
     campaign: attribution?.campaign || CAMPAIGN,
     content: attribution?.content || '',
-    referrer: attribution?.referrer || classifyReferrer()
+    referrer: attribution?.referrer || classifyReferrer(),
+    traffic_class: INTERNAL ? 'internal' : 'public'
   });
 
   const safeProps = (props = {}) => Object.fromEntries(
@@ -69,7 +79,7 @@
   );
 
   const dispatch = (name, props = {}) => {
-    if (DNT) return;
+    if (DNT || INTERNAL) return;
     const eventName = slug(name);
     const payload = safeProps(props);
 
@@ -92,11 +102,12 @@
   };
 
   window.RavenAnalytics = {
-    version: '1.0.0',
+    version: '1.1.0',
     attribution: () => ({ ...(attribution || {}) }),
     context,
     track: dispatch,
-    tagUrl
+    tagUrl,
+    isInternal: () => INTERNAL
   };
 
   dispatch('raven_page_view', {

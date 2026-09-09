@@ -1,0 +1,1 @@
+Editorial rewrite documentation lives in this folder. See RAVEN_PUBLIC_LANGUAGE_STANDARD_V1.md and EDITORIAL_REWRITE_PHASE_V1.md.

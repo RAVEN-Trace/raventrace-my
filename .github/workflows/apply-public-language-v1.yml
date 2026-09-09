@@ -1,0 +1,75 @@
+name: Apply RAVEN Public Language V1
+
+on:
+  push:
+    branches:
+      - editorial-public-language-v1
+    paths:
+      - .github/workflows/apply-public-language-v1.yml
+
+permissions:
+  contents: write
+
+jobs:
+  rewrite:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout branch
+        uses: actions/checkout@v4
+        with:
+          ref: editorial-public-language-v1
+          fetch-depth: 0
+
+      - name: Apply editorial rewrite
+        run: python3 scripts/apply_public_language_v1.py
+
+      - name: Editorial QA
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          from pathlib import Path
+          import re
+
+          files = list(Path('.').rglob('*.html'))
+          assert files, 'No HTML pages found'
+
+          problems = []
+          # Public-facing leftovers that should be Malay-first after this phase.
+          banned = [
+              r'>FACT<', r'>CLAIM<', r'>UNKNOWN<', r'>DISPUTED<',
+              r'Executive briefing', r'Latest evidence snapshot', r'Case docket',
+              r'Claim → checkpoint → verification', r'People ledger', r'Source Room',
+              r'Independent · Evidence-led · Malaysia'
+          ]
+          for p in files:
+              text = p.read_text(encoding='utf-8', errors='ignore')
+              # Ignore JSON-LD/source titles only for generic words; exact UI phrases
+              # above are expected to disappear everywhere.
+              for pattern in banned:
+                  if re.search(pattern, text, flags=re.I):
+                      problems.append(f'{p}: leftover {pattern}')
+          if problems:
+              print('\n'.join(problems[:100]))
+              raise SystemExit(f'Editorial QA failed with {len(problems)} leftover items')
+
+          # Evidence/legal safety phrases must remain represented sitewide.
+          all_text = '\n'.join(p.read_text(encoding='utf-8', errors='ignore') for p in files)
+          assert 'pertuduhan bukan sabitan' in all_text.lower(), 'Missing legal-status caveat'
+          assert 'belum diketahui' in all_text.lower(), 'Unknown-state language missing'
+          print(f'Editorial QA passed across {len(files)} HTML files')
+          PY
+
+      - name: Commit rewritten public pages
+        shell: bash
+        run: |
+          set -euo pipefail
+          if git diff --quiet && git diff --cached --quiet; then
+            echo "No changes to commit"
+            exit 0
+          fi
+          git config user.name "RAVEN-Trace Editorial Bot"
+          git config user.email "actions@users.noreply.github.com"
+          git add -A
+          git commit -m "Rewrite public copy for clarity and accessibility"
+          git push origin HEAD:editorial-public-language-v1

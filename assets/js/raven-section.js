@@ -30,10 +30,10 @@
     event.currentTarget.textContent = open ? 'Tutup semua rekod' : 'Buka semua rekod';
   });
 
-  // Canonical standalone-section state. Latest verified public record in this release:
-  // PDRM statement reported by Bernama at 18:29 MYT, 9 Sep 2026.
+  // Canonical standalone-section state for release v20.
+  // Latest verified public record included: PDRM/Bernama, 9 Sep 2026 18:29 MYT.
   qa('.section-cutoff').forEach((el) => { el.textContent = 'Data cut-off · 9 Sep 2026 · 18:29 MYT'; });
-  document.documentElement.dataset.ravenCaseState = 'rci-th-v19-20260909-1829';
+  document.documentElement.dataset.ravenCaseState = 'rci-th-v20-20260909-1829';
 
   const addSourceRow = (id, grade, href, title, note) => {
     const list = q('#sources .sources-grid');
@@ -47,6 +47,7 @@
   addSourceRow('s53','B','https://www.bernama.com/en/news.php?id=2604854','Abdul Azeez didakwa di Mahkamah Sesyen','Bernama · 9 Sep · pertuduhan SPRM');
   addSourceRow('s55','B','https://www.bernama.com/bm/news.php?id=2604822','Abdul Azeez + dua bekas pegawai kanan TH direman dalam siasatan hibah','Bernama · 9 Sep · PDRM · Seksyen 420');
   addSourceRow('s56','B','https://www.bernama.com/en/region/news.php?id=2605104','PDRM: lima individu ditahan dalam siasatan hibah dan AMLA','Bernama · 9 Sep · kenyataan Bukit Aman CCID');
+  addSourceRow('s57','B','https://www.bernama.com/bm/news.php?id=2605101','Azmi Ahmad dijadual didakwa 10 September','Bernama · 9 Sep · semakan sistem mahkamah');
 
   const updatePerson = (nameNeedle, statusClass, statusText, bodyText, sourceIds = []) => {
     const card = qa('.person-card').find((item) => q('h3', item)?.textContent.includes(nameNeedle));
@@ -76,18 +77,26 @@
       'Selepas tempoh reman berakhir pada 8 September, Jamil Khir dilepaskan dengan jaminan SPRM. Pelepasan bukan NFA, acquittal atau penentuan bahawa siasatan telah tamat. Laporan jangkaan pendakwaan bagi beliau kekal belum disahkan pada cut-off ini.',
       ['s49']
     );
+    updatePerson(
+      'Azmi Ahmad',
+      'process',
+      'Prosiding dijadualkan · 10 Sep · 9 pagi',
+      'Bernama melaporkan berdasarkan semakan sistem mahkamah bahawa Azmi Ahmad dijadual didakwa di Mahkamah Sesyen Jenayah 14 Kuala Lumpur pada 10 September, 9 pagi. Sehingga pertuduhan benar-benar dibaca dan direkodkan, RAVEN-Trace mengekalkan status ini sebagai prosiding dijadualkan, bukan pertuduhan yang telah berlaku dan bukan sabitan.',
+      ['s57']
+    );
   }
 
   if (path.includes('/timeline/')) {
     const lines = qa('.history-line');
     const enforcement = lines[lines.length - 1];
-    if (enforcement && !q('[data-v19-timeline]', enforcement)) {
+    if (enforcement && !q('[data-v20-timeline]', enforcement)) {
       const wrap = document.createElement('div');
-      wrap.dataset.v19Timeline = 'true';
+      wrap.dataset.v20Timeline = 'true';
       wrap.innerHTML = `
         <article><time>8 Sep</time><h3>Jamil Khir dilepaskan</h3><p>Dilepaskan dengan jaminan SPRM selepas tamat reman. Pelepasan bukan NFA atau keputusan kes.</p></article>
         <article><time>9 Sep · SPRM</time><h3>Abdul Azeez didakwa</h3><p>Didakwa di bawah Seksyen 23(1) Akta SPRM 2009 dan mengaku tidak bersalah. Pertuduhan bukan sabitan.</p></article>
-        <article><time>9 Sep · PDRM</time><h3>Trek hibah bergerak berasingan</h3><p>Abdul Azeez dan dua bekas pegawai kanan TH direman dua hari bagi membantu siasatan di bawah Seksyen 420 Kanun Keseksaan berkaitan pemberian hibah TH. PDRM kemudian menyatakan lima individu ditahan dalam trek hibah dan AMLA yang berasingan.</p></article>`;
+        <article><time>9 Sep · PDRM</time><h3>Trek hibah bergerak berasingan</h3><p>Abdul Azeez dan dua bekas pegawai kanan TH direman dua hari bagi membantu siasatan di bawah Seksyen 420 Kanun Keseksaan berkaitan pemberian hibah TH. PDRM kemudian menyatakan lima individu ditahan dalam trek hibah dan AMLA yang berasingan.</p></article>
+        <article><time>10 Sep · checkpoint</time><h3>Azmi Ahmad dijadual didakwa</h3><p>Semakan sistem mahkamah yang dilaporkan Bernama menetapkan prosiding pada 9 pagi di Mahkamah Sesyen Jenayah 14 Kuala Lumpur. Status kekal dijadualkan sehingga pertuduhan dibaca.</p></article>`;
       [...wrap.children].forEach((node) => enforcement.appendChild(node));
     }
   }
@@ -109,6 +118,12 @@
 
   if (path.includes('/updates/')) {
     const stack = q('#updates .trace-stack');
+    if (stack && !q('[data-azmi-checkpoint]', stack)) {
+      const azmi = document.createElement('article');
+      azmi.className = 'trace-card'; azmi.dataset.azmiCheckpoint = 'true';
+      azmi.innerHTML = '<div class="trace-head"><span>CHECKPOINT / 10 SEP</span><time datetime="2026-09-10T09:00">10 Sep 2026 · 9:00 pagi</time></div><div class="meta-row"><span class="status process">DIJADUALKAN · BELUM BERLAKU</span><span class="source-grade">Gred B</span></div><h3>Azmi Ahmad dijadual didakwa di Mahkamah Sesyen Kuala Lumpur.</h3><dl><div><dt>Apa diketahui?</dt><dd>Bernama melaporkan semakan sistem mahkamah menetapkan prosiding pada 10 September, 9 pagi.</dd></div><div><dt>Status tepat</dt><dd>Prosiding dijadualkan. RAVEN-Trace belum menganggap beliau telah didakwa sehingga pertuduhan benar-benar dibaca dan direkodkan.</dd></div><div><dt>Had</dt><dd>Jadual mahkamah boleh berubah dan pertuduhan bukan sabitan.</dd></div></dl><p class="inline-sources"><a href="#s57">S57</a></p>';
+      stack.prepend(azmi);
+    }
     if (stack && !q('[data-pdrm-hibah-update]', stack)) {
       const card = document.createElement('article');
       card.className = 'trace-card';

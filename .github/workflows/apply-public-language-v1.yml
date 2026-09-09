@@ -9,6 +9,7 @@ on:
       - scripts/apply_public_language_v1.py
       - scripts/apply_public_language_v1_1.py
       - scripts/apply_public_language_v1_2.py
+      - scripts/apply_public_language_v1_3.py
 
 permissions:
   contents: write
@@ -29,8 +30,11 @@ jobs:
       - name: Apply editorial cleanup V1.1
         run: python3 scripts/apply_public_language_v1_1.py
 
-      - name: Apply final cleanup V1.2
+      - name: Apply deterministic cleanup V1.2
         run: python3 scripts/apply_public_language_v1_2.py
+
+      - name: Apply human-language polish V1.3
+        run: python3 scripts/apply_public_language_v1_3.py
 
       - name: Editorial QA
         shell: bash
@@ -43,14 +47,14 @@ jobs:
           files = list(Path('.').rglob('*.html'))
           assert files, 'No HTML pages found'
 
-          # Case-sensitive UI remnants. Anchor ids such as #unknowns are allowed.
           banned = [
               r'>FACT<', r'>CLAIM<', r'>UNKNOWN<', r'>DISPUTED<',
               r'Executive briefing', r'Latest evidence snapshot', r'Case docket',
               r'Claim → checkpoint → verification', r'People ledger', r'Source Room',
               r'Independent · Evidence-led · Malaysia', r'Data masa semakan',
               r'Baca keputusan verifikasi', r'>DAKWAAN tarikh', r'>DAKWAAN asal',
-              r'>Unknowns<', r'>Confidence<'
+              r'>Unknowns<', r'>Confidence<', r'MASIH DISEMAK DAKWAAN',
+              r'arah DAKWAAN', r'<b>perbezaan</b>'
           ]
           problems = []
           for p in files:
@@ -80,5 +84,5 @@ jobs:
           git config user.name "RAVEN-Trace Editorial Bot"
           git config user.email "actions@users.noreply.github.com"
           git add -A
-          git commit -m "Finalize public language V1"
+          git commit -m "Polish public language V1"
           git push origin HEAD:editorial-public-language-v1

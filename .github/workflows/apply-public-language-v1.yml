@@ -11,6 +11,7 @@ on:
       - scripts/apply_public_language_v1_2.py
       - scripts/apply_public_language_v1_3.py
       - scripts/apply_public_language_v1_4.py
+      - scripts/apply_public_language_v1_5.py
 
 permissions:
   contents: write
@@ -40,6 +41,9 @@ jobs:
       - name: Remove final mechanical phrase V1.4
         run: python3 scripts/apply_public_language_v1_4.py
 
+      - name: Polish remaining vocabulary V1.5
+        run: python3 scripts/apply_public_language_v1_5.py
+
       - name: Editorial QA
         shell: bash
         run: |
@@ -58,7 +62,8 @@ jobs:
               r'Independent · Evidence-led · Malaysia', r'Data masa semakan',
               r'Baca keputusan verifikasi', r'>DAKWAAN tarikh', r'>DAKWAAN asal',
               r'>Unknowns<', r'>Confidence<', r'MASIH DISEMAK DAKWAAN',
-              r'arah DAKWAAN', r'<b>perbezaan</b>'
+              r'arah DAKWAAN', r'<b>perbezaan</b>', r'developing claim',
+              r'Developing claim', r'DAKWAAN itu', r'DAKWAAN tersebut', r'remunerasi'
           ]
           problems = []
           for p in files:

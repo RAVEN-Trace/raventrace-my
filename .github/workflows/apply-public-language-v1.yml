@@ -43,19 +43,20 @@ jobs:
           files = list(Path('.').rglob('*.html'))
           assert files, 'No HTML pages found'
 
-          problems = []
+          # Case-sensitive UI remnants. Anchor ids such as #unknowns are allowed.
           banned = [
               r'>FACT<', r'>CLAIM<', r'>UNKNOWN<', r'>DISPUTED<',
               r'Executive briefing', r'Latest evidence snapshot', r'Case docket',
               r'Claim → checkpoint → verification', r'People ledger', r'Source Room',
               r'Independent · Evidence-led · Malaysia', r'Data masa semakan',
               r'Baca keputusan verifikasi', r'>DAKWAAN tarikh', r'>DAKWAAN asal',
-              r'Unknowns', r'>Confidence<'
+              r'>Unknowns<', r'>Confidence<'
           ]
+          problems = []
           for p in files:
               text = p.read_text(encoding='utf-8', errors='ignore')
               for pattern in banned:
-                  if re.search(pattern, text, flags=re.I):
+                  if re.search(pattern, text):
                       problems.append(f'{p}: leftover {pattern}')
           if problems:
               print('\n'.join(problems[:100]))

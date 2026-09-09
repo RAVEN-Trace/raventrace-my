@@ -5,9 +5,7 @@
   const path=location.pathname; const home=path==='/raventrace-my/'||path.endsWith('/raventrace-my/index.html')||path==='/';
   const casePage=path.includes('/raventrace-my/investigations/rci-tabung-haji');
   const make=(tag,cls,html)=>{const e=document.createElement(tag);if(cls)e.className=cls;if(html!=null)e.innerHTML=html;return e;};
-
   const loadCss=()=>{if(q('link[data-raven-evidence-ux]'))return;const l=document.createElement('link');l.rel='stylesheet';l.href='/raventrace-my/assets/css/raven-evidence-ux.css?v=2.1.0';l.dataset.ravenEvidenceUx='true';document.head.appendChild(l);}; loadCss();
-
   const evidenceCue=(label,grade,source,href,note)=>`<div class="rv-evidence-cue"><span class="rv-evidence-label">EVIDENCE</span><a href="${href}" rel="noopener noreferrer"><b>${grade}</b> · ${source}</a><span>${label}</span>${note?`<small>${note}</small>`:''}</div>`;
 
   if(home){
@@ -23,9 +21,12 @@
   }
 
   if(casePage){
+    document.documentElement.dataset.ravenCaseState='rci-th-v20-20260909-1829';
     const meta=q('meta[name="description"]'); if(meta)meta.content='CASEFILE RCI Tabung Haji: RCI, penguatkuasaan, individu, pelaburan, tadbir urus, PDRM, SPRM, jurang bukti dan sumber awam — state semasa hingga 9 September 2026, 18:29 MYT.';
     const util=q('.utility-inner > span'); if(util)util.textContent='CASEFILE · RCI-TH-2026 · v20';
     qa('.section-cutoff,.case-cutoff').forEach(e=>e.textContent='Data cut-off · 9 Sep 2026 · 18:29 MYT');
+    const change=q('.raven-change-log'); if(change){const title=q('h3',change);if(title)title.textContent='What changed · v20';const cards=qa('.raven-change-grid > div',change);if(cards[3]){const p=q('p',cards[3]);if(p)p.textContent='Azmi Ahmad dijadualkan menghadapi prosiding pada 10 September, 9 pagi. Status kekal checkpoint sehingga pertuduhan benar-benar dibaca dan direkodkan. Jamil Khir kekal belum disahkan didakwa pada cut-off ini.';}}
+    const boundary=q('.raven-evidence-boundary'); if(boundary){const unknown=q('.raven-evidence-boundary-grid article:nth-child(3) p',boundary);if(unknown)unknown.textContent='Butiran empat NFA, hasil akhir setiap fail dan outcome prosiding Azmi Ahmad yang dijadualkan 10 September masih belum diketahui pada cut-off ini.';}
     const hero=q('.case-hero'); if(hero&&!q('.rv-case-trustbar',hero)){const trust=make('div','rv-case-trustbar',`<div><b>LAST VERIFIED</b><span>9 SEP · 18:29 MYT</span></div><div><b>EVIDENCE MODEL</b><span>FACT · CLAIM · DISPUTED · UNKNOWN</span></div><div><b>LEGAL RULE</b><span>REMAN ≠ DAKWA ≠ SABIT</span></div>`);const container=q('.container',hero)||hero;container.appendChild(trust);}
     const people=q('#people'); if(people&&!q('.rv-legal-ladder',people)){const ladder=make('aside','rv-legal-ladder',`<div class="rv-ladder-head"><p class="eyebrow">Legal-state map</p><h3>Satu nama boleh berada pada state berbeza dalam trek berbeza.</h3></div><div class="rv-ladder-track"><b>Abdul Azeez · SPRM</b><span>SIASATAN</span><i>→</i><span>REMAN</span><i>→</i><span class="active">DAKWA</span><i>→</i><span>BICARA</span><i>→</i><span>KEPUTUSAN</span><small>Didakwa 9 Sep · mengaku tidak bersalah · belum sabit</small></div><div class="rv-ladder-track"><b>PDRM · Hibah 2017</b><span>SIASATAN</span><i>→</i><span class="active">REMAN</span><i>→</i><span>DAKWA</span><i>→</i><span>BICARA</span><i>→</i><span>KEPUTUSAN</span><small>Trek berasingan · jangan infer pertuduhan daripada reman</small></div>`);const h=q('h2',people);if(h)h.insertAdjacentElement('afterend',ladder);else people.prepend(ladder);}
     const sources=q('#sources'); if(sources&&!q('.rv-grade-key',sources)){const key=make('aside','rv-grade-key',`<div><b>A · PRIMARY</b><span>Dokumen / rekod rasmi asal</span></div><div><b>B · VERIFIED REPORTING</b><span>Laporan yang boleh dijejak kepada prosiding atau kenyataan</span></div><div><b>C · PARTIAL</b><span>Sokongan berguna tetapi tidak lengkap</span></div><div><b>X · UNVERIFIED</b><span>Petunjuk; jangan guna sebagai asas kesimpulan</span></div>`);const h=q('h2',sources);if(h)h.insertAdjacentElement('afterend',key);else sources.prepend(key);}

@@ -5,6 +5,7 @@ on:
     branches: [main]
     paths:
       - 'scripts/apply_rci_10sep_live_state.py'
+      - 'scripts/apply_rci_10sep_standalone_sync.py'
       - '.github/workflows/apply-rci-10sep-live-state.yml'
   workflow_dispatch:
 
@@ -19,12 +20,10 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
-      - name: Install builder dependencies
-        run: python -m pip install lxml Pillow
       - name: Apply verified 10 Sep state
         run: python scripts/apply_rci_10sep_live_state.py
-      - name: Rebuild standalone RCI sections
-        run: python scripts/build_rci_share_pages.py
+      - name: Sync standalone RCI sections
+        run: python scripts/apply_rci_10sep_standalone_sync.py
       - name: QA verified state
         run: |
           python - <<'PY'
@@ -33,9 +32,12 @@ jobs:
             'investigations/rci-tabung-haji/index.html': ['10 Sep 2026', 'Azmi Ahmad didakwa', 'Reman Abdul Azeez', 'id="s58"', 'id="s59"'],
             'investigations/rci-tabung-haji/updates/index.html': ['10 Sep 2026', 'Azmi Ahmad didakwa', 'Reman Abdul Azeez'],
             'investigations/rci-tabung-haji/people/index.html': ['Datuk Azmi Ahmad', 'Didakwa · belum sabit'],
+            'investigations/rci-tabung-haji/timeline/index.html': ['10 Sep', 'Azmi didakwa', 'Reman hibah Abdul Azeez tamat'],
+            'investigations/rci-tabung-haji/tracks/index.html': ['PDRM · hibah 2017 + AMLA'],
             'investigations/index.html': ['4 individu didakwa setakat 10 Sep', 'azmi-ahmad-didakwa'],
             'news/index.html': ['news-2026-09-10-azmi-charged', 'news-2026-09-10-azeez-remand'],
             'investigations/rci-tabung-haji/narratives/index.html': ['Setakat 10 September, empat individu telah didakwa'],
+            'assets/js/raven-section.js': ['Azmi Ahmad didakwa', "addSourceRow('s58'", "addSourceRow('s59'"],
           }
           for rel, needles in checks.items():
             text = Path(rel).read_text()

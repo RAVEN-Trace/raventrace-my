@@ -1,0 +1,30 @@
+name: Integrate RCI narrative everywhere
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'scripts/integrate_rci_narrative_everywhere.py'
+      - '.github/workflows/integrate-rci-narrative-everywhere.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  integrate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Apply persistent narrative integration
+        run: python scripts/integrate_rci_narrative_everywhere.py
+      - name: Commit generated integration
+        run: |
+          if git diff --quiet; then
+            echo 'No generated changes required.'
+            exit 0
+          fi
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add investigations/rci-tabung-haji scripts/build_rci_share_pages.py
+          git commit -m 'Persist RCI narrative audit across section navigation'
+          git push

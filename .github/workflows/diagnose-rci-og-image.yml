@@ -1,0 +1,36 @@
+name: Diagnose RCI OG image
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/diagnose-rci-og-image.yml'
+  workflow_dispatch:
+
+jobs:
+  diagnose:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Inspect image bytes and decoders
+        run: |
+          set -x
+          ls -lh assets/og/rci-tabung-haji-share-v5.jpg
+          file assets/og/rci-tabung-haji-share-v5.jpg || true
+          xxd -l 32 assets/og/rci-tabung-haji-share-v5.jpg || true
+          tail -c 16 assets/og/rci-tabung-haji-share-v5.jpg | xxd || true
+          python - <<'PY'
+          from pathlib import Path
+          p=Path('assets/og/rci-tabung-haji-share-v5.jpg')
+          b=p.read_bytes()
+          print('size=',len(b),'start=',b[:4].hex(),'end=',b[-4:].hex())
+          try:
+              from PIL import Image
+              with Image.open(p) as im:
+                  print('PIL', im.format, im.size, im.mode)
+                  im.verify()
+                  print('PIL verify PASS')
+          except Exception as e:
+              print('PIL FAIL',repr(e))
+              raise
+          PY

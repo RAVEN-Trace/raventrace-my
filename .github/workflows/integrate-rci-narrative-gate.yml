@@ -1,0 +1,30 @@
+name: Integrate RCI narrative gate
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'scripts/integrate_rci_narrative_gate.py'
+      - '.github/workflows/integrate-rci-narrative-gate.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  integrate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Integrate narrative audit discovery links
+        run: python scripts/integrate_rci_narrative_gate.py
+      - name: Commit integration
+        run: |
+          if git diff --quiet; then
+            echo 'No integration changes required.'
+            exit 0
+          fi
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add investigations/index.html investigations/rci-tabung-haji/index.html
+          git commit -m 'Integrate RCI narrative audit into investigation paths'
+          git push

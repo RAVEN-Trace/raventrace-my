@@ -1,0 +1,97 @@
+name: Apply RAVEN Public Language V1
+
+on:
+  push:
+    branches:
+      - editorial-public-language-v1
+    paths:
+      - .github/workflows/apply-public-language-v1.yml
+      - scripts/apply_public_language_v1.py
+      - scripts/apply_public_language_v1_1.py
+      - scripts/apply_public_language_v1_2.py
+      - scripts/apply_public_language_v1_3.py
+      - scripts/apply_public_language_v1_4.py
+      - scripts/apply_public_language_v1_5.py
+
+permissions:
+  contents: write
+
+jobs:
+  rewrite:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout branch
+        uses: actions/checkout@v4
+        with:
+          ref: editorial-public-language-v1
+          fetch-depth: 0
+
+      - name: Apply editorial rewrite V1
+        run: python3 scripts/apply_public_language_v1.py
+
+      - name: Apply editorial cleanup V1.1
+        run: python3 scripts/apply_public_language_v1_1.py
+
+      - name: Apply deterministic cleanup V1.2
+        run: python3 scripts/apply_public_language_v1_2.py
+
+      - name: Apply human-language polish V1.3
+        run: python3 scripts/apply_public_language_v1_3.py
+
+      - name: Remove final mechanical phrase V1.4
+        run: python3 scripts/apply_public_language_v1_4.py
+
+      - name: Polish remaining vocabulary V1.5
+        run: python3 scripts/apply_public_language_v1_5.py
+
+      - name: Editorial QA
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          from pathlib import Path
+          import re
+
+          files = list(Path('.').rglob('*.html'))
+          assert files, 'No HTML pages found'
+
+          banned = [
+              r'>FACT<', r'>CLAIM<', r'>UNKNOWN<', r'>DISPUTED<',
+              r'Executive briefing', r'Latest evidence snapshot', r'Case docket',
+              r'Claim → checkpoint → verification', r'People ledger', r'Source Room',
+              r'Independent · Evidence-led · Malaysia', r'Data masa semakan',
+              r'Baca keputusan verifikasi', r'>DAKWAAN tarikh', r'>DAKWAAN asal',
+              r'>Unknowns<', r'>Confidence<', r'MASIH DISEMAK DAKWAAN',
+              r'arah DAKWAAN', r'<b>perbezaan</b>', r'developing claim',
+              r'Developing claim', r'DAKWAAN itu', r'DAKWAAN tersebut', r'remunerasi'
+          ]
+          problems = []
+          for p in files:
+              text = p.read_text(encoding='utf-8', errors='ignore')
+              for pattern in banned:
+                  if re.search(pattern, text):
+                      problems.append(f'{p}: leftover {pattern}')
+          if problems:
+              print('\n'.join(problems[:100]))
+              raise SystemExit(f'Editorial QA failed with {len(problems)} leftover items')
+
+          all_text = '\n'.join(p.read_text(encoding='utf-8', errors='ignore') for p in files)
+          assert 'pertuduhan bukan sabitan' in all_text.lower(), 'Missing legal-status caveat'
+          assert 'belum diketahui' in all_text.lower(), 'Unknown-state language missing'
+          assert 'bukti dahulu' in all_text.lower(), 'Core editorial principle missing'
+          print(f'Editorial QA passed across {len(files)} HTML files')
+          PY
+
+      - name: Commit rewritten public pages
+        shell: bash
+        run: |
+          set -euo pipefail
+          if git diff --quiet && git diff --cached --quiet; then
+            echo "No changes to commit"
+            exit 0
+          fi
+          git config user.name "RAVEN-Trace Editorial Bot"
+          git config user.email "actions@users.noreply.github.com"
+          git add -A
+          git commit -m "Complete public language V1"
+          git push origin HEAD:editorial-public-language-v1

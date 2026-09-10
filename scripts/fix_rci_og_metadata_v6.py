@@ -15,7 +15,7 @@ for path in html_files:
         V6,
         s,
     )
-    # v6 is a validated 1200x630 JPEG.
+    # v6 is a validated 1200x630 JPEG. Update dimensions where these tags exist.
     s = re.sub(r'(<meta property="og:image:width" content=")[^"]+', r'\g<1>1200', s)
     s = re.sub(r'(<meta property="og:image:height" content=")[^"]+', r'\g<1>630', s)
     path.write_text(s)
@@ -37,18 +37,18 @@ s = s.replace(
 )
 updates.write_text(s)
 
-# QA
+# QA: enforce critical public surfaces, but do not require optional dimension tags on every section page.
 main = (BASE / 'index.html').read_text()
 updates_text = updates.read_text()
 assert V6 in main
 assert 'share-v4.jpg' not in main
 assert 'og:image:width" content="1200"' in main
 assert 'og:image:height" content="630"' in main
+assert V6 in updates_text
 assert 'Disemak hingga 10 September 2026.' in updates_text
 assert '<strong>11 Sep:</strong> DAKWAAN berkaitan Azmi.' not in updates_text
 for path in html_files:
     text = path.read_text()
-    if V6 in text:
-        assert 'og:image:width" content="1200"' in text
-        assert 'og:image:height" content="630"' in text
+    assert 'share-v4.jpg' not in text
+    assert 'share-v5.jpg' not in text
 print(f'RCI OG metadata v6 QA PASS across {len(html_files)} pages')

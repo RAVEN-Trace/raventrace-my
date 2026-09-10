@@ -44,6 +44,9 @@
     list.appendChild(li);
   };
 
+  addSourceRow('s58','B','https://www.bernama.com/bm/jenayah_mahkamah/news.php?id=2605277','Azmi Ahmad didakwa atas dua pertuduhan menipu','Bernama · 10 Sep · Mahkamah Sesyen');
+  addSourceRow('s59','B','https://www.bernama.com/bm/wilayah/news.php?id=2605390','Reman Abdul Azeez tidak disambung','Bernama · 10 Sep · siasatan hibah PDRM');
+  addSourceRow('s60','B','https://www.bernama.com/tv/news.php?id=2605104','Lima ditahan dalam trek hibah dan AMLA','Bernama · 9 Sep · kenyataan PDRM');
   addSourceRow('s53','B','https://www.bernama.com/en/news.php?id=2604854','Abdul Azeez didakwa di Mahkamah Sesyen','Bernama · 9 Sep · pertuduhan SPRM');
   addSourceRow('s55','B','https://www.bernama.com/bm/news.php?id=2604822','Abdul Azeez + dua bekas pegawai kanan TH direman dalam siasatan hibah','Bernama · 9 Sep · PDRM · Seksyen 420');
   addSourceRow('s56','B','https://www.bernama.com/en/region/news.php?id=2605104','PDRM: lima individu ditahan dalam siasatan hibah dan AMLA','Bernama · 9 Sep · kenyataan Bukit Aman CCID');
@@ -96,7 +99,7 @@
         <article><time>8 Sep</time><h3>Jamil Khir dilepaskan</h3><p>Dilepaskan dengan jaminan SPRM selepas tamat reman. Pelepasan bukan NFA atau keputusan kes.</p></article>
         <article><time>9 Sep · SPRM</time><h3>Abdul Azeez didakwa</h3><p>Didakwa di bawah Seksyen 23(1) Akta SPRM 2009 dan mengaku tidak bersalah. Pertuduhan bukan sabitan.</p></article>
         <article><time>9 Sep · PDRM</time><h3>Trek hibah bergerak berasingan</h3><p>Abdul Azeez dan dua bekas pegawai kanan TH direman dua hari bagi membantu siasatan di bawah Seksyen 420 Kanun Keseksaan berkaitan pemberian hibah TH. PDRM kemudian menyatakan lima individu ditahan dalam trek hibah dan AMLA yang berasingan.</p></article>
-        <article><time>10 Sep · checkpoint</time><h3>Azmi Ahmad dijadual didakwa</h3><p>Semakan sistem mahkamah yang dilaporkan Bernama menetapkan prosiding pada 9 pagi di Mahkamah Sesyen Jenayah 14 Kuala Lumpur. Status kekal dijadualkan sehingga pertuduhan dibaca.</p></article>`;
+        <article><time>10 Sep · mahkamah</time><h3>Azmi Ahmad didakwa</h3><p>Bernama melaporkan Azmi mengaku tidak bersalah atas dua pertuduhan menipu berkaitan kadar sewaan harian kapal. Rekod sebenar menggantikan checkpoint terdahulu. Semakan sistem mahkamah yang dilaporkan Bernama menetapkan prosiding pada 9 pagi di Mahkamah Sesyen Jenayah 14 Kuala Lumpur. Status kekal dijadualkan sehingga pertuduhan dibaca.</p></article>`;
       [...wrap.children].forEach((node) => enforcement.appendChild(node));
     }
   }

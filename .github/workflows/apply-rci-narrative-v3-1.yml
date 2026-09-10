@@ -1,0 +1,43 @@
+name: Apply RCI Narrative Audit UX V3.1
+
+on:
+  push:
+    paths:
+      - '.github/workflows/apply-rci-narrative-v3-1.yml'
+      - 'scripts/apply_rci_narrative_v3_1.py'
+      - 'assets/css/raven-narrative-v3-1.css'
+      - 'assets/js/raven-narrative-v3-1.js'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  apply:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Apply V3.1 publication UX
+        run: python scripts/apply_rci_narrative_v3_1.py
+      - name: QA asset references
+        run: |
+          test -s assets/css/raven-narrative-v3-1.css
+          test -s assets/js/raven-narrative-v3-1.js
+          grep -q 'raven-narrative-v3-1.css?v=3.1.0' investigations/rci-tabung-haji/narratives/index.html
+          grep -q 'raven-narrative-v3-1.js?v=3.1.0' investigations/rci-tabung-haji/narratives/index.html
+          grep -q 'Apa yang boleh mengubah verdict?' investigations/rci-tabung-haji/narratives/index.html
+          grep -q 'Pertuduhan bukan sabitan.' investigations/rci-tabung-haji/narratives/index.html
+      - name: Commit generated integration
+        run: |
+          if git diff --quiet; then
+            echo 'No generated changes.'
+            exit 0
+          fi
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add investigations/rci-tabung-haji/narratives/index.html
+          git commit -m 'Apply Narrative Audit UX V3.1'
+          git push

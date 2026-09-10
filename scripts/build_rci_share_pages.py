@@ -59,6 +59,8 @@ def build():
   title = 'RCI Tabung Haji — ' + label
   url = ORIGIN + BASE + key + '/'
   nav = ''.join(f'<a href="{BASE}{slug}/"' + (' aria-current="page"' if key == slug else '') + f'>{escape(name)}</a>' for slug, (name, _) in SECTIONS.items())
+  if '/rci-tabung-haji/narratives/' not in nav:
+   nav = nav.replace(f'<a href="{BASE}sources/"', f'<a href="{BASE}narratives/">Audit naratif</a><a href="{BASE}sources/"')
   body = '\n'.join(serialize(block) for block in content)
   page = f'''<!doctype html>
 <html lang="ms"><head>

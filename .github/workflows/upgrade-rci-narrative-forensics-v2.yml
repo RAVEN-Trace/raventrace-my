@@ -1,0 +1,34 @@
+name: Upgrade RCI narrative forensics V2
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'scripts/upgrade_rci_narrative_forensics_v2.py'
+      - '.github/workflows/upgrade-rci-narrative-forensics-v2.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  upgrade:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Apply forensic narrative upgrade
+        run: python scripts/upgrade_rci_narrative_forensics_v2.py
+      - name: Commit upgraded narrative page
+        run: |
+          if git diff --quiet; then
+            echo 'No changes to commit'
+            exit 0
+          fi
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add investigations/rci-tabung-haji/narratives/index.html
+          git commit -m 'Upgrade RCI narrative cards to forensic format'
+          git push

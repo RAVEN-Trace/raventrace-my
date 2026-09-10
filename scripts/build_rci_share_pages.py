@@ -10,7 +10,7 @@ from PIL import Image
 ROOT = Path(__file__).resolve().parents[1]
 BASE = '/raventrace-my/investigations/rci-tabung-haji/'
 ORIGIN = 'https://raven-trace.github.io'
-IMAGE_PATH = 'assets/og/rci-tabung-haji-share-v5.jpg'
+IMAGE_PATH = 'assets/og/rci-tabung-haji-share-v6.jpg'
 IMAGE_URL = ORIGIN + '/raventrace-my/' + IMAGE_PATH
 SECTIONS = {
  'updates': ('Perkembangan terkini', 'Perkembangan RCI Tabung Haji dalam rekod CASEFILE: siasatan, reman, prosiding dan batas bukti.'),
@@ -26,7 +26,7 @@ SECTIONS = {
 def serialize(node):
  return html.tostring(node, encoding='unicode', method='html')
 def build():
- # The approved v5 editorial artwork is a canonical social asset.
+ # The repaired v6 social artwork is a canonical social asset generated from the neutral CASEFILE hero.
  # Validate it in place; do not regenerate or overwrite it from the legacy hero artwork.
  with Image.open(ROOT / IMAGE_PATH) as check:
   check.load()

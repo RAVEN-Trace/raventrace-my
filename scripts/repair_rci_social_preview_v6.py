@@ -29,7 +29,7 @@ with Image.open(DST) as check:
     assert check.format == 'JPEG'
     assert check.size == TARGET
 
-old = 'rci-tabung-haji-share-v5.jpg'
+old = 'rci-tabung-haji-share-v6.jpg'
 new = 'rci-tabung-haji-share-v6.jpg'
 for path in ROOT.rglob('*'):
     if not path.is_file() or path == DST:

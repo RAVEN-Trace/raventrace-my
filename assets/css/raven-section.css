@@ -15,3 +15,322 @@
 .section-content .sources-grid small, .section-content .source-note { font-size: .875rem; }
 .case-share-page .raven-sharebar { flex-wrap: wrap; }
 @media (max-width: 600px) { .section-intro { padding: 1.75rem 0; } .section-content .control-grid, .section-content .metric-grid, .section-content .sources-grid { grid-template-columns: minmax(0, 1fr); } }
+
+/* RCI NARRATIVE AUDIT — page-specific visual system. Content is intentionally untouched. */
+body:has(.section-links a[href$="/narratives/"][aria-current="page"]) {
+  --narrative-cyan: #27d3f2;
+  --narrative-ink: #080b0f;
+  --narrative-panel: #fffdf8;
+  --narrative-soft: #e8e4da;
+}
+body:has(.section-links a[href$="/narratives/"][aria-current="page"]) .section-intro {
+  position: relative;
+  overflow: hidden;
+  padding: clamp(3rem, 7vw, 6.25rem) 0 clamp(3.5rem, 8vw, 7rem);
+  background:
+    linear-gradient(90deg, rgba(39,211,242,.055) 1px, transparent 1px),
+    linear-gradient(rgba(39,211,242,.04) 1px, transparent 1px),
+    radial-gradient(circle at 82% 18%, rgba(39,211,242,.13), transparent 27rem),
+    #080b0f;
+  background-size: 72px 72px, 72px 72px, auto, auto;
+}
+body:has(.section-links a[href$="/narratives/"][aria-current="page"]) .section-intro::before {
+  content: "";
+  position: absolute;
+  width: min(36vw, 460px);
+  aspect-ratio: 1;
+  right: -6vw;
+  top: 12%;
+  border: 1px solid rgba(39,211,242,.2);
+  border-radius: 50%;
+  box-shadow: 0 0 0 34px rgba(39,211,242,.025), 0 0 0 70px rgba(39,211,242,.018);
+  pointer-events: none;
+}
+body:has(.section-links a[href$="/narratives/"][aria-current="page"]) .section-intro .container { position: relative; z-index: 1; }
+body:has(.section-links a[href$="/narratives/"][aria-current="page"]) .section-kicker {
+  display: inline-flex;
+  align-items: center;
+  gap: .65rem;
+  margin-bottom: 1.15rem;
+  font-family: var(--mono);
+  font-size: .73rem;
+  letter-spacing: .15em;
+}
+body:has(.section-links a[href$="/narratives/"][aria-current="page"]) .section-kicker::before {
+  content: "";
+  width: 2.7rem;
+  height: 2px;
+  background: var(--narrative-cyan);
+}
+body:has(.section-links a[href$="/narratives/"][aria-current="page"]) .section-intro h1 {
+  max-width: 16ch;
+  font-size: clamp(3rem, 7.2vw, 6.4rem);
+  line-height: .94;
+  letter-spacing: -.055em;
+}
+body:has(.section-links a[href$="/narratives/"][aria-current="page"]) .section-intro h1 + p {
+  max-width: 61ch;
+  margin-top: 1.5rem;
+  color: #cbd5df;
+  font: 400 clamp(1.05rem, 1.7vw, 1.28rem)/1.62 var(--serif);
+}
+body:has(.section-links a[href$="/narratives/"][aria-current="page"]) .section-cutoff {
+  display: inline-block;
+  margin-top: .75rem;
+  padding: .38rem .6rem;
+  border: 1px solid #33404c;
+  background: rgba(5,7,10,.6);
+  font-family: var(--mono);
+  letter-spacing: .045em;
+}
+body:has(.section-links a[href$="/narratives/"][aria-current="page"]) .section-boundary {
+  max-width: 62ch;
+  margin-top: 1.15rem;
+  padding: .85rem 1rem;
+  border: 0;
+  border-left: 4px solid #f59e0b;
+  background: rgba(245,158,11,.07);
+  color: #e4e8ed;
+}
+body:has(.section-links a[href$="/narratives/"][aria-current="page"]) .section-links {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  width: 100%;
+  max-width: none;
+  padding: .72rem max(1rem, calc((100vw - var(--max))/2));
+  flex-wrap: nowrap;
+  overflow-x: auto;
+  scrollbar-width: thin;
+  background: rgba(243,240,232,.96);
+  border-bottom: 1px solid var(--line);
+  box-shadow: 0 8px 24px rgba(8,11,15,.06);
+  backdrop-filter: blur(14px);
+}
+body:has(.section-links a[href$="/narratives/"][aria-current="page"]) .section-links a {
+  flex: 0 0 auto;
+  border: 0;
+  border-bottom: 2px solid transparent;
+  padding: .58rem .72rem;
+  color: #555b63;
+  font: 800 .76rem/1.15 var(--sans);
+  text-decoration: none;
+}
+body:has(.section-links a[href$="/narratives/"][aria-current="page"]) .section-links a[aria-current] {
+  background: transparent;
+  color: var(--ink);
+  border-bottom-color: var(--narrative-cyan);
+}
+body:has(.section-links a[href$="/narratives/"][aria-current="page"]) .section-content {
+  max-width: 1180px;
+  padding-top: clamp(1.5rem, 4vw, 3rem);
+}
+body:has(.section-links a[href$="/narratives/"][aria-current="page"]) .case-section {
+  position: relative;
+  padding: clamp(2.75rem, 6vw, 5.5rem) 0;
+  border-top: 1px solid var(--line);
+}
+body:has(.section-links a[href$="/narratives/"][aria-current="page"]) .case-section:first-child { border-top: 0; }
+body:has(.section-links a[href$="/narratives/"][aria-current="page"]) .section-marker {
+  display: grid;
+  grid-template-columns: 3.3rem auto;
+  align-items: center;
+  gap: .85rem;
+  margin-bottom: 1.15rem;
+}
+body:has(.section-links a[href$="/narratives/"][aria-current="page"]) .section-marker span {
+  display: grid;
+  place-items: center;
+  width: 3.3rem;
+  height: 3.3rem;
+  border: 1px solid #9da3a8;
+  border-radius: 50%;
+  color: var(--cyan);
+  font: 900 .76rem/1 var(--mono);
+}
+body:has(.section-links a[href$="/narratives/"][aria-current="page"]) .section-marker p {
+  margin: 0;
+  color: #60666d;
+  font: 850 .72rem/1.2 var(--mono);
+  letter-spacing: .13em;
+  text-transform: uppercase;
+}
+body:has(.section-links a[href$="/narratives/"][aria-current="page"]) .case-section > h2 {
+  max-width: 20ch;
+  margin-bottom: 1.35rem;
+  font-size: clamp(2rem, 4.7vw, 4.15rem);
+  line-height: .98;
+}
+body:has(.section-links a[href$="/narratives/"][aria-current="page"]) .section-lead {
+  max-width: 72ch;
+  color: #42474e;
+  font: 400 clamp(1.05rem, 1.8vw, 1.24rem)/1.68 var(--serif);
+}
+body:has(.section-links a[href$="/narratives/"][aria-current="page"]) .case-warning.light {
+  position: relative;
+  margin-top: 1.7rem;
+  padding: 1.15rem 1.25rem 1.15rem 1.55rem;
+  border: 1px solid #c8c3b8;
+  border-left: 5px solid var(--cyan);
+  background: #ebe8df;
+  box-shadow: 8px 8px 0 rgba(10,13,17,.05);
+}
+/* The six narrative items become evidence dossiers rather than generic cards. */
+body:has(.section-links a[href$="/narratives/"][aria-current="page"]) .case-section:nth-of-type(2) .control-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1rem;
+  counter-reset: narrative;
+}
+body:has(.section-links a[href$="/narratives/"][aria-current="page"]) .case-section:nth-of-type(2) .control-grid > article {
+  counter-increment: narrative;
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(230px,.78fr) minmax(0,1.65fr);
+  column-gap: clamp(1.5rem, 4vw, 3.4rem);
+  align-content: start;
+  min-height: 220px;
+  padding: clamp(1.35rem, 3vw, 2.15rem);
+  padding-left: clamp(4.5rem, 8vw, 6.2rem);
+  border: 1px solid #c8c3b8;
+  border-top: 4px solid var(--ink);
+  background: var(--narrative-panel);
+  box-shadow: 0 12px 30px rgba(8,11,15,.045);
+}
+body:has(.section-links a[href$="/narratives/"][aria-current="page"]) .case-section:nth-of-type(2) .control-grid > article::before {
+  content: counter(narrative, decimal-leading-zero);
+  position: absolute;
+  left: 1.25rem;
+  top: 1.35rem;
+  color: #9a9da0;
+  font: 900 clamp(1.4rem, 3vw, 2.2rem)/1 var(--mono);
+  letter-spacing: -.08em;
+}
+body:has(.section-links a[href$="/narratives/"][aria-current="page"]) .case-section:nth-of-type(2) .control-grid > article::after {
+  content: "";
+  position: absolute;
+  left: clamp(3.75rem, 7vw, 5.25rem);
+  top: 1.25rem;
+  bottom: 1.25rem;
+  width: 1px;
+  background: #d7d2c7;
+}
+body:has(.section-links a[href$="/narratives/"][aria-current="page"]) .case-section:nth-of-type(2) article h3 {
+  grid-column: 1;
+  grid-row: 1 / span 8;
+  padding-right: .5rem;
+  font-size: clamp(1.45rem, 2.6vw, 2.15rem);
+  line-height: 1.08;
+}
+body:has(.section-links a[href$="/narratives/"][aria-current="page"]) .case-section:nth-of-type(2) article p {
+  grid-column: 2;
+  margin-bottom: .85rem;
+}
+body:has(.section-links a[href$="/narratives/"][aria-current="page"]) .case-section:nth-of-type(2) article p:has(.status) {
+  order: -1;
+  margin-bottom: 1rem;
+}
+body:has(.section-links a[href$="/narratives/"][aria-current="page"]) .case-section:nth-of-type(2) .status {
+  border-width: 1px;
+  background: rgba(255,255,255,.72);
+  box-shadow: 3px 3px 0 currentColor;
+}
+/* Position map becomes a four-way editorial field. */
+body:has(.section-links a[href$="/narratives/"][aria-current="page"]) .case-section:nth-of-type(3) .control-grid {
+  position: relative;
+  display: grid;
+  grid-template-columns: repeat(2,minmax(0,1fr));
+  gap: 1px;
+  padding: 1px;
+  background: #aaa59a;
+  border: 1px solid #aaa59a;
+}
+body:has(.section-links a[href$="/narratives/"][aria-current="page"]) .case-section:nth-of-type(3) .control-grid::before,
+body:has(.section-links a[href$="/narratives/"][aria-current="page"]) .case-section:nth-of-type(3) .control-grid::after {
+  content: "";
+  position: absolute;
+  z-index: 2;
+  pointer-events: none;
+  background: rgba(39,211,242,.35);
+}
+body:has(.section-links a[href$="/narratives/"][aria-current="page"]) .case-section:nth-of-type(3) .control-grid::before { width: 1px; top: 0; bottom: 0; left: 50%; }
+body:has(.section-links a[href$="/narratives/"][aria-current="page"]) .case-section:nth-of-type(3) .control-grid::after { height: 1px; left: 0; right: 0; top: 50%; }
+body:has(.section-links a[href$="/narratives/"][aria-current="page"]) .case-section:nth-of-type(3) .control-grid > article {
+  min-height: 260px;
+  padding: clamp(1.35rem, 3vw, 2.2rem);
+  border: 0;
+  background: #f8f5ed;
+}
+body:has(.section-links a[href$="/narratives/"][aria-current="page"]) .case-section:nth-of-type(3) article h3 {
+  padding-bottom: .75rem;
+  border-bottom: 3px solid var(--ink);
+}
+body:has(.section-links a[href$="/narratives/"][aria-current="page"]) .case-section:nth-of-type(3) article:last-child {
+  background: #0b1016;
+  color: #eef3f6;
+}
+body:has(.section-links a[href$="/narratives/"][aria-current="page"]) .case-section:nth-of-type(3) article:last-child h3 { border-color: var(--narrative-cyan); }
+/* Unknowns read as hard editorial red lines. */
+body:has(.section-links a[href$="/narratives/"][aria-current="page"]) .unknown-list {
+  list-style: none;
+  counter-reset: unknown;
+  display: grid;
+  grid-template-columns: repeat(2,minmax(0,1fr));
+  gap: 1rem;
+  margin: 2rem 0 0;
+  padding: 0;
+}
+body:has(.section-links a[href$="/narratives/"][aria-current="page"]) .unknown-list li {
+  counter-increment: unknown;
+  position: relative;
+  min-height: 190px;
+  padding: 3.6rem 1.35rem 1.35rem;
+  border-top: 5px solid var(--red);
+  background: #15191e;
+  color: #e7ebef;
+  font-family: var(--serif);
+  font-size: 1.08rem;
+  line-height: 1.62;
+}
+body:has(.section-links a[href$="/narratives/"][aria-current="page"]) .unknown-list li::before {
+  content: "0" counter(unknown);
+  position: absolute;
+  top: 1rem;
+  left: 1.35rem;
+  color: #ff6679;
+  font: 900 .78rem/1 var(--mono);
+  letter-spacing: .08em;
+}
+/* Enforcement section gets a dossier-like spine. */
+body:has(.section-links a[href$="/narratives/"][aria-current="page"]) .case-section:nth-of-type(5) {
+  padding-left: clamp(1.25rem, 4vw, 3rem);
+  border-left: 6px solid #f59e0b;
+  background: linear-gradient(90deg, rgba(245,158,11,.07), transparent 36%);
+}
+body:has(.section-links a[href$="/narratives/"][aria-current="page"]) .source-room {
+  margin-top: 1rem;
+  padding-inline: clamp(1.25rem, 3vw, 2rem);
+  background: #ebe8df;
+  border: 1px solid #ccc6bb;
+}
+@media (max-width: 760px) {
+  body:has(.section-links a[href$="/narratives/"][aria-current="page"]) .section-intro { padding-top: 2.5rem; }
+  body:has(.section-links a[href$="/narratives/"][aria-current="page"]) .section-intro::before { opacity: .45; width: 72vw; right: -34vw; }
+  body:has(.section-links a[href$="/narratives/"][aria-current="page"]) .section-intro h1 { font-size: clamp(2.7rem, 14vw, 4.7rem); }
+  body:has(.section-links a[href$="/narratives/"][aria-current="page"]) .section-links { padding-inline: .65rem; }
+  body:has(.section-links a[href$="/narratives/"][aria-current="page"]) .case-section:nth-of-type(2) .control-grid > article {
+    display: block;
+    min-height: 0;
+    padding: 4.25rem 1.15rem 1.25rem;
+  }
+  body:has(.section-links a[href$="/narratives/"][aria-current="page"]) .case-section:nth-of-type(2) .control-grid > article::before { left: 1.15rem; top: 1.15rem; }
+  body:has(.section-links a[href$="/narratives/"][aria-current="page"]) .case-section:nth-of-type(2) .control-grid > article::after { left: 4.4rem; top: .95rem; bottom: auto; width: calc(100% - 5.5rem); height: 1px; }
+  body:has(.section-links a[href$="/narratives/"][aria-current="page"]) .case-section:nth-of-type(2) article h3 { margin-bottom: 1rem; }
+  body:has(.section-links a[href$="/narratives/"][aria-current="page"]) .case-section:nth-of-type(3) .control-grid,
+  body:has(.section-links a[href$="/narratives/"][aria-current="page"]) .unknown-list { grid-template-columns: 1fr; }
+  body:has(.section-links a[href$="/narratives/"][aria-current="page"]) .case-section:nth-of-type(3) .control-grid::before,
+  body:has(.section-links a[href$="/narratives/"][aria-current="page"]) .case-section:nth-of-type(3) .control-grid::after { display: none; }
+  body:has(.section-links a[href$="/narratives/"][aria-current="page"]) .case-section:nth-of-type(3) .control-grid > article { min-height: 0; }
+  body:has(.section-links a[href$="/narratives/"][aria-current="page"]) .unknown-list li { min-height: 0; }
+  body:has(.section-links a[href$="/narratives/"][aria-current="page"]) .case-section:nth-of-type(5) { padding-left: 1rem; }
+}

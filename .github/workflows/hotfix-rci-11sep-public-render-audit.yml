@@ -1,0 +1,55 @@
+name: Hotfix RCI 11 Sep public render audit
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'scripts/hotfix_rci_11sep_public_render_audit.py'
+      - '.github/workflows/hotfix-rci-11sep-public-render-audit.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  hotfix:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Apply public render audit hotfix
+        run: python scripts/hotfix_rci_11sep_public_render_audit.py
+      - name: QA wording and numbering
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          home = Path('index.html').read_text()
+          desk = Path('investigations/index.html').read_text()
+          case = Path('investigations/rci-tabung-haji/index.html').read_text()
+          article = Path('news/2026/09/11/empat-atau-lima-didakwa-rekod-tidak-seragam/index.html').read_text()
+          assert 'pertuduhan telah dibacakan kepada empat individu' not in home
+          assert '4 pertuduhan dibacakan · kiraan SPRM: 5' not in desk
+          assert 'Datuk Azmi Ahmad didakwa hari ini' not in desk
+          assert '<div class="update-index">00</div>' in home
+          assert '<div class="update-index">01</div>' in home
+          assert '<div class="update-index">02</div>' in home
+          assert '<div class="update-index">03</div>' in home
+          assert '<div class="update-index">04</div>' in home
+          assert 'Chronology' not in home
+          assert 'Chronology' not in article
+          assert 'individu dengan pertuduhan dibacakan' in case
+          print('Public render audit QA PASS')
+          PY
+      - name: Commit generated hotfix
+        run: |
+          if git diff --quiet; then
+            echo 'No generated changes.'
+            exit 0
+          fi
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add index.html investigations news
+          git commit -m 'Hotfix RCI public wording and count units'
+          git push

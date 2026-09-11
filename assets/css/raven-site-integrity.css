@@ -1,0 +1,76 @@
+/* RAVEN-Trace · Site Integrity V1
+   Cross-page UX safeguards. No factual/case-state content belongs here. */
+
+/* CASEFILE section navigation: compact, horizontally scrollable on narrow screens. */
+.case-share-page .section-links {
+  flex-wrap: nowrap;
+  overflow-x: auto;
+  overscroll-behavior-inline: contain;
+  scrollbar-width: thin;
+  -webkit-overflow-scrolling: touch;
+}
+.case-share-page .section-links a {
+  flex: 0 0 auto;
+  white-space: nowrap;
+}
+
+/* Prevent long source URLs and labels from forcing horizontal page overflow. */
+.case-share-page .section-content,
+.case-share-page .section-intro,
+.case-share-page .source-room,
+.case-share-page .sources-grid {
+  min-width: 0;
+}
+.case-share-page a,
+.case-share-page .source-note,
+.case-share-page small {
+  overflow-wrap: anywhere;
+}
+
+/* Public-readable minimum sizing for dense forensic UI labels. */
+.case-share-page .section-cutoff,
+.case-share-page .source-grade,
+.case-share-page .date-chip,
+.case-share-page .status,
+.case-share-page .section-links a {
+  font-size: max(.75rem, 12px);
+}
+
+/* Keep touch targets usable on phones. */
+@media (max-width: 760px) {
+  .case-share-page .section-links {
+    position: sticky;
+    top: 0;
+    z-index: 48;
+    width: 100%;
+    max-width: none;
+    padding: .55rem 1rem;
+    background: rgba(243,240,232,.97);
+    border-bottom: 1px solid var(--line);
+    box-shadow: 0 6px 18px rgba(8,11,15,.06);
+    backdrop-filter: blur(12px);
+  }
+  .case-share-page .section-links a {
+    min-height: 42px;
+    display: inline-flex;
+    align-items: center;
+    padding: .55rem .72rem;
+  }
+  .case-share-page .section-intro {
+    padding-bottom: 1.5rem;
+  }
+}
+
+/* Narrative Audit has two sticky rails; stack them deterministically. */
+@media (max-width: 760px) {
+  body.narrative-v31 {
+    --raven-case-rail-height: 54px;
+  }
+  body.narrative-v31 .narrative-filterbar {
+    top: var(--raven-case-rail-height) !important;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+}

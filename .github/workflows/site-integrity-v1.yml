@@ -1,0 +1,52 @@
+name: Site Integrity V1
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'assets/js/**'
+      - 'assets/css/**'
+      - 'about/**'
+      - 'methodology/**'
+      - 'tips/**'
+      - 'corrections/**'
+      - 'investigations/**'
+      - 'news/**'
+      - 'scripts/check_site_integrity_v1.py'
+      - '.github/workflows/site-integrity-v1.yml'
+  pull_request:
+    paths:
+      - 'assets/js/**'
+      - 'assets/css/**'
+      - 'about/**'
+      - 'methodology/**'
+      - 'tips/**'
+      - 'corrections/**'
+      - 'investigations/**'
+      - 'news/**'
+      - 'scripts/check_site_integrity_v1.py'
+      - '.github/workflows/site-integrity-v1.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  integrity:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Run Site Integrity V1 gate
+        run: python scripts/check_site_integrity_v1.py
+      - name: Confirm section controller is interaction-only
+        run: |
+          ! grep -E "Jamil Khir|Abdul Azeez|Azmi Ahmad|section-cutoff|ravenCaseState|Data cut-off" assets/js/raven-section.js
+      - name: Confirm corrupt OG v5 is not referenced by public HTML
+        run: |
+          if grep -R "rci-tabung-haji-share-v5.jpg" --include='*.html' .; then
+            echo 'Legacy corrupt OG v5 referenced by public HTML' >&2
+            exit 1
+          fi

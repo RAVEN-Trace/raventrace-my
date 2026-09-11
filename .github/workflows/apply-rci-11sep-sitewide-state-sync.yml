@@ -1,0 +1,67 @@
+name: Apply RCI 11 Sep sitewide state sync
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'scripts/apply_rci_11sep_sitewide_state_sync.py'
+      - '.github/workflows/apply-rci-11sep-sitewide-state-sync.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Apply 11 Sep sitewide state sync
+        run: python scripts/apply_rci_11sep_sitewide_state_sync.py
+      - name: QA current-state boundaries
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          checks = {
+            'index.html': ['11 September 2026', 'Empat atau lima telah didakwa?', 'SPRM pula menyebut lima'],
+            'investigations/index.html': ['11 Sep 2026', 'rekod awam tidak seragam', '14 Sep'],
+            'investigations/rci-tabung-haji/index.html': ['JEJAK / 11-01', 'DIPERTIKAIKAN · REKOD', 'SPRM menyebut lima'],
+            'investigations/rci-tabung-haji/people/index.html': ['Tindakan mahkamah dijadual · 14 Sep', 'notis pendakwaan'],
+            'investigations/rci-tabung-haji/timeline/index.html': ['Audit 4 lawan 5', '14 Sep'],
+            'investigations/rci-tabung-haji/tracks/index.html': ['BELUM DIKETAHUI / OPEN', '11 Sep 2026'],
+            'investigations/rci-tabung-haji/governance/index.html': ['Seruan Istito’ah', '76% daripada 25 syor RCI'],
+            'investigations/rci-tabung-haji/narratives/index.html': ['SPRM pula menyebut lima'],
+            'investigations/rci-tabung-haji/sources/index.html': ['id="s61"', 'id="s64"'],
+            'news/2026/09/11/empat-atau-lima-didakwa-rekod-tidak-seragam/index.html': ['https://www.bernama.com/en/news.php?id=2605582', 'https://www.bernama.com/en/news.php?id=2605735'],
+          }
+          for rel, needles in checks.items():
+            text = Path(rel).read_text()
+            missing = [n for n in needles if n not in text]
+            if missing:
+              raise SystemExit(f'{rel}: missing {missing}')
+          # Evidence lock: never silently promote MACC's five to five formally arraigned.
+          forbidden = {
+            'index.html': ['lima individu telah berdepan pertuduhan yang dibacakan'],
+            'investigations/rci-tabung-haji/index.html': ['lima individu telah berdepan pertuduhan yang dibacakan'],
+          }
+          for rel, needles in forbidden.items():
+            text = Path(rel).read_text()
+            hit = [n for n in needles if n in text]
+            if hit:
+              raise SystemExit(f'{rel}: forbidden overclaim {hit}')
+          print('11 Sep sitewide state QA PASS')
+          PY
+      - name: Commit generated sitewide sync
+        run: |
+          if git diff --quiet; then
+            echo 'No generated changes.'
+            exit 0
+          fi
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add index.html investigations news
+          git commit -m 'Sync RCI sitewide state through 11 Sep'
+          git push

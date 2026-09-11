@@ -38,10 +38,8 @@ patch('investigations/index.html', [
 
 # Main CASEFILE: same unit-of-count correction and Malay-first wording.
 patch('investigations/rci-tabung-haji/index.html', [
-    ('<div><dt>04</dt><dd>pertuduhan dibacakan · kiraan SPRM: 5 · rekod belum seragam</dd></div>',
-     '<div><dt>04</dt><dd>individu dengan pertuduhan dibacakan · kiraan SPRM: 5 · rekod belum seragam</dd></div>'),
-    ('Chronology mahkamah yang disemak menunjukkan empat individu telah berdepan pertuduhan yang dibacakan.',
-     'Kronologi mahkamah yang disemak menunjukkan empat individu telah berdepan pertuduhan yang dibacakan.'),
+    ('<div><dt>04</dt><dd>pertuduhan dibacakan setakat chronology mahkamah · SPRM menyebut 05</dd></div>',
+     '<div><dt>04</dt><dd>individu dengan pertuduhan dibacakan setakat kronologi mahkamah · SPRM menyebut 05</dd></div>'),
 ])
 
 # 11 Sep forensic article: public language consistency.

@@ -5,6 +5,7 @@ on:
     branches: [main]
     paths:
       - 'assets/css/raven-signal-v6.css'
+      - 'assets/css/raven-signal-v6-polish.css'
       - 'assets/js/raven-signal-v6.js'
       - 'scripts/apply_raven_signal_v6.py'
       - '.github/workflows/apply-raven-signal-v6.yml'
@@ -39,8 +40,9 @@ jobs:
         run: |
           python - <<'PY'
           from pathlib import Path
+          import re
           root = Path('.')
-          css = 'data-raven-signal-v6'
+          marker_re = re.compile(r'data-raven-signal-v6(?=[ >])')
           live = []
           for rel in ['index.html','about','corrections','investigations','methodology','news','tips']:
               p = root / rel
@@ -51,15 +53,18 @@ jobs:
           assert live, 'No live pages found'
           for p in live:
               t = p.read_text(encoding='utf-8')
-              assert t.count(css) == 2, f'Signal assets not canonical in {p}'
+              assert len(marker_re.findall(t)) == 2, f'Signal CSS/JS not canonical in {p}'
               assert '/assets/css/raven-signal-v6.css?v=6.0.0' in t, p
               assert '/assets/js/raven-signal-v6.js?v=6.0.0' in t, p
           assert 'https://raven-trace.github.io/raventrace-my/' in Path('index.html').read_text(encoding='utf-8')
           case = Path('investigations/rci-tabung-haji/index.html').read_text(encoding='utf-8')
+          narrative = Path('investigations/rci-tabung-haji/narratives/index.html').read_text(encoding='utf-8')
           assert 'https://raven-trace.github.io/raventrace-my/investigations/rci-tabung-haji/' in case
+          assert narrative.count('data-raven-signal-v6-polish') == 1, 'Narrative polish must be wired exactly once'
+          assert '/assets/css/raven-signal-v6-polish.css?v=6.0.1' in narrative
           assert not Path('rcitabunghaji').exists(), 'Do not migrate the public route yet'
           for p in root.rglob('research/**/index.html'):
-              assert css not in p.read_text(encoding='utf-8'), f'Historical research mutated: {p}'
+              assert not marker_re.search(p.read_text(encoding='utf-8')), f'Historical research mutated: {p}'
           print(f'Validated {len(live)} live public pages; historical research excluded.')
           PY
 

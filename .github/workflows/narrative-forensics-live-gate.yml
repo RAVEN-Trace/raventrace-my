@@ -1,0 +1,66 @@
+name: Narrative Forensics Live Gate
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/narrative-forensics-live-gate.yml'
+      - 'investigations/rci-tabung-haji/narratives/**'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    env:
+      BASE: https://raven-trace.github.io/raventrace-my
+    steps:
+      - name: Wait for Narrative Forensics V4.2 deployment
+        run: |
+          python - <<'PY'
+          import os,time,urllib.request
+          base=os.environ['BASE']
+          paths={
+            '/investigations/rci-tabung-haji/narratives/':['FORENSIK NARATIF','Urutan Raven','AMARAN NARATIF','Peraturan Raven'],
+            '/investigations/rci-tabung-haji/narratives/political-social-media/':['FORENSIK POLITIK + MEDIA SOSIAL','Forensik bahasa','CATEGORY COLLAPSE','EMOTIONAL PRIMING','MOTIVE INFLATION','REPETITION RISK','REPRESENTATIVENESS ERROR','Neutralise, bukan counter-spin','Prinsip komunikasi']
+          }
+          headers={'User-Agent':'RAVEN-Trace-Narrative-QA/4.2','Cache-Control':'no-cache'}
+          for attempt in range(60):
+              ok=True
+              for path,tokens in paths.items():
+                  try:
+                      req=urllib.request.Request(base+path+'?qa='+str(time.time_ns()),headers=headers)
+                      text=urllib.request.urlopen(req,timeout=15).read().decode('utf-8','replace')
+                      if not all(tok in text for tok in tokens): ok=False
+                  except Exception:
+                      ok=False
+              if ok:
+                  print('NARRATIVE FORENSICS V4.2 LIVE PAYLOAD READY')
+                  raise SystemExit(0)
+              time.sleep(5)
+          raise SystemExit('Timed out waiting for Narrative Forensics V4.2')
+          PY
+      - name: Verify narrative language and evidence boundaries
+        run: |
+          python - <<'PY'
+          import os,time,urllib.request
+          base=os.environ['BASE']
+          headers={'User-Agent':'RAVEN-Trace-Narrative-QA/4.2','Cache-Control':'no-cache'}
+          def get(path):
+              req=urllib.request.Request(base+path+'?qa='+str(time.time_ns()),headers=headers)
+              return urllib.request.urlopen(req,timeout=20).read().decode('utf-8','replace')
+          main=get('/investigations/rci-tabung-haji/narratives/')
+          social=get('/investigations/rci-tabung-haji/narratives/political-social-media/')
+          main_required=['Apa yang cerita cuba buat kita percaya','Mula dengan apa yang boleh dibuktikan','Selepas framing dibuang:','Bukti apa boleh mengubah penilaian?','Pertuduhan bukan sabitan']
+          social_required=['Buang parti, buang slogan, buang emosi','signal yang diperhatikan','Campur kategori','Emosi sebelum bukti','Tindakan menjadi niat','Viral menjadi “suara rakyat”']
+          for x in main_required: assert x in main, 'main missing '+x
+          for x in social_required: assert x in social, 'social missing '+x
+          forbidden=['Siapa kata apa — dan apa rekod tunjuk?','Peta naratif politik & media sosial — RCI Tabung Haji','<b>Frame:</b>','<b>Gap:</b>','<b>Confidence:</b>','<b>Siapa menggunakan naratif ini?</b>']
+          for x in forbidden:
+              assert x not in main, 'main stale '+x
+              assert x not in social, 'social stale '+x
+          print('NARRATIVE FORENSICS LIVE LANGUAGE/EVIDENCE: PASS')
+          PY

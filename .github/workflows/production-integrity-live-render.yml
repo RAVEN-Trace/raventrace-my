@@ -102,7 +102,7 @@ jobs:
             '/investigations/rci-tabung-haji/tracks/':['AMLA','BELUM DIKETAHUI'],
             '/investigations/rci-tabung-haji/governance/':['Seruan Istito’ah','RM15,000','Tabung Haji · kenyataan rasmi · 11 Sep'],
             '/investigations/rci-tabung-haji/narratives/':['SPRM','lima','Pertuduhan bukan sabitan','Naratif politik + media sosial','political-social-media/','raven-v5.css?v=5.0.0','raven-v5.js?v=5.0.1'],
-            '/investigations/rci-tabung-haji/narratives/political-social-media/':['Kerajaan / PH','UMNO','PAS','BERSATU','AMK / sayap PH','Signal media sosial','sentimen awam tanpa kaedah pensampelan'],
+            '/investigations/rci-tabung-haji/narratives/political-social-media/':['Kerajaan / PH','UMNO','PAS','BERSATU','AMK / sayap PH','Signal media sosial','signal naratif yang diperhatikan'],
             '/investigations/rci-tabung-haji/sources/':['2605735','2605582','pr11092026_BM','id="s65"','id="s66"'],
             '/investigations/rci-tabung-haji/updates/':['JEJAK / 12-01','15 Sep:','RM18.6 juta','AMLA'],
           }

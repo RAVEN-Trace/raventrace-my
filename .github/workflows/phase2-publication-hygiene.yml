@@ -1,0 +1,47 @@
+name: Phase 2 publication hygiene
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - phase2-publication-hygiene
+    paths:
+      - 'scripts/phase2_publication_hygiene.py'
+      - 'scripts/check_phase2_publication_hygiene.py'
+      - '.github/workflows/phase2-publication-hygiene.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  hygiene:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: phase2-publication-hygiene
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Self-host licensed SPRM contextual photo
+        run: |
+          mkdir -p assets/photos
+          curl -L --fail --retry 3 --retry-delay 2 \
+            'https://upload.wikimedia.org/wikipedia/commons/thumb/3/33/Putrajaya_Malaysia_Anti-Corruption_Commission-01.jpg/1280px-Putrajaya_Malaysia_Anti-Corruption_Commission-01.jpg' \
+            -o assets/photos/sprm-hq-putrajaya.jpg
+          test $(wc -c < assets/photos/sprm-hq-putrajaya.jpg) -gt 100000
+      - name: Apply static navigation, image, analytics and cache hygiene
+        run: python scripts/phase2_publication_hygiene.py
+      - name: QA Phase 2 publication hygiene
+        run: python scripts/check_phase2_publication_hygiene.py
+      - name: Commit generated hygiene changes
+        run: |
+          git config user.name 'raven-trace-bot'
+          git config user.email 'actions@users.noreply.github.com'
+          git add assets investigations news about methodology corrections tips index.html
+          if git diff --cached --quiet; then
+            echo 'No generated changes to commit.'
+          else
+            git commit -m 'Apply Phase 2 publication hygiene'
+            git push origin HEAD:phase2-publication-hygiene
+          fi

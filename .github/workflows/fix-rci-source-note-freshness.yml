@@ -1,0 +1,47 @@
+name: Fix RCI source-note freshness
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'scripts/fix_rci_source_note_freshness.py'
+      - '.github/workflows/fix-rci-source-note-freshness.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  repair:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Repair source-note freshness
+        run: python scripts/fix_rci_source_note_freshness.py
+      - name: QA repaired source notes
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          base=Path('investigations/rci-tabung-haji')
+          old='Maklumat disemak hingga:</strong> 10 September 2026 · lewat malam MYT. <strong>Semakan laman:</strong> 7 September 2026 · v18.'
+          for p in base.rglob('*.html'):
+              t=p.read_text(encoding='utf-8',errors='ignore')
+              assert old not in t, f'stale source note remains: {p}'
+          print('SOURCE NOTE QA: PASS')
+          PY
+      - name: Commit repaired pages
+        run: |
+          if git diff --quiet; then
+            echo 'No generated changes'
+            exit 0
+          fi
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add investigations/rci-tabung-haji
+          git commit -m 'Fix RCI source-note freshness through 11 Sep'
+          git push

@@ -1,4 +1,4 @@
-name: Apply Narrative Reading Experience V5.2
+name: Apply Narrative Reading Experience V5.2.1
 
 on:
   push:
@@ -35,7 +35,7 @@ jobs:
           test -s assets/css/raven-narrative-v5.css
           test -s assets/js/raven-narrative-v5.js
           grep -q 'raven-narrative-v5.css?v=5.1.0' investigations/rci-tabung-haji/narratives/index.html
-          test "$(grep -o 'raven-narrative-v5.js?v=5.2.0' investigations/rci-tabung-haji/narratives/index.html | wc -l)" -eq 1
+          test "$(grep -o 'raven-narrative-v5.js?v=5.2.1' investigations/rci-tabung-haji/narratives/index.html | wc -l)" -eq 1
           grep -q 'Naratif utama' investigations/rci-tabung-haji/narratives/index.html
           grep -q 'Apa yang boleh disahkan?' investigations/rci-tabung-haji/narratives/index.html
           git diff --check
@@ -48,5 +48,5 @@ jobs:
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
           git add investigations/rci-tabung-haji/narratives/index.html
-          git commit -m 'ux: activate resilient Narrative Reading Experience V5.2'
+          git commit -m 'ux: activate Narrative Reading Experience V5.2.1'
           git push

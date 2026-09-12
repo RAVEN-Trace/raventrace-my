@@ -1,0 +1,61 @@
+name: Harden V4 runtime
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'scripts/harden_v4_runtime.py'
+      - '.github/workflows/harden-v4-runtime.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  harden:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Apply V4 runtime hardening
+        run: python scripts/harden_v4_runtime.py
+      - name: QA V4 runtime contract
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          root=Path('.')
+          home=(root/'index.html').read_text(encoding='utf-8')
+          assert '<body class="raven-editorial-home">' in home
+          assert 'raven-publication.js?v=4.3.0' in home
+          for p in [root/'assets/js/raven.js', root/'assets/js/raven-share.js']:
+              text=p.read_text(encoding='utf-8')
+              assert 'raven-publication.js?v=1.1.0' not in text
+              assert 'raven-publication.js?v=2.1.0' not in text
+              assert 'raven-publication.js?v=4.3.0' in text
+          governance=(root/'investigations/rci-tabung-haji/governance/index.html').read_text(encoding='utf-8')
+          sources=(root/'investigations/rci-tabung-haji/sources/index.html').read_text(encoding='utf-8')
+          assert 'pr11092026_BM' in governance
+          assert 'pr11092026_BM' in sources
+          for p in root.rglob('*.html'):
+              if any(part in {'.git'} for part in p.parts):
+                  continue
+              text=p.read_text(encoding='utf-8', errors='ignore')
+              assert 'raven-publication.js?v=1.1.0' not in text
+              assert 'raven-publication.js?v=2.1.0' not in text
+          print('V4 RUNTIME QA: PASS')
+          PY
+      - name: Commit generated hardening
+        run: |
+          if git diff --quiet; then
+            echo 'No generated changes'
+            exit 0
+          fi
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add index.html about methodology corrections tips news investigations assets/js/raven.js assets/js/raven-share.js
+          git commit -m 'Harden V4 runtime and upgrade primary TH source'
+          git push

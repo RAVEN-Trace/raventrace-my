@@ -1,0 +1,44 @@
+name: Revise Narrative Forensics NLP V4
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/revise-narrative-forensics-nlp-v4.yml'
+      - 'scripts/revise_narrative_forensics_nlp_v4.py'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  apply:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Apply narrative forensics NLP revision
+        run: python scripts/revise_narrative_forensics_nlp_v4.py
+      - name: QA narrative forensics language
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          main=Path('investigations/rci-tabung-haji/narratives/index.html').read_text(encoding='utf-8')
+          social=Path('investigations/rci-tabung-haji/narratives/political-social-media/index.html').read_text(encoding='utf-8')
+          required_main=['FORENSIK NARATIF','Apa yang cerita cuba buat kita percaya','Urutan Raven','AMARAN NARATIF','Selepas framing dibuang:','Peraturan Raven']
+          required_social=['FORENSIK POLITIK + MEDIA SOSIAL','Buang parti, buang slogan, buang emosi','Forensik bahasa','CATEGORY COLLAPSE','EMOTIONAL PRIMING','MOTIVE INFLATION','REPETITION RISK','REPRESENTATIVENESS ERROR','Neutralise, bukan counter-spin','Prinsip komunikasi']
+          for x in required_main: assert x in main, 'main missing '+x
+          for x in required_social: assert x in social, 'social missing '+x
+          forbidden=['<b>Frame:</b>','<b>Gap:</b>','<b>Confidence:</b>','<b>Siapa menggunakan naratif ini?</b>','<b>Verdict Raven:</b>']
+          for x in forbidden:
+              assert x not in main, 'main stale label '+x
+              assert x not in social, 'social stale label '+x
+          print('NARRATIVE FORENSICS NLP V4: PASS')
+          PY
+      - name: Commit generated pages
+        run: |
+          if git diff --quiet; then echo 'No changes'; exit 0; fi
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add investigations/rci-tabung-haji/narratives/index.html investigations/rci-tabung-haji/narratives/political-social-media/index.html
+          git commit -m 'Reframe narrative audit as evidence-first narrative forensics'
+          git push

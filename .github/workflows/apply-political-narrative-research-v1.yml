@@ -1,0 +1,55 @@
+name: Apply political narrative research v1
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'scripts/apply_political_narrative_research_v1.py'
+      - '.github/workflows/apply-political-narrative-research-v1.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  apply:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+      - name: Apply narrative research integration
+        run: python scripts/apply_political_narrative_research_v1.py
+      - name: QA political narrative layer
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          p=Path('investigations/rci-tabung-haji/narratives/index.html')
+          t=p.read_text(encoding='utf-8')
+          req=[
+            'Naratif politik + media sosial',
+            'political-social-media/',
+            'Gred C / research lead',
+            '12 Sep 2026 · 22:03 MYT',
+            'sentimen platform',
+          ]
+          for x in req:
+              assert x in t, 'missing narrative token: '+x
+          assert 'UMNO paling terdedah kerana' not in t
+          assert 'PAS cuba mengalih naratif' not in t
+          print('POLITICAL NARRATIVE QA: PASS')
+          PY
+      - name: Commit generated narrative update
+        run: |
+          if git diff --quiet; then
+            echo 'No generated changes.'
+            exit 0
+          fi
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add investigations/rci-tabung-haji/narratives/index.html
+          git commit -m 'Integrate political and social-media narrative research'
+          git push

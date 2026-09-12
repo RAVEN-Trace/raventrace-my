@@ -5,6 +5,7 @@ ROOT = Path(__file__).resolve().parents[1]
 CSS = '<link rel="stylesheet" href="/raventrace-my/assets/css/raven-signal-v6.css?v=6.0.0" data-raven-signal-v6>'
 JS = '<script src="/raventrace-my/assets/js/raven-signal-v6.js?v=6.0.0" defer data-raven-signal-v6></script>'
 SECTION_JS = '/raventrace-my/assets/js/raven-section.js?v=2.1.0'
+NARRATIVE_REL = Path('investigations/rci-tabung-haji/narratives/index.html')
 
 PUBLIC_ROOTS = [
     ROOT / 'index.html',
@@ -25,6 +26,25 @@ def is_live_public(path: Path) -> bool:
     if any(p.startswith('.') for p in rel.parts):
         return False
     return path.name == 'index.html'
+
+
+def normalize_narrative_rule(text: str) -> str:
+    """Keep the Narrative closing principle inside the article/main, never after the footer."""
+    pattern = re.compile(
+        r'<section class="case-section" id="narrative-rule">.*?</section>',
+        re.S,
+    )
+    match = pattern.search(text)
+    if not match:
+        return text
+
+    block = match.group(0)
+    text = text[:match.start()] + text[match.end():]
+    anchor = '</article></main>'
+    if anchor not in text:
+        raise RuntimeError('Narrative closing main/article anchor missing')
+    text = text.replace(anchor, f'{block}\n{anchor}', 1)
+    return text
 
 
 paths = []
@@ -56,15 +76,27 @@ for path in paths:
         text,
     )
 
+    # Historical migration scripts once placed the Narrative closing principle
+    # after the footer. Normalize the live page into semantic document order.
+    if path.relative_to(ROOT) == NARRATIVE_REL:
+        text = normalize_narrative_rule(text)
+
     if '</head>' not in text or '</body>' not in text:
         raise RuntimeError(f'Missing closing head/body in {path.relative_to(ROOT)}')
 
     text = text.replace('</head>', f'{CSS}\n</head>', 1)
-    # Put Signal last so it can progressively enhance V5/Narrative V5.2 output.
+    # Put Signal last so it can progressively enhance V5/Narrative V5.2.1 output.
     text = text.replace('</body>', f'{JS}\n</body>', 1)
 
     if text.count('data-raven-signal-v6') != 2:
         raise RuntimeError(f'Unexpected Signal tag count in {path.relative_to(ROOT)}')
+
+    if path.relative_to(ROOT) == NARRATIVE_REL:
+        rule_pos = text.find('id="narrative-rule"')
+        main_end = text.find('</main>')
+        footer_pos = text.find('<footer')
+        if not (0 <= rule_pos < main_end < footer_pos):
+            raise RuntimeError('Narrative rule must be inside main and before footer')
 
     if text != original:
         path.write_text(text, encoding='utf-8')

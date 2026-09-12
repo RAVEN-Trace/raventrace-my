@@ -1,0 +1,132 @@
+name: Production Integrity Live Render
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/production-integrity-live-render.yml'
+      - 'index.html'
+      - 'investigations/**'
+      - 'news/**'
+      - 'assets/js/**'
+      - 'assets/css/**'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  live-render:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      BASE: https://raven-trace.github.io/raventrace-my
+    steps:
+      - name: Wait for current Pages payload
+        run: |
+          python - <<'PY'
+          import os,time,urllib.request
+          url=os.environ['BASE']+'/?liveqa='+str(int(time.time()))
+          expected=['raven-publication.js?v=5.0.0','raven-evidence-ux.js?v=3.0.0','11 September 2026','empat individu telah berdepan pertuduhan']
+          last=''
+          for i in range(36):
+              try:
+                  req=urllib.request.Request(url+'&n='+str(i),headers={'User-Agent':'RAVEN-Trace-Live-QA/1.0','Cache-Control':'no-cache'})
+                  with urllib.request.urlopen(req,timeout=15) as r:
+                      text=r.read().decode('utf-8','replace')
+                      last=text
+                      if all(x in text for x in expected):
+                          print('LIVE PAYLOAD READY')
+                          raise SystemExit(0)
+              except Exception as e:
+                  print('wait',i,type(e).__name__,str(e)[:180])
+              time.sleep(5)
+          print(last[:1500])
+          raise SystemExit('Timed out waiting for current Pages payload')
+          PY
+
+      - name: Verify homepage live state
+        run: |
+          python - <<'PY'
+          import os,urllib.request,time
+          u=os.environ['BASE']+'/?qa='+str(time.time_ns())
+          req=urllib.request.Request(u,headers={'User-Agent':'RAVEN-Trace-Live-QA/1.0','Cache-Control':'no-cache'})
+          t=urllib.request.urlopen(req,timeout=20).read().decode('utf-8','replace')
+          required=[
+            '11 September 2026 · disemak 23:37 MYT',
+            'empat individu telah berdepan pertuduhan',
+            'SPRM pula menyebut lima',
+            'DIPERTIKAIKAN · REKOD',
+            'raven-publication.js?v=5.0.0',
+            'raven-evidence-ux.js?v=3.0.0',
+            'Pertuduhan bukan sabitan',
+          ]
+          forbidden=[
+            'Setakat 9 September, tiga individu telah didakwa',
+            '9 September 2026 · verified 18:29 MYT',
+            'raven-publication.js?v=4.3.0',
+            'raven-evidence-ux.js?v=2.1.0',
+          ]
+          for x in required: assert x in t, 'missing homepage token: '+x
+          for x in forbidden: assert x not in t, 'stale homepage token: '+x
+          print('HOMEPAGE LIVE STATE: PASS')
+          PY
+
+      - name: Verify core investigation pages
+        run: |
+          python - <<'PY'
+          import os,urllib.request,time
+          base=os.environ['BASE']
+          checks={
+            '/investigations/':['11 Sep 2026','empat individu','SPRM menyebut lima','14 Sep','24 Sep'],
+            '/investigations/rci-tabung-haji/':['11 Sep 2026','DIPERTIKAIKAN','Pertuduhan bukan sabitan','SPRM pula menyebut lima'],
+            '/investigations/rci-tabung-haji/people/':['Didakwa · belum sabit','Tindakan mahkamah dijadual · 14 Sep'],
+            '/investigations/rci-tabung-haji/timeline/':['14 Sep','empat','lima'],
+            '/investigations/rci-tabung-haji/tracks/':['AMLA','BELUM DIKETAHUI'],
+            '/investigations/rci-tabung-haji/governance/':['Seruan Istito’ah','RM15,000','Tabung Haji · kenyataan rasmi · 11 Sep'],
+            '/investigations/rci-tabung-haji/narratives/':['SPRM pula menyebut lima','Pertuduhan bukan sabitan'],
+            '/investigations/rci-tabung-haji/sources/':['2605735','2605567','2605960','pr11092026_BM'],
+            '/investigations/rci-tabung-haji/updates/':['11 Sep','empat','lima'],
+          }
+          for path,tokens in checks.items():
+              u=base+path+'?qa='+str(time.time_ns())
+              req=urllib.request.Request(u,headers={'User-Agent':'RAVEN-Trace-Live-QA/1.0','Cache-Control':'no-cache'})
+              with urllib.request.urlopen(req,timeout=20) as r:
+                  assert r.status==200,(path,r.status)
+                  text=r.read().decode('utf-8','replace')
+              for x in tokens: assert x in text, f'{path}: missing {x}'
+              print(path,'PASS')
+          PY
+
+      - name: Verify factual runtime assets are inert
+        run: |
+          python - <<'PY'
+          import os,urllib.request,time
+          base=os.environ['BASE']
+          assets=[
+            '/assets/js/raven-evidence-ux.js?v=3.0.0',
+            '/assets/js/raven-publication-core.js?v=3.0.0',
+            '/assets/js/raven-narrative.js?v=2.0.0',
+          ]
+          forbidden=['Jamil Khir','Abdul Azeez','Azmi Ahmad','9 September 2026','18:29 MYT','ravenCaseState','.section-cutoff']
+          for path in assets:
+              req=urllib.request.Request(base+path+'&qa='+str(time.time_ns()),headers={'User-Agent':'RAVEN-Trace-Live-QA/1.0','Cache-Control':'no-cache'})
+              text=urllib.request.urlopen(req,timeout=20).read().decode('utf-8','replace')
+              for x in forbidden: assert x not in text, f'{path}: factual mutator token present: {x}'
+              print(path,'INERT PASS')
+          PY
+
+      - name: Verify production boundary and source hygiene
+        run: |
+          python - <<'PY'
+          import os,urllib.request,time
+          base=os.environ['BASE']
+          paths=['/','/investigations/','/investigations/rci-tabung-haji/','/investigations/rci-tabung-haji/sources/']
+          forbidden=['rci-tabung-haji-share-v5.jpg','11 dan 17 September','lima individu telah didakwa','5 individu telah didakwa']
+          for path in paths:
+              sep='&' if '?' in path else '?'
+              req=urllib.request.Request(base+path+sep+'qa='+str(time.time_ns()),headers={'User-Agent':'RAVEN-Trace-Live-QA/1.0','Cache-Control':'no-cache'})
+              text=urllib.request.urlopen(req,timeout=20).read().decode('utf-8','replace')
+              for x in forbidden: assert x not in text, f'{path}: forbidden production token: {x}'
+          print('PRODUCTION BOUNDARY: PASS')
+          PY

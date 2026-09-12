@@ -4,6 +4,7 @@ import re
 ROOT = Path(__file__).resolve().parents[1]
 CSS = '<link rel="stylesheet" href="/raventrace-my/assets/css/raven-signal-v6.css?v=6.0.0" data-raven-signal-v6>'
 JS = '<script src="/raventrace-my/assets/js/raven-signal-v6.js?v=6.0.0" defer data-raven-signal-v6></script>'
+SECTION_JS = '/raventrace-my/assets/js/raven-section.js?v=2.1.0'
 
 PUBLIC_ROOTS = [
     ROOT / 'index.html',
@@ -47,11 +48,19 @@ for path in paths:
     text = re.sub(r'\s*<link[^>]+data-raven-signal-v6[^>]*>\s*', '\n', text)
     text = re.sub(r'\s*<script[^>]+data-raven-signal-v6[^>]*></script>\s*', '\n', text)
 
+    # Standalone investigation pages use raven-section.js. Canonicalise its
+    # cache key so the horizontal-only tab-centering fix reaches mobile users.
+    text = re.sub(
+        r'/raventrace-my/assets/js/raven-section\.js\?v=[^"\']+',
+        SECTION_JS,
+        text,
+    )
+
     if '</head>' not in text or '</body>' not in text:
         raise RuntimeError(f'Missing closing head/body in {path.relative_to(ROOT)}')
 
     text = text.replace('</head>', f'{CSS}\n</head>', 1)
-    # Put Signal last so it can progressively enhance V5/Narrative V5.1 output.
+    # Put Signal last so it can progressively enhance V5/Narrative V5.2 output.
     text = text.replace('</body>', f'{JS}\n</body>', 1)
 
     if text.count('data-raven-signal-v6') != 2:

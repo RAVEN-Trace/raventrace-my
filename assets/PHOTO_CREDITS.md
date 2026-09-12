@@ -3,6 +3,7 @@
 ## SPRM Headquarters, Putrajaya
 
 - File: Putrajaya Malaysia Anti-Corruption Commission-01.jpg
+- Local production copy: `assets/photos/sprm-hq-putrajaya.jpg` (1,280 px Wikimedia derivative; no editorial manipulation beyond Wikimedia resizing)
 - Photographer: CEphoto, Uwe Aranas
 - Source: https://commons.wikimedia.org/wiki/File:Putrajaya_Malaysia_Anti-Corruption_Commission-01.jpg
 - License: CC BY-SA 3.0 — https://creativecommons.org/licenses/by-sa/3.0/

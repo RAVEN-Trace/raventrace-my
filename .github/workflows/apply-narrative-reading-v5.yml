@@ -1,0 +1,45 @@
+name: Apply Narrative Reading Experience V5.1
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'assets/css/raven-narrative-v5.css'
+      - 'assets/js/raven-narrative-v5.js'
+      - 'scripts/apply_narrative_reading_v5.py'
+      - '.github/workflows/apply-narrative-reading-v5.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  apply:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Wire Narrative Reading Experience
+        run: python scripts/apply_narrative_reading_v5.py
+      - name: Validate assets and page wiring
+        run: |
+          test -s assets/css/raven-narrative-v5.css
+          test -s assets/js/raven-narrative-v5.js
+          grep -q 'raven-narrative-v5.css?v=5.1.0' investigations/rci-tabung-haji/narratives/index.html
+          grep -q 'raven-narrative-v5.js?v=5.1.0' investigations/rci-tabung-haji/narratives/index.html
+          git diff --check
+      - name: Commit rollout
+        run: |
+          if git diff --quiet; then
+            echo 'No changes required'
+            exit 0
+          fi
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add investigations/rci-tabung-haji/narratives/index.html
+          git commit -m 'ux: activate Narrative Reading Experience V5.1'
+          git push

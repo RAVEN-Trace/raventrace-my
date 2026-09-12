@@ -7,6 +7,8 @@ on:
       - '.github/workflows/raven-signal-v6-visual-qa.yml'
       - 'assets/css/raven-signal-v6.css'
       - 'assets/js/raven-signal-v6.js'
+      - 'assets/js/raven-section.js'
+      - 'assets/js/raven-narrative-v5.js'
       - 'index.html'
       - 'investigations/**'
       - 'news/**'
@@ -48,6 +50,7 @@ jobs:
             ['news','/news/'],
             ['sources','/investigations/rci-tabung-haji/sources/']
           ];
+          const sectionPages = new Set(['narrative','money','people','sources']);
           const browser = await chromium.launch();
           const report = [];
           const errors = [];
@@ -55,24 +58,23 @@ jobs:
 
           async function openCurrent(page, name, path) {
             let last = null;
-            for (let attempt = 0; attempt < 16; attempt++) {
+            for (let attempt = 0; attempt < 18; attempt++) {
               const url = `${base}${path}?signalqa=${Date.now()}-${Math.random()}`;
               await page.goto(url, { waitUntil: 'networkidle', timeout: 45000 });
               await page.waitForSelector('body.raven-signal', { timeout: 15000 });
-              const ready = await page.evaluate((pageName) => {
+              const ready = await page.evaluate(({ pageName, requireSection }) => {
                 const signal = !!document.querySelector('link[href*="raven-signal-v6.css?v=6.0.0"]') &&
                   !!document.querySelector('script[src*="raven-signal-v6.js?v=6.0.0"]');
                 if (!signal) return false;
-                if (pageName === 'narrative') {
-                  return !!document.querySelector('script[src*="raven-narrative-v5.js?v=5.2.0"]');
-                }
+                if (pageName === 'narrative' && !document.querySelector('script[src*="raven-narrative-v5.js?v=5.2.1"]')) return false;
+                if (requireSection && !document.querySelector('script[src*="raven-section.js?v=2.1.0"]')) return false;
                 return true;
-              }, name);
+              }, { pageName: name, requireSection: sectionPages.has(name) });
               last = url;
               if (ready) return last;
               await sleep(4000);
             }
-            throw new Error(`${name}: production did not reach required V6/V5.2 payload`);
+            throw new Error(`${name}: production did not reach required Signal V6 / Narrative V5.2.1 / section-controller payload`);
           }
 
           function check(condition, message) {
@@ -89,23 +91,35 @@ jobs:
                   await page.waitForSelector('.narrative-v5-card', { timeout: 15000 }).catch(() => {});
                   await page.waitForSelector('.signal-narrative-card', { timeout: 15000 }).catch(() => {});
                 }
+                await page.waitForTimeout(300);
 
-                const metrics = await page.evaluate(() => ({
-                  title: document.title,
-                  bodyClass: document.body.className,
-                  width: document.documentElement.clientWidth,
-                  scrollWidth: document.documentElement.scrollWidth,
-                  signalCss: !!document.querySelector('link[data-raven-signal-v6]'),
-                  signalJs: !!document.querySelector('script[data-raven-signal-v6]'),
-                  homeHero: !!document.querySelector('.signal-home-hero'),
-                  lenses: document.querySelectorAll('.signal-lens').length,
-                  truthMap: document.querySelectorAll('.signal-map-node').length,
-                  narrativeV5Cards: document.querySelectorAll('.narrative-v5-card').length,
-                  narrativeCards: document.querySelectorAll('.signal-narrative-card').length,
-                  moneyClarifier: !!document.querySelector('.signal-money-clarifier'),
-                  processRail: !!document.querySelector('.signal-process-rail'),
-                  sourceKey: !!document.querySelector('.signal-source-key')
-                }));
+                const metrics = await page.evaluate(() => {
+                  const skip = document.querySelector('.skip-link');
+                  const rect = skip?.getBoundingClientRect();
+                  const skipVisible = !!rect && rect.bottom > 0 && rect.top < innerHeight && rect.right > 0 && rect.left < innerWidth;
+                  return {
+                    title: document.title,
+                    bodyClass: document.body.className,
+                    width: document.documentElement.clientWidth,
+                    scrollWidth: document.documentElement.scrollWidth,
+                    scrollY: window.scrollY,
+                    signalCss: !!document.querySelector('link[data-raven-signal-v6]'),
+                    signalJs: !!document.querySelector('script[data-raven-signal-v6]'),
+                    sectionJs21: !!document.querySelector('script[src*="raven-section.js?v=2.1.0"]'),
+                    narrativeJs521: !!document.querySelector('script[src*="raven-narrative-v5.js?v=5.2.1"]'),
+                    homeHero: !!document.querySelector('.signal-home-hero'),
+                    lenses: document.querySelectorAll('.signal-lens').length,
+                    truthMap: document.querySelectorAll('.signal-map-node').length,
+                    narrativeV5Cards: document.querySelectorAll('.narrative-v5-card').length,
+                    narrativeCards: document.querySelectorAll('.signal-narrative-card').length,
+                    legacyNarrativeDetails: document.querySelectorAll('.narrative-v5-card > details:not(.narrative-v5-details)').length,
+                    duplicateNarrativeSummaries: [...document.querySelectorAll('.narrative-v5-card summary')].filter((el) => /buka bukti/i.test(el.textContent || '')).length,
+                    moneyClarifier: !!document.querySelector('.signal-money-clarifier'),
+                    processRail: !!document.querySelector('.signal-process-rail'),
+                    sourceKey: !!document.querySelector('.signal-source-key'),
+                    skipVisible
+                  };
+                });
 
                 await page.screenshot({ path: `visual-qa/${viewName}-${name}.png`, fullPage: true });
                 report.push({ viewName, name, url, ...metrics });
@@ -113,11 +127,19 @@ jobs:
                 check(metrics.width === viewport.width, `${viewName}/${name}: viewport ${metrics.width}, expected ${viewport.width}`);
                 check(metrics.signalCss && metrics.signalJs, `${viewName}/${name}: Signal assets missing`);
                 check(metrics.scrollWidth <= metrics.width + 4, `${viewName}/${name}: horizontal overflow ${metrics.scrollWidth} > ${metrics.width}`);
+                if (viewName === 'mobile') {
+                  check(metrics.scrollY <= 4, `${viewName}/${name}: page auto-scrolled vertically to ${metrics.scrollY}px`);
+                  check(!metrics.skipVisible, `${viewName}/${name}: skip-link visible without focus`);
+                }
+                if (sectionPages.has(name)) check(metrics.sectionJs21, `${viewName}/${name}: section controller 2.1 missing`);
                 if (name === 'home') check(metrics.homeHero, `${viewName}/home: Signal hero missing`);
                 if (name === 'case') check(metrics.lenses === 4 && metrics.truthMap === 7, `${viewName}/case: lenses/map mismatch ${metrics.lenses}/${metrics.truthMap}`);
                 if (name === 'narrative') {
-                  check(metrics.narrativeV5Cards >= 8, `${viewName}/narrative: only ${metrics.narrativeV5Cards} V5.2 cards rendered`);
+                  check(metrics.narrativeJs521, `${viewName}/narrative: Narrative V5.2.1 missing`);
+                  check(metrics.narrativeV5Cards >= 8, `${viewName}/narrative: only ${metrics.narrativeV5Cards} V5.2.1 cards rendered`);
                   check(metrics.narrativeCards >= 8, `${viewName}/narrative: only ${metrics.narrativeCards} Signal cards rendered`);
+                  check(metrics.legacyNarrativeDetails === 0, `${viewName}/narrative: ${metrics.legacyNarrativeDetails} legacy narrative disclosures remain`);
+                  check(metrics.duplicateNarrativeSummaries === 0, `${viewName}/narrative: duplicate “Buka bukti” controls remain`);
                 }
                 if (name === 'money') check(metrics.moneyClarifier, `${viewName}/money: category clarifier missing`);
                 if (name === 'people') check(metrics.processRail, `${viewName}/people: process rail missing`);

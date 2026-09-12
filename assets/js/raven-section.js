@@ -56,11 +56,18 @@
     event.currentTarget.textContent = open ? 'Tutup semua rekod' : 'Buka semua rekod';
   });
 
-  // Keep active CASEFILE section link visible in the horizontal rail on mobile.
+  /*
+   * Keep the active CASEFILE tab visible on narrow screens WITHOUT moving the
+   * document vertically. scrollIntoView() was previously used here and can
+   * pull the whole page down to the horizontal rail on load.
+   */
   const activeSection = q('.section-links a[aria-current]');
   if (activeSection && matchMedia('(max-width: 760px)').matches) {
     requestAnimationFrame(() => {
-      activeSection.scrollIntoView({ block: 'nearest', inline: 'center' });
+      const rail = activeSection.closest('.section-links');
+      if (!rail) return;
+      const left = activeSection.offsetLeft - (rail.clientWidth - activeSection.offsetWidth) / 2;
+      rail.scrollTo({ left: Math.max(0, left), behavior: 'auto' });
     });
   }
 })();

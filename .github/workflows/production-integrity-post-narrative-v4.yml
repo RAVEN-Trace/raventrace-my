@@ -1,0 +1,69 @@
+name: Production Integrity Post Narrative V4
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/production-integrity-post-narrative-v4.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    env:
+      BASE: https://raven-trace.github.io/raventrace-my
+    steps:
+      - name: Verify current core production state
+        run: |
+          python - <<'PY'
+          import os,time,urllib.request
+          b=os.environ['BASE']; h={'User-Agent':'RAVEN-Trace-Integrity/4.2','Cache-Control':'no-cache'}
+          checks={
+            '/':['Status mahkamah: 11 Sep · freshness sweep: 12 Sep 20:44 MYT','empat individu telah berdepan pertuduhan','SPRM pula menyebut lima','prosiding PAC berkaitan TH dijadual 15 Sep.'],
+            '/investigations/rci-tabung-haji/':['JEJAK / 12-01','PAC TH dijadual 15 September','SPRM menyebut lima'],
+            '/investigations/rci-tabung-haji/people/':['Didakwa · belum sabit','Tindakan mahkamah dijadual · 14 Sep'],
+            '/investigations/rci-tabung-haji/tracks/':['AMLA','BELUM DIKETAHUI'],
+            '/investigations/rci-tabung-haji/sources/':['2605735','2605582','id="s65"','id="s66"']
+          }
+          for path,tokens in checks.items():
+              req=urllib.request.Request(b+path+'?qa='+str(time.time_ns()),headers=h)
+              text=urllib.request.urlopen(req,timeout=20).read().decode('utf-8','replace')
+              for x in tokens: assert x in text, f'{path}: missing {x}'
+              print(path,'PASS')
+          PY
+      - name: Verify Narrative Forensics V4.2 live state
+        run: |
+          python - <<'PY'
+          import os,time,urllib.request
+          b=os.environ['BASE']; h={'User-Agent':'RAVEN-Trace-Integrity/4.2','Cache-Control':'no-cache'}
+          def get(path):
+              req=urllib.request.Request(b+path+'?qa='+str(time.time_ns()),headers=h)
+              return urllib.request.urlopen(req,timeout=20).read().decode('utf-8','replace')
+          main=get('/investigations/rci-tabung-haji/narratives/')
+          social=get('/investigations/rci-tabung-haji/narratives/political-social-media/')
+          req_main=['FORENSIK NARATIF','Apa yang cerita cuba buat kita percaya','Urutan Raven','AMARAN NARATIF','Selepas framing dibuang:','Peraturan Raven','Pertuduhan bukan sabitan']
+          req_social=['FORENSIK POLITIK + MEDIA SOSIAL','Buang parti, buang slogan, buang emosi','Forensik bahasa','CATEGORY COLLAPSE','EMOTIONAL PRIMING','MOTIVE INFLATION','REPETITION RISK','REPRESENTATIVENESS ERROR','Neutralise, bukan counter-spin','Prinsip komunikasi','signal yang diperhatikan']
+          for x in req_main: assert x in main, 'main missing '+x
+          for x in req_social: assert x in social, 'social missing '+x
+          forbidden=['Siapa kata apa — dan apa rekod tunjuk?','Peta naratif politik & media sosial — RCI Tabung Haji','<b>Frame:</b>','<b>Gap:</b>','<b>Confidence:</b>','<b>Siapa menggunakan naratif ini?</b>','5 individu telah didakwa']
+          for x in forbidden:
+              assert x not in main, 'main stale/unsafe '+x
+              assert x not in social, 'social stale/unsafe '+x
+          print('NARRATIVE FORENSICS V4.2: PASS')
+          PY
+      - name: Verify factual runtime remains inert
+        run: |
+          python - <<'PY'
+          import os,time,urllib.request
+          b=os.environ['BASE']; h={'User-Agent':'RAVEN-Trace-Integrity/4.2','Cache-Control':'no-cache'}
+          for p in ['/assets/js/raven-evidence-ux.js?v=3.0.0','/assets/js/raven-publication-core.js?v=3.0.0','/assets/js/raven-narrative.js?v=2.0.0']:
+              req=urllib.request.Request(b+p+'&qa='+str(time.time_ns()),headers=h)
+              text=urllib.request.urlopen(req,timeout=20).read().decode('utf-8','replace')
+              for x in ['Jamil Khir','Abdul Azeez','Azmi Ahmad','ravenCaseState','.section-cutoff']:
+                  assert x not in text, f'{p}: factual mutator {x}'
+          print('RUNTIME INERT: PASS')
+          PY

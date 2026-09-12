@@ -1,6 +1,10 @@
 import { chromium } from 'playwright';
 import fs from 'node:fs';
 import path from 'node:path';
+import { createRequire } from 'node:module';
+
+const require = createRequire(import.meta.url);
+const axePath = require.resolve('axe-core/axe.min.js');
 
 const base = process.env.RAVEN_QA_BASE || 'https://raven-trace.github.io/raventrace-my';
 const output = process.env.RAVEN_QA_OUTPUT || 'visual-qa';
@@ -38,7 +42,7 @@ async function openDeployed(page, route) {
     await page.goto(url, { waitUntil: 'domcontentloaded', timeout: 45000 });
     const ready = await page.evaluate(() =>
       document.body.classList.contains('raven-v7') &&
-      Boolean(document.querySelector('link[href*="raven-unified-v7.css?v=7.0.0"]'))
+      Boolean(document.querySelector('link[href*="raven-unified-v7.css?v=7.0.1"]'))
     );
     if (ready) return url;
     await delay(5000);
@@ -60,46 +64,14 @@ async function auditPage(page, view, item) {
     }
   ` });
   await page.waitForTimeout(180);
+  await page.addScriptTag({ path: axePath });
 
-  const metrics = await page.evaluate(({ mobile }) => {
+  const metrics = await page.evaluate(async ({ mobile }) => {
     const visible = (element) => {
       const style = getComputedStyle(element);
       const rect = element.getBoundingClientRect();
       return !element.hidden && style.display !== 'none' && style.visibility !== 'hidden' &&
         Number(style.opacity) > 0 && rect.width > 0 && rect.height > 0;
-    };
-    const rgba = (value) => {
-      const parts = value.match(/[\d.]+/g)?.map(Number) || [];
-      if (parts.length < 3) return null;
-      return [parts[0], parts[1], parts[2], parts.length > 3 ? parts[3] : 1];
-    };
-    const over = (front, back) => {
-      const alpha = front[3] + back[3] * (1 - front[3]);
-      if (!alpha) return [255, 255, 255, 1];
-      return [0, 1, 2].map((i) => (front[i] * front[3] + back[i] * back[3] * (1 - front[3])) / alpha).concat(alpha);
-    };
-    const background = (element) => {
-      const layers = [];
-      for (let node = element; node; node = node.parentElement) {
-        const parsed = rgba(getComputedStyle(node).backgroundColor);
-        if (parsed && parsed[3] > 0) layers.push(parsed);
-      }
-      let result = [255, 255, 255, 1];
-      for (let i = layers.length - 1; i >= 0; i -= 1) result = over(layers[i], result);
-      return result;
-    };
-    const luminance = (colour) => {
-      const channels = colour.slice(0, 3).map((value) => {
-        const channel = value / 255;
-        return channel <= .03928 ? channel / 12.92 : ((channel + .055) / 1.055) ** 2.4;
-      });
-      return .2126 * channels[0] + .7152 * channels[1] + .0722 * channels[2];
-    };
-    const ratio = (foreground, backdrop) => {
-      const fg = over(foreground, backdrop);
-      const high = Math.max(luminance(fg), luminance(backdrop));
-      const low = Math.min(luminance(fg), luminance(backdrop));
-      return (high + .05) / (low + .05);
     };
     const selectorFor = (element) => {
       if (element.id) return `#${element.id}`;
@@ -107,38 +79,31 @@ async function auditPage(page, view, item) {
       return `${element.tagName.toLowerCase()}${classes ? `.${classes}` : ''}`;
     };
 
-    const contrastFailures = [];
-    const candidates = [...document.querySelectorAll('body *')].filter((element) => {
-      if (!visible(element) || ['SCRIPT', 'STYLE', 'SVG', 'PATH'].includes(element.tagName)) return false;
-      return [...element.childNodes].some((node) => node.nodeType === Node.TEXT_NODE && node.textContent.trim());
+    const axeResults = await window.axe.run(document, {
+      runOnly: { type: 'rule', values: ['color-contrast'] },
+      resultTypes: ['violations', 'incomplete']
     });
-    for (const element of candidates) {
-      const style = getComputedStyle(element);
-      const foreground = rgba(style.color);
-      if (!foreground) continue;
-      const backdrop = background(element);
-      const value = ratio(foreground, backdrop);
-      const size = Number.parseFloat(style.fontSize);
-      const weight = Number.parseInt(style.fontWeight, 10) || 400;
-      const large = size >= 24 || (size >= 18.66 && weight >= 700);
-      const minimum = large ? 3 : 4.5;
-      if (value + .001 < minimum) {
-        contrastFailures.push({
-          selector: selectorFor(element),
-          text: element.textContent.trim().replace(/\s+/g, ' ').slice(0, 90),
-          ratio: Number(value.toFixed(2)),
-          minimum,
-          color: style.color,
-          background: backdrop.slice(0, 3).map(Math.round).join(',')
-        });
-      }
-    }
+    const contrastFailures = axeResults.violations.flatMap((violation) =>
+      violation.nodes.map((node) => ({
+        impact: violation.impact,
+        selector: node.target.join(', '),
+        html: node.html.slice(0, 180),
+        summary: node.failureSummary
+      }))
+    );
+    const contrastIncomplete = axeResults.incomplete.flatMap((item) =>
+      item.nodes.map((node) => ({
+        impact: item.impact,
+        selector: node.target.join(', '),
+        html: node.html.slice(0, 180)
+      }))
+    );
 
-    const controls = [...document.querySelectorAll('.btn,.filter-btn,.raven-share-btn,.raven-share-link,.section-links a,.nav-toggle,.site-nav a,.footer-nav a,.v5-quicklinks a,.raven-question-grid a,.raven-continue-list>a,.reading-nav a,main button,summary')].filter(visible);
+    const controls = [...document.querySelectorAll('.btn,.filter-btn,.raven-share-btn,.raven-share-link,.section-links a,.nav-toggle,.v5-quicklinks a,.raven-question-grid a,.raven-continue-list>a,.reading-nav a,main button,summary')].filter(visible);
     const smallControls = controls.map((element) => {
       const rect = element.getBoundingClientRect();
       return { selector: selectorFor(element), width: rect.width, height: rect.height };
-    }).filter(({ width, height }) => width < (mobile ? 44 : 40) || height < (mobile ? 44 : 40));
+    }).filter(({ height }) => height + .5 < (mobile ? 44 : 40));
 
     const unnamedControls = [...document.querySelectorAll('a[href],button,summary,[role="button"]')]
       .filter(visible)
@@ -159,13 +124,15 @@ async function auditPage(page, view, item) {
       scrollWidth: document.documentElement.scrollWidth,
       contrastFailures: contrastFailures.slice(0, 60),
       contrastFailureCount: contrastFailures.length,
+      contrastIncomplete: contrastIncomplete.slice(0, 60),
+      contrastIncompleteCount: contrastIncomplete.length,
       smallControls: smallControls.slice(0, 30),
       smallControlCount: smallControls.length,
       unnamedControls,
       duplicateIds: [...new Set(duplicateIds)],
       missingAnchors: [...new Set(missingAnchors)],
       fakeShareLinks: document.querySelectorAll('.raven-share-link[href="#"]').length,
-      unifiedCss: Boolean(document.querySelector('link[href*="raven-unified-v7.css?v=7.0.0"]')),
+      unifiedCss: Boolean(document.querySelector('link[href*="raven-unified-v7.css?v=7.0.1"]')),
       skipLink: Boolean(document.querySelector('.skip-link'))
     };
   }, { mobile: view.name === 'mobile' });

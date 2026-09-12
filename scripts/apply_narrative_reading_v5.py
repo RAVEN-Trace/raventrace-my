@@ -22,7 +22,7 @@ text = re.sub(
     text,
 )
 if js not in text:
-    marker = '<script src="/raventrace-my/assets/js/raven-v5.js?v=5.1.0" defer data-raven-v5-static></script>'
+    marker = '<script src="/raventrace-my/assets/js/raven-v5.js?v=5.1.1" defer data-raven-v5-static></script>'
     if marker not in text:
         raise SystemExit('V5 JS marker not found')
     text = text.replace(marker, marker + '\n' + js, 1)

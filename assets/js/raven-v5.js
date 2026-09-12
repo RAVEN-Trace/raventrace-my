@@ -20,7 +20,7 @@
   if (!q('link[data-raven-unified]')) {
     const unified = document.createElement('link');
     unified.rel = 'stylesheet';
-    unified.href = '/raventrace-my/assets/css/raven-unified-v7.css?v=7.0.0';
+    unified.href = '/raventrace-my/assets/css/raven-unified-v7.css?v=7.0.1';
     unified.dataset.ravenUnified = 'true';
     document.head.appendChild(unified);
   }
@@ -95,9 +95,12 @@
 
   const quickstart = (items, label = 'Nak mula kat mana?') => {
     if (q('.v5-quickstart')) return;
+    const availableItems = items.filter(([, href]) =>
+      !href.startsWith('#') || Boolean(document.getElementById(decodeURIComponent(href.slice(1))))
+    );
     const block = document.createElement('div');
     block.className = 'v5-quickstart';
-    block.innerHTML = `<div class="v5-quickstart-inner"><strong>${label}</strong><div class="v5-quicklinks">${items.map(([t,h]) => `<a href="${h}">${t}</a>`).join('')}</div></div>`;
+    block.innerHTML = `<div class="v5-quickstart-inner"><strong>${label}</strong><div class="v5-quicklinks">${availableItems.map(([t,h]) => `<a href="${h}">${t}</a>`).join('')}</div></div>`;
     return block;
   };
 

@@ -1,4 +1,4 @@
-/* RAVEN-Trace Unified Design System V7
+/* RAVEN-Trace Unified Design System V7.0.1
    Final presentation and accessibility layer shared by every public page.
    Colour is semantic: teal=evidence/action, oxblood=disputed, amber=caution. */
 
@@ -373,6 +373,10 @@ body.raven-v5.raven-v5-news .article-header .v5-human-note {
   color: var(--rv7-on-dark);
 }
 
+body.raven-v5.raven-v5-news .article-header .v5-human-note strong {
+  color: var(--rv7-cyan);
+}
+
 body.raven-v5.raven-v5-narrative main .section-boundary {
   border: 1px solid var(--rv7-line);
   border-left: 5px solid var(--rv7-teal);
@@ -448,6 +452,13 @@ body.raven-v5 .section-links a[aria-current],
 body.raven-v5 .section-links a.active {
   border-bottom-color: var(--rv7-teal);
   color: var(--rv7-ink);
+}
+
+@media (min-width: 761px) {
+  body.raven-v5 .section-links {
+    flex-wrap: wrap;
+    overflow-x: visible;
+  }
 }
 
 /* Keyboard focus must remain visible on every surface. */

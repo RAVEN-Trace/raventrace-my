@@ -61,7 +61,7 @@
       /* V5 is intentionally last: it simplifies the established V4 publication
          system without replacing evidence semantics or factual HTML. */
       loadCss('/raventrace-my/assets/css/raven-v5.css?v=5.0.0','ravenV5');
-      loadScript('/raventrace-my/assets/js/raven-v5.js?v=5.1.0','ravenV5Ux');
+      loadScript('/raventrace-my/assets/js/raven-v5.js?v=5.1.1','ravenV5Ux');
     });
   });
 })();

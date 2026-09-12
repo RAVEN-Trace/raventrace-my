@@ -109,11 +109,11 @@
   if (isRci && !isNarrative) {
     const hero = q('.case-hero') || q('.article-header') || q('main > section');
     const block = quickstart([
-      ['Faham dulu','#briefing'],
-      ['Apa berubah?','#updates'],
-      ['Siapa & status','#people'],
+      ['Faham dulu','/raventrace-my/investigations/rci-tabung-haji/#briefing'],
+      ['Apa berubah?','/raventrace-my/investigations/rci-tabung-haji/#updates'],
+      ['Siapa & status','/raventrace-my/investigations/rci-tabung-haji/#people'],
       ['Check narrative','/raventrace-my/investigations/rci-tabung-haji/narratives/'],
-      ['Bukti & sumber','#sources']
+      ['Bukti & sumber','/raventrace-my/investigations/rci-tabung-haji/#sources']
     ], 'Kes ni panjang. Kau nak mula kat mana?');
     if (hero && block) hero.insertAdjacentElement('afterend', block);
   }

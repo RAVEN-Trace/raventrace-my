@@ -1,20 +1,29 @@
 (() => {
-  if (window.__RAVEN_PUBLICATION_LOADER_V51__) return;
-  window.__RAVEN_PUBLICATION_LOADER_V51__ = true;
+  if (window.__RAVEN_PUBLICATION_LOADER_V52__) return;
+  window.__RAVEN_PUBLICATION_LOADER_V52__ = true;
 
   const loadScript = (src, key, done) => {
-    const existing = document.querySelector(`script[data-${key}]`);
-    if (existing) { if (done) done(); return; }
+    const pathOnly = src.split('?')[0];
+    const existing = [...document.scripts].find((node) => (node.getAttribute('src') || '').includes(pathOnly));
+    if (existing) {
+      if (done) {
+        if (existing.dataset.loaded === 'true' || existing.readyState === 'complete') done();
+        else existing.addEventListener('load', done, { once: true });
+      }
+      return;
+    }
     const s = document.createElement('script');
     s.src = src;
     s.defer = true;
     s.dataset[key] = 'true';
-    if (done) s.onload = done;
+    if (done) s.onload = () => { s.dataset.loaded = 'true'; done(); };
     document.head.appendChild(s);
   };
 
   const loadCss = (href, key) => {
-    if (document.querySelector(`link[data-${key}]`)) return;
+    const pathOnly = href.split('?')[0];
+    const existing = [...document.querySelectorAll('link[rel="stylesheet"]')].find((node) => (node.getAttribute('href') || '').includes(pathOnly));
+    if (existing) return;
     const l = document.createElement('link');
     l.rel = 'stylesheet';
     l.href = href;
@@ -52,7 +61,7 @@
       /* V5 is intentionally last: it simplifies the established V4 publication
          system without replacing evidence semantics or factual HTML. */
       loadCss('/raventrace-my/assets/css/raven-v5.css?v=5.0.0','ravenV5');
-      loadScript('/raventrace-my/assets/js/raven-v5.js?v=5.0.0','ravenV5Ux');
+      loadScript('/raventrace-my/assets/js/raven-v5.js?v=5.0.1','ravenV5Ux');
     });
   });
 })();

@@ -1,12 +1,19 @@
-name: Refresh RCI Visual V7
+name: Refresh RCI Visual V8
 
 on:
   push:
     paths:
       - '.github/workflows/refresh-rci-visual-v7.yml'
+      - 'assets/source/rci-v7/part00.b64'
+      - 'assets/source/rci-v7/part01.b64'
+      - 'assets/source/rci-v7/part02.b64'
 
 permissions:
   contents: write
+
+concurrency:
+  group: refresh-rci-visual-v8
+  cancel-in-progress: false
 
 jobs:
   refresh:
@@ -25,37 +32,115 @@ jobs:
       - name: Install Pillow
         run: python -m pip install --quiet pillow
 
-      - name: Replace canonical RCI page artwork
+      - name: Assemble and verify V8 artwork
+        run: |
+          cat assets/source/rci-v7/part00.b64 assets/source/rci-v7/part01.b64 assets/source/rci-v7/part02.b64 | tr -d '\n\r ' | base64 --decode > /tmp/rci-v8.jpg
+          python - <<'PY'
+          from pathlib import Path
+          from PIL import Image
+          import hashlib
+
+          src = Path('/tmp/rci-v8.jpg')
+          expected = '79c9c69583502ee20c690748477e25255ed04e4081aa2722fadda8dfedc69d98'
+          digest = hashlib.sha256(src.read_bytes()).hexdigest()
+          if digest != expected:
+              raise SystemExit(f'SHA mismatch: {digest}')
+          with Image.open(src) as im:
+              im.load()
+              if im.format != 'JPEG':
+                  raise SystemExit(f'Unexpected format: {im.format}')
+              if im.size != (1200, 630):
+                  raise SystemExit(f'Unexpected dimensions: {im.size}')
+          print(f'Validated V8 JPEG: {src.stat().st_size} bytes · {digest}')
+          PY
+
+      - name: Publish canonical RCI artwork
         run: |
           python - <<'PY'
           from pathlib import Path
           from PIL import Image
 
-          src = Path('assets/images/rci-tabung-haji-v7.jpg')
-          dst = Path('assets/images/rci-tabung-haji.webp')
+          src = Path('/tmp/rci-v8.jpg')
+          og = Path('assets/og')
+          og.mkdir(parents=True, exist_ok=True)
+          data = src.read_bytes()
+          for name in (
+              'rci-tabung-haji-share-v8.jpg',
+              'rci-tabung-haji-share-v7.jpg',
+              'rci-tabung-haji-share-v6.jpg',
+          ):
+              (og / name).write_bytes(data)
 
           with Image.open(src) as im:
               im = im.convert('RGB')
-              if im.size != (1200, 630):
-                  raise SystemExit(f'Unexpected V7 dimensions: {im.size}')
-              im.save(dst, 'WEBP', quality=82, method=6)
+              im.save('assets/images/rci-tabung-haji.webp', 'WEBP', quality=84, method=6)
+              im.save('assets/art/rci-tabung-haji-hero.webp', 'WEBP', quality=84, method=6)
 
-          with Image.open(dst) as check:
-              check.load()
-              assert check.format == 'WEBP'
-              assert check.size == (1200, 630)
+          # Root share metadata gets a genuinely new URL so Meta/Threads has no
+          # reason to reuse the historical Raven-bird image cache.
+          home = Path('index.html')
+          text = home.read_text(encoding='utf-8')
+          replacements = [
+              ('assets/og/rci-tabung-haji-share-v6.jpg?v=20260912-home', 'assets/og/rci-tabung-haji-share-v8.jpg?v=20260912-v8'),
+              ('assets/og/rci-tabung-haji-share-v7.jpg?v=20260912-home', 'assets/og/rci-tabung-haji-share-v8.jpg?v=20260912-v8'),
+              ('assets/og/rci-tabung-haji-share-v7.jpg', 'assets/og/rci-tabung-haji-share-v8.jpg?v=20260912-v8'),
+              ('assets/art/rci-tabung-haji-hero.webp', 'assets/og/rci-tabung-haji-share-v8.jpg?v=20260912-v8'),
+          ]
+          for old, new in replacements:
+              text = text.replace(old, new)
+          home.write_text(text, encoding='utf-8')
 
-          print(f'Refreshed {dst}: {dst.stat().st_size} bytes')
+          desk = Path('investigations/index.html')
+          text = desk.read_text(encoding='utf-8')
+          text = text.replace(
+              'https://raven-trace.github.io/raventrace-my/assets/images/rci-tabung-haji.webp',
+              'https://raven-trace.github.io/raventrace-my/assets/og/rci-tabung-haji-share-v8.jpg?v=20260912-v8'
+          )
+          desk.write_text(text, encoding='utf-8')
           PY
 
-      - name: Commit refreshed source visual
+      - name: Validate generated files
         run: |
-          if git diff --quiet -- assets/images/rci-tabung-haji.webp; then
-            echo 'Canonical artwork already matches V7.'
-            exit 0
-          fi
+          python - <<'PY'
+          from pathlib import Path
+          from PIL import Image
+          import re
+
+          checks = {
+              Path('assets/og/rci-tabung-haji-share-v8.jpg'): ('JPEG', (1200, 630)),
+              Path('assets/og/rci-tabung-haji-share-v7.jpg'): ('JPEG', (1200, 630)),
+              Path('assets/og/rci-tabung-haji-share-v6.jpg'): ('JPEG', (1200, 630)),
+              Path('assets/images/rci-tabung-haji.webp'): ('WEBP', (1200, 630)),
+              Path('assets/art/rci-tabung-haji-hero.webp'): ('WEBP', (1200, 630)),
+          }
+          for path, expected in checks.items():
+              with Image.open(path) as im:
+                  im.load()
+                  assert (im.format, im.size) == expected, (path, im.format, im.size)
+
+          home = Path('index.html').read_text(encoding='utf-8')
+          assert 'rci-tabung-haji-share-v8.jpg?v=20260912-v8' in home
+          assert 'og:image:width' in home and '1200' in home
+          desk = Path('investigations/index.html').read_text(encoding='utf-8')
+          assert 'rci-tabung-haji-share-v8.jpg?v=20260912-v8' in desk
+          assert '/raventrace-my/assets/images/rci-tabung-haji.webp' in desk
+          print('RCI V8 visual integrity: PASS')
+          PY
+
+      - name: Commit verified V8 artwork
+        run: |
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git add assets/images/rci-tabung-haji.webp
-          git commit -m 'assets: sync canonical RCI page image to V7'
+          git add \
+            assets/og/rci-tabung-haji-share-v8.jpg \
+            assets/og/rci-tabung-haji-share-v7.jpg \
+            assets/og/rci-tabung-haji-share-v6.jpg \
+            assets/images/rci-tabung-haji.webp \
+            assets/art/rci-tabung-haji-hero.webp \
+            index.html investigations/index.html
+          if git diff --cached --quiet; then
+            echo 'V8 artwork already current.'
+            exit 0
+          fi
+          git commit -m 'social: publish verified RCI Tabung Haji V8 artwork'
           git push

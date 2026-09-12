@@ -95,7 +95,9 @@ for token in ['Pertuduhan bukan sabitan', 'DIPERTIKAIKAN', '11 Sep 2026']:
         fail(f'main CASEFILE missing current evidence boundary: {token}')
 
 home = (ROOT / 'index.html').read_text(encoding='utf-8')
-for token in ['11 September 2026', 'empat individu telah berdepan pertuduhan', 'SPRM pula menyebut lima']:
+# The canonical homepage uses abbreviated Malay month formatting ("11 Sep 2026").
+# Integrity checks the state, not the spelling style of the date.
+for token in ['11 Sep 2026', 'empat individu telah berdepan pertuduhan', 'SPRM pula menyebut lima']:
     if token not in home:
         fail(f'homepage missing current static state: {token}')
 

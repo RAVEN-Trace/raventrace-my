@@ -1,0 +1,4 @@
+RAVEN Narrative Reading Experience V5.1
+Activated: 2026-09-12 MYT
+Requires main >= be72c46489324dea1e05a3214358ac3bfc751f02
+Purpose: force GitHub Pages deployment after workflow-generated page wiring.

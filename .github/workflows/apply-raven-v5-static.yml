@@ -1,0 +1,61 @@
+name: Apply Raven V5 Static Assets
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/apply-raven-v5-static.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  apply:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Inject V5 assets into public HTML
+        run: python scripts/apply_raven_v5_static.py
+
+      - name: Validate V5 tags
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          root=Path('.')
+          required=[
+            Path('index.html'),
+            Path('investigations/index.html'),
+            Path('investigations/rci-tabung-haji/index.html'),
+            Path('investigations/rci-tabung-haji/narratives/index.html'),
+            Path('news/index.html'),
+            Path('methodology/index.html'),
+            Path('about/index.html'),
+            Path('tips/index.html'),
+            Path('corrections/index.html'),
+          ]
+          for p in required:
+            t=p.read_text(encoding='utf-8')
+            assert 'raven-v5.css?v=5.0.0' in t, p
+            assert 'raven-v5.js?v=5.0.1' in t, p
+          print('RAVEN V5 STATIC TAGS: PASS')
+          PY
+
+      - name: Commit rollout
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add index.html about methodology tips corrections investigations news
+          if git diff --cached --quiet; then
+            echo 'V5 static rollout already current.'
+            exit 0
+          fi
+          git commit -m 'design: roll out Raven V5 assets across public pages'
+          git push

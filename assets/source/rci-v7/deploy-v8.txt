@@ -1,0 +1,4 @@
+RCI Tabung Haji social artwork V8 deployment marker
+JPEG: 1200x630
+SHA256: 79c9c69583502ee20c690748477e25255ed04e4081aa2722fadda8dfedc69d98
+Published asset: assets/og/rci-tabung-haji-share-v8.jpg

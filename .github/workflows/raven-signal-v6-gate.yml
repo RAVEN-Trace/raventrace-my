@@ -6,6 +6,7 @@ on:
     paths:
       - '**/*.html'
       - 'assets/css/raven-signal-v6.css'
+      - 'assets/css/raven-signal-v6-polish.css'
       - 'assets/js/raven-signal-v6.js'
       - 'scripts/apply_raven_signal_v6.py'
       - '.github/workflows/raven-signal-v6-gate.yml'
@@ -30,8 +31,9 @@ jobs:
         run: |
           python - <<'PY'
           from pathlib import Path
+          import re
           root = Path('.')
-          marker = 'data-raven-signal-v6'
+          marker_re = re.compile(r'data-raven-signal-v6(?=[ >])')
           css_url = '/assets/css/raven-signal-v6.css?v=6.0.0'
           js_url = '/assets/js/raven-signal-v6.js?v=6.0.0'
 
@@ -45,7 +47,7 @@ jobs:
           assert live, 'No public pages discovered'
           for p in live:
               t = p.read_text(encoding='utf-8')
-              assert t.count(marker) == 2, f'Signal CSS/JS must each appear once: {p}'
+              assert len(marker_re.findall(t)) == 2, f'Signal CSS/JS must each appear once: {p}'
               assert css_url in t and js_url in t, f'Wrong Signal version: {p}'
 
           home = Path('index.html').read_text(encoding='utf-8')
@@ -57,16 +59,26 @@ jobs:
           assert '/investigations/rci-tabung-haji/narratives/' in home
           assert '/investigations/rci-tabung-haji/narratives/' in case
           assert 'raven-narrative-v5' in narrative, 'Narrative progressive-disclosure layer missing'
-          assert marker in narrative, 'Signal Narrative layer missing'
+          assert marker_re.search(narrative), 'Signal Narrative layer missing'
+          assert narrative.count('data-raven-signal-v6-polish') == 1, 'Narrative polish must appear exactly once'
+          assert '/assets/css/raven-signal-v6-polish.css?v=6.0.1' in narrative
+          rule_pos = narrative.find('id="narrative-rule"')
+          main_end = narrative.find('</main>')
+          footer_pos = narrative.find('<footer')
+          assert 0 <= rule_pos < main_end < footer_pos, 'Narrative rule must stay inside main before footer'
           assert not Path('rcitabunghaji').exists(), 'Public URL migration remains intentionally paused'
 
           for p in root.rglob('research/**/index.html'):
-              assert marker not in p.read_text(encoding='utf-8'), f'Historical research must remain untouched: {p}'
+              t = p.read_text(encoding='utf-8')
+              assert not marker_re.search(t), f'Historical research must remain untouched: {p}'
+              assert 'data-raven-signal-v6-polish' not in t, f'Historical research polish leak: {p}'
 
           css = Path('assets/css/raven-signal-v6.css').read_text(encoding='utf-8')
+          polish = Path('assets/css/raven-signal-v6-polish.css').read_text(encoding='utf-8')
           js = Path('assets/js/raven-signal-v6.js').read_text(encoding='utf-8')
           for token in ['signal-case-lenses','signal-truth-map','signal-narrative-card','signal-money-clarifier','signal-process-rail','signal-source-key']:
               assert token in css, f'Missing Signal CSS primitive: {token}'
+          assert '.raven-signal-narrative .section-intro .btn-primary' in polish, 'Narrative hero action contrast fix missing'
           for token in ['upgradeHome','upgradeCasefile','upgradeNarratives','upgradeMoney','upgradePeople','upgradeNews','upgradeSources']:
               assert token in js, f'Missing Signal JS module: {token}'
 

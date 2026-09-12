@@ -50,52 +50,95 @@ jobs:
           ];
           const browser = await chromium.launch();
           const report = [];
+          const errors = [];
+          const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
-          async function check(viewName, viewport, targets) {
-            const context = await browser.newContext({ viewportSize: viewport, deviceScaleFactor: 1 });
-            for (const [name, path] of targets) {
-              const page = await context.newPage();
+          async function openCurrent(page, name, path) {
+            let last = null;
+            for (let attempt = 0; attempt < 16; attempt++) {
               const url = `${base}${path}?signalqa=${Date.now()}-${Math.random()}`;
               await page.goto(url, { waitUntil: 'networkidle', timeout: 45000 });
               await page.waitForSelector('body.raven-signal', { timeout: 15000 });
+              const ready = await page.evaluate((pageName) => {
+                const signal = !!document.querySelector('link[href*="raven-signal-v6.css?v=6.0.0"]') &&
+                  !!document.querySelector('script[src*="raven-signal-v6.js?v=6.0.0"]');
+                if (!signal) return false;
+                if (pageName === 'narrative') {
+                  return !!document.querySelector('script[src*="raven-narrative-v5.js?v=5.2.0"]');
+                }
+                return true;
+              }, name);
+              last = url;
+              if (ready) return last;
+              await sleep(4000);
+            }
+            throw new Error(`${name}: production did not reach required V6/V5.2 payload`);
+          }
 
-              const metrics = await page.evaluate(() => ({
-                title: document.title,
-                bodyClass: document.body.className,
-                width: document.documentElement.clientWidth,
-                scrollWidth: document.documentElement.scrollWidth,
-                signalCss: !!document.querySelector('link[data-raven-signal-v6]'),
-                signalJs: !!document.querySelector('script[data-raven-signal-v6]'),
-                homeHero: !!document.querySelector('.signal-home-hero'),
-                lenses: document.querySelectorAll('.signal-lens').length,
-                truthMap: document.querySelectorAll('.signal-map-node').length,
-                narrativeCards: document.querySelectorAll('.signal-narrative-card').length,
-                moneyClarifier: !!document.querySelector('.signal-money-clarifier'),
-                processRail: !!document.querySelector('.signal-process-rail'),
-                sourceKey: !!document.querySelector('.signal-source-key')
-              }));
+          function check(condition, message) {
+            if (!condition) errors.push(message);
+          }
 
-              if (!metrics.signalCss || !metrics.signalJs) throw new Error(`${name}: Signal assets missing`);
-              if (metrics.scrollWidth > metrics.width + 4) throw new Error(`${name}: horizontal overflow ${metrics.scrollWidth} > ${metrics.width}`);
-              if (name === 'home' && !metrics.homeHero) throw new Error('home: Signal hero missing');
-              if (name === 'case' && (metrics.lenses !== 4 || metrics.truthMap !== 7)) throw new Error(`case: lenses/map mismatch ${metrics.lenses}/${metrics.truthMap}`);
-              if (name === 'narrative' && metrics.narrativeCards < 8) throw new Error(`narrative: only ${metrics.narrativeCards} Signal cards rendered`);
-              if (name === 'money' && !metrics.moneyClarifier) throw new Error('money: category clarifier missing');
-              if (name === 'people' && !metrics.processRail) throw new Error('people: process rail missing');
-              if (name === 'sources' && !metrics.sourceKey) throw new Error('sources: source key missing');
+          async function checkView(viewName, viewport, targets) {
+            const context = await browser.newContext({ viewport, deviceScaleFactor: 1 });
+            for (const [name, path] of targets) {
+              const page = await context.newPage();
+              try {
+                const url = await openCurrent(page, name, path);
+                if (name === 'narrative') {
+                  await page.waitForSelector('.narrative-v5-card', { timeout: 15000 }).catch(() => {});
+                  await page.waitForSelector('.signal-narrative-card', { timeout: 15000 }).catch(() => {});
+                }
 
-              await page.screenshot({ path: `visual-qa/${viewName}-${name}.png`, fullPage: true });
-              report.push({ viewName, name, url, ...metrics });
-              await page.close();
+                const metrics = await page.evaluate(() => ({
+                  title: document.title,
+                  bodyClass: document.body.className,
+                  width: document.documentElement.clientWidth,
+                  scrollWidth: document.documentElement.scrollWidth,
+                  signalCss: !!document.querySelector('link[data-raven-signal-v6]'),
+                  signalJs: !!document.querySelector('script[data-raven-signal-v6]'),
+                  homeHero: !!document.querySelector('.signal-home-hero'),
+                  lenses: document.querySelectorAll('.signal-lens').length,
+                  truthMap: document.querySelectorAll('.signal-map-node').length,
+                  narrativeV5Cards: document.querySelectorAll('.narrative-v5-card').length,
+                  narrativeCards: document.querySelectorAll('.signal-narrative-card').length,
+                  moneyClarifier: !!document.querySelector('.signal-money-clarifier'),
+                  processRail: !!document.querySelector('.signal-process-rail'),
+                  sourceKey: !!document.querySelector('.signal-source-key')
+                }));
+
+                await page.screenshot({ path: `visual-qa/${viewName}-${name}.png`, fullPage: true });
+                report.push({ viewName, name, url, ...metrics });
+
+                check(metrics.width === viewport.width, `${viewName}/${name}: viewport ${metrics.width}, expected ${viewport.width}`);
+                check(metrics.signalCss && metrics.signalJs, `${viewName}/${name}: Signal assets missing`);
+                check(metrics.scrollWidth <= metrics.width + 4, `${viewName}/${name}: horizontal overflow ${metrics.scrollWidth} > ${metrics.width}`);
+                if (name === 'home') check(metrics.homeHero, `${viewName}/home: Signal hero missing`);
+                if (name === 'case') check(metrics.lenses === 4 && metrics.truthMap === 7, `${viewName}/case: lenses/map mismatch ${metrics.lenses}/${metrics.truthMap}`);
+                if (name === 'narrative') {
+                  check(metrics.narrativeV5Cards >= 8, `${viewName}/narrative: only ${metrics.narrativeV5Cards} V5.2 cards rendered`);
+                  check(metrics.narrativeCards >= 8, `${viewName}/narrative: only ${metrics.narrativeCards} Signal cards rendered`);
+                }
+                if (name === 'money') check(metrics.moneyClarifier, `${viewName}/money: category clarifier missing`);
+                if (name === 'people') check(metrics.processRail, `${viewName}/people: process rail missing`);
+                if (name === 'sources') check(metrics.sourceKey, `${viewName}/sources: source key missing`);
+              } catch (error) {
+                errors.push(`${viewName}/${name}: ${error.message}`);
+                await page.screenshot({ path: `visual-qa/${viewName}-${name}-failure.png`, fullPage: true }).catch(() => {});
+              } finally {
+                await page.close();
+              }
             }
             await context.close();
           }
 
-          await check('mobile', { width: 390, height: 844 }, pages);
-          await check('desktop', { width: 1440, height: 900 }, pages.filter(([n]) => ['home','case','narrative'].includes(n)));
+          await checkView('mobile', { width: 390, height: 844 }, pages);
+          await checkView('desktop', { width: 1440, height: 900 }, pages.filter(([n]) => ['home','case','narrative'].includes(n)));
           await browser.close();
-          fs.writeFileSync('visual-qa/report.json', JSON.stringify(report, null, 2));
-          console.log(JSON.stringify(report, null, 2));
+
+          fs.writeFileSync('visual-qa/report.json', JSON.stringify({ report, errors }, null, 2));
+          console.log(JSON.stringify({ report, errors }, null, 2));
+          if (errors.length) throw new Error(`Visual QA failed:\n${errors.join('\n')}`);
           JS
           node visual-qa/raven-visual-qa.mjs
 

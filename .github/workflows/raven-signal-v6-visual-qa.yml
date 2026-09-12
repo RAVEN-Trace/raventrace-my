@@ -34,7 +34,7 @@ jobs:
       - name: Run rendered mobile and desktop checks
         run: |
           mkdir -p visual-qa
-          cat > /tmp/raven-visual-qa.mjs <<'JS'
+          cat > visual-qa/raven-visual-qa.mjs <<'JS'
           import { chromium } from 'playwright';
           import fs from 'fs';
 
@@ -97,9 +97,10 @@ jobs:
           fs.writeFileSync('visual-qa/report.json', JSON.stringify(report, null, 2));
           console.log(JSON.stringify(report, null, 2));
           JS
-          node /tmp/raven-visual-qa.mjs
+          node visual-qa/raven-visual-qa.mjs
 
       - name: Upload rendered QA screenshots
+        if: always()
         uses: actions/upload-artifact@v4
         with:
           name: raven-signal-v6-visual-qa

@@ -1,11 +1,35 @@
 (() => {
-  if (window.__RAVEN_PUBLICATION_LOADER_V21__) return;
-  window.__RAVEN_PUBLICATION_LOADER_V21__ = true;
-  const load = (src, key, done) => {
-    if (document.querySelector(`script[data-${key}]`)) { if (done) done(); return; }
-    const s=document.createElement('script'); s.src=src; s.defer=true; s.dataset[key]='true'; if(done)s.onload=done; document.head.appendChild(s);
+  if (window.__RAVEN_PUBLICATION_LOADER_V40__) return;
+  window.__RAVEN_PUBLICATION_LOADER_V40__ = true;
+
+  const loadScript = (src, key, done) => {
+    const existing = document.querySelector(`script[data-${key}]`);
+    if (existing) { if (done) done(); return; }
+    const s = document.createElement('script');
+    s.src = src;
+    s.defer = true;
+    s.dataset[key] = 'true';
+    if (done) s.onload = done;
+    document.head.appendChild(s);
   };
-  load('/raventrace-my/assets/js/raven-publication-core.js?v=2.2.0','ravenPublicationCore',()=>{
-    load('/raventrace-my/assets/js/raven-evidence-ux.js?v=2.1.0','ravenEvidenceUx');
+
+  const loadCss = (href, key) => {
+    if (document.querySelector(`link[data-${key}]`)) return;
+    const l = document.createElement('link');
+    l.rel = 'stylesheet';
+    l.href = href;
+    l.dataset[key] = 'true';
+    document.head.appendChild(l);
+  };
+
+  const path = location.pathname;
+  const isRciCase = path.includes('/raventrace-my/investigations/rci-tabung-haji');
+
+  loadScript('/raventrace-my/assets/js/raven-publication-core.js?v=2.2.0','ravenPublicationCore',()=>{
+    loadScript('/raventrace-my/assets/js/raven-evidence-ux.js?v=2.1.0','ravenEvidenceUx',()=>{
+      if (isRciCase) {
+        loadCss('/raventrace-my/assets/css/raven-v4-case.css?v=4.0.0','ravenV4Case');
+      }
+    });
   });
 })();

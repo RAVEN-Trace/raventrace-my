@@ -1,4 +1,4 @@
-# Final live verification candidate after source-note repair
+# Live production gate for legal-state + freshness-state separation
 name: Production Integrity Live Render
 
 on:
@@ -23,45 +23,50 @@ jobs:
     env:
       BASE: https://raven-trace.github.io/raventrace-my
     steps:
-      - name: Wait for complete current Pages payload
+      - name: Wait for complete 12 Sep Pages payload
         run: |
           python - <<'PY'
           import os,time,urllib.request
           base=os.environ['BASE']
-          home_expected=['raven-publication.js?v=5.0.0','raven-evidence-ux.js?v=3.0.0','11 September 2026','empat individu telah berdepan pertuduhan']
-          source_expected=['2605735','2605582','2605960','pr11092026_BM','11 September 2026 · 23:37 MYT']
-          last_home=last_sources=''
+          headers={'User-Agent':'RAVEN-Trace-Live-QA/1.1','Cache-Control':'no-cache'}
+          checks={
+            '/':['freshness sweep: 12 Sep 20:44 MYT','empat individu telah berdepan pertuduhan','SPRM pula menyebut lima'],
+            '/news/':['freshness sweep 12 Sep 2026','PAC TH bersidang 15 September'],
+            '/investigations/rci-tabung-haji/updates/':['JEJAK / 12-01','15 Sep','RM18.6 juta'],
+            '/investigations/rci-tabung-haji/sources/':['id="s65"','id="s66"','parlimen.gov.my/pac/senarai-mesyuarat'],
+          }
+          last={}
           for i in range(48):
-              try:
-                  headers={'User-Agent':'RAVEN-Trace-Live-QA/1.0','Cache-Control':'no-cache'}
-                  stamp=str(time.time_ns())
-                  hreq=urllib.request.Request(base+'/?liveqa='+stamp,headers=headers)
-                  sreq=urllib.request.Request(base+'/investigations/rci-tabung-haji/sources/?liveqa='+stamp,headers=headers)
-                  last_home=urllib.request.urlopen(hreq,timeout=15).read().decode('utf-8','replace')
-                  last_sources=urllib.request.urlopen(sreq,timeout=15).read().decode('utf-8','replace')
-                  if all(x in last_home for x in home_expected) and all(x in last_sources for x in source_expected):
-                      print('COMPLETE LIVE PAYLOAD READY')
-                      raise SystemExit(0)
-              except Exception as e:
-                  print('wait',i,type(e).__name__,str(e)[:180])
+              ok=True
+              for path,tokens in checks.items():
+                  try:
+                      req=urllib.request.Request(base+path+'?liveqa='+str(time.time_ns()),headers=headers)
+                      text=urllib.request.urlopen(req,timeout=15).read().decode('utf-8','replace')
+                      last[path]=text
+                      if not all(x in text for x in tokens): ok=False
+                  except Exception as e:
+                      ok=False
+                      print('wait',i,path,type(e).__name__,str(e)[:160])
+              if ok:
+                  print('COMPLETE 12 SEP LIVE PAYLOAD READY')
+                  raise SystemExit(0)
               time.sleep(5)
-          print('HOME SAMPLE:',last_home[:800])
-          print('SOURCES SAMPLE:',last_sources[-1200:])
-          raise SystemExit('Timed out waiting for complete current Pages payload')
+          for path,text in last.items(): print(path,text[:500])
+          raise SystemExit('Timed out waiting for complete 12 Sep Pages payload')
           PY
 
-      - name: Verify homepage live state
+      - name: Verify homepage legal and freshness boundary
         run: |
           python - <<'PY'
           import os,urllib.request,time
-          u=os.environ['BASE']+'/?qa='+str(time.time_ns())
-          req=urllib.request.Request(u,headers={'User-Agent':'RAVEN-Trace-Live-QA/1.0','Cache-Control':'no-cache'})
+          req=urllib.request.Request(os.environ['BASE']+'/?qa='+str(time.time_ns()),headers={'User-Agent':'RAVEN-Trace-Live-QA/1.1','Cache-Control':'no-cache'})
           t=urllib.request.urlopen(req,timeout=20).read().decode('utf-8','replace')
           required=[
-            '11 September 2026 · disemak 23:37 MYT',
+            'Status mahkamah: 11 Sep · freshness sweep: 12 Sep 20:44 MYT',
             'empat individu telah berdepan pertuduhan',
             'SPRM pula menyebut lima',
             'DIPERTIKAIKAN · REKOD',
+            'PAC TH dijadual bersidang 15 Sep',
             'raven-publication.js?v=5.0.0',
             'raven-evidence-ux.js?v=3.0.0',
             'Siasatan, tangkapan, reman dan pertuduhan tidak membuktikan kesalahan.',
@@ -71,31 +76,32 @@ jobs:
             '9 September 2026 · verified 18:29 MYT',
             'raven-publication.js?v=4.3.0',
             'raven-evidence-ux.js?v=2.1.0',
+            '5 individu telah didakwa',
           ]
           for x in required: assert x in t, 'missing homepage token: '+x
           for x in forbidden: assert x not in t, 'stale homepage token: '+x
-          print('HOMEPAGE LIVE STATE: PASS')
+          print('HOMEPAGE LEGAL/FRESHNESS BOUNDARY: PASS')
           PY
 
-      - name: Verify core investigation pages
+      - name: Verify 12 Sep article and core investigation pages
         run: |
           python - <<'PY'
           import os,urllib.request,time
           base=os.environ['BASE']
           checks={
-            '/investigations/':['11 Sep 2026','empat individu','SPRM menyebut lima','14 Sep','24 Sep'],
-            '/investigations/rci-tabung-haji/':['11 Sep 2026','DIPERTIKAIKAN','Pertuduhan bukan sabitan','SPRM menyebut lima individu'],
+            '/news/':['12 SEP 2026','PAC TH bersidang 15 September'],
+            '/news/2026/09/12/freshness-sweep-pac-15-sep-rm18m-claim/':['Status undang-undang belum berubah','BELUM DISELESAIKAN / HOLD','15 September 2026','14 Sep','24 Sep'],
+            '/investigations/rci-tabung-haji/':['JEJAK / 12-01','PAC TH dijadual 15 September','SPRM menyebut lima'],
             '/investigations/rci-tabung-haji/people/':['Didakwa · belum sabit','Tindakan mahkamah dijadual · 14 Sep'],
-            '/investigations/rci-tabung-haji/timeline/':['14 Sep','empat','lima'],
+            '/investigations/rci-tabung-haji/timeline/':['15 Sep</time><h3>PAC Parlimen','14 Sep','empat','lima'],
             '/investigations/rci-tabung-haji/tracks/':['AMLA','BELUM DIKETAHUI'],
             '/investigations/rci-tabung-haji/governance/':['Seruan Istito’ah','RM15,000','Tabung Haji · kenyataan rasmi · 11 Sep'],
             '/investigations/rci-tabung-haji/narratives/':['SPRM','lima','Pertuduhan bukan sabitan'],
-            '/investigations/rci-tabung-haji/sources/':['2605735','2605582','2605960','pr11092026_BM','11 September 2026 · 23:37 MYT'],
-            '/investigations/rci-tabung-haji/updates/':['11 Sep','empat','lima'],
+            '/investigations/rci-tabung-haji/sources/':['2605735','2605582','pr11092026_BM','id="s65"','id="s66"'],
+            '/investigations/rci-tabung-haji/updates/':['JEJAK / 12-01','15 Sep:','RM18.6 juta','AMLA'],
           }
           for path,tokens in checks.items():
-              u=base+path+'?qa='+str(time.time_ns())
-              req=urllib.request.Request(u,headers={'User-Agent':'RAVEN-Trace-Live-QA/1.0','Cache-Control':'no-cache'})
+              req=urllib.request.Request(base+path+'?qa='+str(time.time_ns()),headers={'User-Agent':'RAVEN-Trace-Live-QA/1.1','Cache-Control':'no-cache'})
               with urllib.request.urlopen(req,timeout=20) as r:
                   assert r.status==200,(path,r.status)
                   text=r.read().decode('utf-8','replace')
@@ -103,7 +109,7 @@ jobs:
               print(path,'PASS')
           PY
 
-      - name: Verify factual runtime assets are inert
+      - name: Verify factual runtime assets remain inert
         run: |
           python - <<'PY'
           import os,urllib.request,time
@@ -115,7 +121,7 @@ jobs:
           ]
           forbidden=['Jamil Khir','Abdul Azeez','Azmi Ahmad','9 September 2026','18:29 MYT','ravenCaseState','.section-cutoff']
           for path in assets:
-              req=urllib.request.Request(base+path+'&qa='+str(time.time_ns()),headers={'User-Agent':'RAVEN-Trace-Live-QA/1.0','Cache-Control':'no-cache'})
+              req=urllib.request.Request(base+path+'&qa='+str(time.time_ns()),headers={'User-Agent':'RAVEN-Trace-Live-QA/1.1','Cache-Control':'no-cache'})
               text=urllib.request.urlopen(req,timeout=20).read().decode('utf-8','replace')
               for x in forbidden: assert x not in text, f'{path}: factual mutator token present: {x}'
               print(path,'INERT PASS')
@@ -126,11 +132,10 @@ jobs:
           python - <<'PY'
           import os,urllib.request,time
           base=os.environ['BASE']
-          paths=['/','/investigations/','/investigations/rci-tabung-haji/','/investigations/rci-tabung-haji/sources/']
+          paths=['/','/news/','/investigations/rci-tabung-haji/','/investigations/rci-tabung-haji/updates/','/investigations/rci-tabung-haji/sources/']
           forbidden=['rci-tabung-haji-share-v5.jpg','11 dan 17 September','5 individu telah didakwa','Maklumat disemak hingga:</strong> 10 September 2026 · lewat malam MYT']
           for path in paths:
-              sep='&' if '?' in path else '?'
-              req=urllib.request.Request(base+path+sep+'qa='+str(time.time_ns()),headers={'User-Agent':'RAVEN-Trace-Live-QA/1.0','Cache-Control':'no-cache'})
+              req=urllib.request.Request(base+path+'?qa='+str(time.time_ns()),headers={'User-Agent':'RAVEN-Trace-Live-QA/1.1','Cache-Control':'no-cache'})
               text=urllib.request.urlopen(req,timeout=20).read().decode('utf-8','replace')
               for x in forbidden: assert x not in text, f'{path}: forbidden production token: {x}'
           print('PRODUCTION BOUNDARY: PASS')

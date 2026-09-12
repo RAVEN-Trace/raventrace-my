@@ -6,6 +6,7 @@ on:
     paths:
       - '.github/workflows/raven-signal-v6-visual-qa.yml'
       - 'assets/css/raven-signal-v6.css'
+      - 'assets/css/raven-signal-v6-polish.css'
       - 'assets/js/raven-signal-v6.js'
       - 'assets/js/raven-section.js'
       - 'assets/js/raven-narrative-v5.js'
@@ -58,7 +59,7 @@ jobs:
 
           async function openCurrent(page, name, path) {
             let last = null;
-            for (let attempt = 0; attempt < 18; attempt++) {
+            for (let attempt = 0; attempt < 45; attempt++) {
               const url = `${base}${path}?signalqa=${Date.now()}-${Math.random()}`;
               await page.goto(url, { waitUntil: 'networkidle', timeout: 45000 });
               await page.waitForSelector('body.raven-signal', { timeout: 15000 });
@@ -66,19 +67,34 @@ jobs:
                 const signal = !!document.querySelector('link[href*="raven-signal-v6.css?v=6.0.0"]') &&
                   !!document.querySelector('script[src*="raven-signal-v6.js?v=6.0.0"]');
                 if (!signal) return false;
-                if (pageName === 'narrative' && !document.querySelector('script[src*="raven-narrative-v5.js?v=5.2.1"]')) return false;
+                if (pageName === 'narrative') {
+                  if (!document.querySelector('script[src*="raven-narrative-v5.js?v=5.2.1"]')) return false;
+                  if (!document.querySelector('link[src*="raven-signal-v6-polish.css?v=6.0.1"], link[href*="raven-signal-v6-polish.css?v=6.0.1"]')) return false;
+                }
                 if (requireSection && !document.querySelector('script[src*="raven-section.js?v=2.1.0"]')) return false;
                 return true;
               }, { pageName: name, requireSection: sectionPages.has(name) });
               last = url;
               if (ready) return last;
-              await sleep(4000);
+              await sleep(5000);
             }
-            throw new Error(`${name}: production did not reach required Signal V6 / Narrative V5.2.1 / section-controller payload`);
+            throw new Error(`${name}: production did not reach required Signal V6 / V6.0.1 polish / Narrative V5.2.1 payload`);
           }
 
           function check(condition, message) {
             if (!condition) errors.push(message);
+          }
+
+          async function forcePaintForScreenshot(page) {
+            await page.addStyleTag({ content: `
+              .timeline-item,.update-card,.trace-card,.person-card,details.investment,
+              .narrative-card,#sources [id^="s"],.case-section {
+                content-visibility: visible !important;
+                contain: none !important;
+              }
+            ` });
+            await page.evaluate(() => window.scrollTo(0, 0));
+            await page.waitForTimeout(80);
           }
 
           async function checkView(viewName, viewport, targets) {
@@ -91,12 +107,41 @@ jobs:
                   await page.waitForSelector('.narrative-v5-card', { timeout: 15000 }).catch(() => {});
                   await page.waitForSelector('.signal-narrative-card', { timeout: 15000 }).catch(() => {});
                 }
-                await page.waitForTimeout(300);
+                await page.waitForTimeout(350);
 
                 const metrics = await page.evaluate(() => {
                   const skip = document.querySelector('.skip-link');
                   const rect = skip?.getBoundingClientRect();
                   const skipVisible = !!rect && rect.bottom > 0 && rect.top < innerHeight && rect.right > 0 && rect.left < innerWidth;
+
+                  const primary = document.querySelector('.raven-signal-narrative .section-intro .btn-primary');
+                  const primaryStyle = primary ? getComputedStyle(primary) : null;
+                  const parseRgb = (value = '') => {
+                    const nums = value.match(/[\d.]+/g)?.slice(0,3).map(Number) || [];
+                    return nums.length === 3 ? nums : null;
+                  };
+                  const luminance = (rgb) => {
+                    if (!rgb) return null;
+                    const c = rgb.map((v) => {
+                      const s = v / 255;
+                      return s <= .03928 ? s / 12.92 : ((s + .055) / 1.055) ** 2.4;
+                    });
+                    return .2126*c[0] + .7152*c[1] + .0722*c[2];
+                  };
+                  const contrast = (a, b) => {
+                    const la = luminance(parseRgb(a));
+                    const lb = luminance(parseRgb(b));
+                    if (la == null || lb == null) return null;
+                    const hi = Math.max(la, lb), lo = Math.min(la, lb);
+                    return (hi + .05) / (lo + .05);
+                  };
+
+                  const main = document.querySelector('main');
+                  const footer = document.querySelector('footer');
+                  const rule = document.querySelector('#narrative-rule');
+                  const ruleInsideMain = !!(main && rule && main.contains(rule));
+                  const footerAfterMain = !!(main && footer && (main.compareDocumentPosition(footer) & Node.DOCUMENT_POSITION_FOLLOWING));
+
                   return {
                     title: document.title,
                     bodyClass: document.body.className,
@@ -105,6 +150,7 @@ jobs:
                     scrollY: window.scrollY,
                     signalCss: !!document.querySelector('link[data-raven-signal-v6]'),
                     signalJs: !!document.querySelector('script[data-raven-signal-v6]'),
+                    narrativePolish: !!document.querySelector('link[data-raven-signal-v6-polish]'),
                     sectionJs21: !!document.querySelector('script[src*="raven-section.js?v=2.1.0"]'),
                     narrativeJs521: !!document.querySelector('script[src*="raven-narrative-v5.js?v=5.2.1"]'),
                     homeHero: !!document.querySelector('.signal-home-hero'),
@@ -114,15 +160,15 @@ jobs:
                     narrativeCards: document.querySelectorAll('.signal-narrative-card').length,
                     legacyNarrativeDetails: document.querySelectorAll('.narrative-v5-card > details:not(.narrative-v5-details)').length,
                     duplicateNarrativeSummaries: [...document.querySelectorAll('.narrative-v5-card summary')].filter((el) => /buka bukti/i.test(el.textContent || '')).length,
+                    narrativePrimaryContrast: primaryStyle ? contrast(primaryStyle.color, primaryStyle.backgroundColor) : null,
+                    narrativeRuleInsideMain: ruleInsideMain,
+                    footerAfterMain,
                     moneyClarifier: !!document.querySelector('.signal-money-clarifier'),
                     processRail: !!document.querySelector('.signal-process-rail'),
                     sourceKey: !!document.querySelector('.signal-source-key'),
                     skipVisible
                   };
                 });
-
-                await page.screenshot({ path: `visual-qa/${viewName}-${name}.png`, fullPage: true });
-                report.push({ viewName, name, url, ...metrics });
 
                 check(metrics.width === viewport.width, `${viewName}/${name}: viewport ${metrics.width}, expected ${viewport.width}`);
                 check(metrics.signalCss && metrics.signalJs, `${viewName}/${name}: Signal assets missing`);
@@ -135,15 +181,22 @@ jobs:
                 if (name === 'home') check(metrics.homeHero, `${viewName}/home: Signal hero missing`);
                 if (name === 'case') check(metrics.lenses === 4 && metrics.truthMap === 7, `${viewName}/case: lenses/map mismatch ${metrics.lenses}/${metrics.truthMap}`);
                 if (name === 'narrative') {
+                  check(metrics.narrativePolish, `${viewName}/narrative: V6.0.1 polish stylesheet missing`);
                   check(metrics.narrativeJs521, `${viewName}/narrative: Narrative V5.2.1 missing`);
                   check(metrics.narrativeV5Cards >= 8, `${viewName}/narrative: only ${metrics.narrativeV5Cards} V5.2.1 cards rendered`);
                   check(metrics.narrativeCards >= 8, `${viewName}/narrative: only ${metrics.narrativeCards} Signal cards rendered`);
                   check(metrics.legacyNarrativeDetails === 0, `${viewName}/narrative: ${metrics.legacyNarrativeDetails} legacy narrative disclosures remain`);
                   check(metrics.duplicateNarrativeSummaries === 0, `${viewName}/narrative: duplicate “Buka bukti” controls remain`);
+                  check(metrics.narrativeRuleInsideMain && metrics.footerAfterMain, `${viewName}/narrative: closing rule/footer DOM order invalid`);
+                  check((metrics.narrativePrimaryContrast || 0) >= 4.5, `${viewName}/narrative: share-action contrast ${metrics.narrativePrimaryContrast}`);
                 }
                 if (name === 'money') check(metrics.moneyClarifier, `${viewName}/money: category clarifier missing`);
                 if (name === 'people') check(metrics.processRail, `${viewName}/people: process rail missing`);
                 if (name === 'sources') check(metrics.sourceKey, `${viewName}/sources: source key missing`);
+
+                await forcePaintForScreenshot(page);
+                await page.screenshot({ path: `visual-qa/${viewName}-${name}.png`, fullPage: true });
+                report.push({ viewName, name, url, ...metrics });
               } catch (error) {
                 errors.push(`${viewName}/${name}: ${error.message}`);
                 await page.screenshot({ path: `visual-qa/${viewName}-${name}-failure.png`, fullPage: true }).catch(() => {});

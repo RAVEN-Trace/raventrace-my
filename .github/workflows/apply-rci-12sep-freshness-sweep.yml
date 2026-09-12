@@ -1,0 +1,54 @@
+name: Apply RCI 12 Sep freshness sweep
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'scripts/apply_rci_12sep_freshness_sweep.py'
+      - '.github/workflows/apply-rci-12sep-freshness-sweep.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  apply:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+      - name: Apply 12 Sep freshness sweep
+        run: python scripts/apply_rci_12sep_freshness_sweep.py
+      - name: QA freshness sweep
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          req={
+            'index.html':['freshness sweep: 12 Sep 20:44 MYT','freshness-sweep-pac-15-sep-rm18m-claim'],
+            'news/index.html':['12 SEP 2026','PAC TH bersidang 15 September'],
+            'investigations/rci-tabung-haji/updates/index.html':['JEJAK / 12-01','15 Sep:','RM18.6 juta'],
+            'investigations/rci-tabung-haji/index.html':['JEJAK / 12-01','PAC TH dijadual 15 September'],
+            'investigations/rci-tabung-haji/timeline/index.html':['15 Sep</time><h3>PAC Parlimen'],
+            'investigations/rci-tabung-haji/sources/index.html':['id="s65"','id="s66"','parlimen.gov.my/pac/senarai-mesyuarat'],
+          }
+          for f,tokens in req.items():
+              t=Path(f).read_text(encoding='utf-8')
+              for x in tokens:
+                  assert x in t, f'{f}: missing {x}'
+          print('12 SEP FRESHNESS QA: PASS')
+          PY
+      - name: Commit generated freshness update
+        run: |
+          if git diff --quiet; then
+            echo 'No generated changes.'
+            exit 0
+          fi
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add index.html news/index.html investigations/rci-tabung-haji/index.html investigations/rci-tabung-haji/updates/index.html investigations/rci-tabung-haji/timeline/index.html investigations/rci-tabung-haji/sources/index.html
+          git commit -m 'Sync RCI freshness through 12 Sep'
+          git push

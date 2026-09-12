@@ -63,10 +63,16 @@
     card.classList.add('narrative-v5-card');
     card.id ||= `naratif-${String(index + 1).padStart(2, '0')}`;
 
-    /* Clear empty legacy helpers produced by the older transformer. */
-    qa(':scope > .narrative-meta, :scope > details', card).forEach((el) => {
-      if (!normalize(el.textContent)) el.remove();
+    /*
+     * V3.1 runs before this transformer on the legacy page. Recover any
+     * evidence paragraphs it may have moved into its disclosure, then remove
+     * all legacy helper UI so readers never get two “open details” controls.
+     */
+    qa(':scope > details:not(.narrative-v5-details)', card).forEach((legacy) => {
+      qa('.narrative-detail > p', legacy).forEach((p) => card.appendChild(p));
+      legacy.remove();
     });
+    qa(':scope > .narrative-meta', card).forEach((el) => el.remove());
 
     const statusP = card.querySelector(':scope > p:has(.status)');
     const statusText = normalize(statusP?.textContent || 'Dakwaan / naratif');

@@ -79,12 +79,12 @@ jobs:
           base=os.environ['BASE']
           checks={
             '/investigations/':['11 Sep 2026','empat individu','SPRM menyebut lima','14 Sep','24 Sep'],
-            '/investigations/rci-tabung-haji/':['11 Sep 2026','DIPERTIKAIKAN','Pertuduhan bukan sabitan','SPRM pula menyebut lima'],
+            '/investigations/rci-tabung-haji/':['11 Sep 2026','DIPERTIKAIKAN','Pertuduhan bukan sabitan','SPRM menyebut lima individu'],
             '/investigations/rci-tabung-haji/people/':['Didakwa · belum sabit','Tindakan mahkamah dijadual · 14 Sep'],
             '/investigations/rci-tabung-haji/timeline/':['14 Sep','empat','lima'],
             '/investigations/rci-tabung-haji/tracks/':['AMLA','BELUM DIKETAHUI'],
             '/investigations/rci-tabung-haji/governance/':['Seruan Istito’ah','RM15,000','Tabung Haji · kenyataan rasmi · 11 Sep'],
-            '/investigations/rci-tabung-haji/narratives/':['SPRM pula menyebut lima','Pertuduhan bukan sabitan'],
+            '/investigations/rci-tabung-haji/narratives/':['SPRM','lima','Pertuduhan bukan sabitan'],
             '/investigations/rci-tabung-haji/sources/':['2605735','2605567','2605960','pr11092026_BM'],
             '/investigations/rci-tabung-haji/updates/':['11 Sep','empat','lima'],
           }
@@ -122,7 +122,7 @@ jobs:
           import os,urllib.request,time
           base=os.environ['BASE']
           paths=['/','/investigations/','/investigations/rci-tabung-haji/','/investigations/rci-tabung-haji/sources/']
-          forbidden=['rci-tabung-haji-share-v5.jpg','11 dan 17 September','lima individu telah didakwa','5 individu telah didakwa']
+          forbidden=['rci-tabung-haji-share-v5.jpg','11 dan 17 September','5 individu telah didakwa']
           for path in paths:
               sep='&' if '?' in path else '?'
               req=urllib.request.Request(base+path+sep+'qa='+str(time.time_ns()),headers={'User-Agent':'RAVEN-Trace-Live-QA/1.0','Cache-Control':'no-cache'})

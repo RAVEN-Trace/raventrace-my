@@ -1,0 +1,74 @@
+name: Raven Signal V6 Gate
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '**/*.html'
+      - 'assets/css/raven-signal-v6.css'
+      - 'assets/js/raven-signal-v6.js'
+      - 'scripts/apply_raven_signal_v6.py'
+      - '.github/workflows/raven-signal-v6-gate.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  signal-integrity:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: JS syntax
+        run: node --check assets/js/raven-signal-v6.js
+
+      - name: Validate design-system and public route invariants
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          root = Path('.')
+          marker = 'data-raven-signal-v6'
+          css_url = '/assets/css/raven-signal-v6.css?v=6.0.0'
+          js_url = '/assets/js/raven-signal-v6.js?v=6.0.0'
+
+          live = []
+          for rel in ['index.html','about','corrections','investigations','methodology','news','tips']:
+              p = root / rel
+              if p.is_file(): live.append(p)
+              elif p.exists():
+                  live += [x for x in p.rglob('index.html') if 'research' not in [q.lower() for q in x.parts]]
+          live = list(dict.fromkeys(live))
+          assert live, 'No public pages discovered'
+          for p in live:
+              t = p.read_text(encoding='utf-8')
+              assert t.count(marker) == 2, f'Signal CSS/JS must each appear once: {p}'
+              assert css_url in t and js_url in t, f'Wrong Signal version: {p}'
+
+          home = Path('index.html').read_text(encoding='utf-8')
+          case = Path('investigations/rci-tabung-haji/index.html').read_text(encoding='utf-8')
+          narrative = Path('investigations/rci-tabung-haji/narratives/index.html').read_text(encoding='utf-8')
+
+          assert '<link rel="canonical" href="https://raven-trace.github.io/raventrace-my/">' in home
+          assert '<link rel="canonical" href="https://raven-trace.github.io/raventrace-my/investigations/rci-tabung-haji/">' in case
+          assert '/investigations/rci-tabung-haji/narratives/' in home
+          assert '/investigations/rci-tabung-haji/narratives/' in case
+          assert 'raven-narrative-v5' in narrative, 'Narrative progressive-disclosure layer missing'
+          assert marker in narrative, 'Signal Narrative layer missing'
+          assert not Path('rcitabunghaji').exists(), 'Public URL migration remains intentionally paused'
+
+          for p in root.rglob('research/**/index.html'):
+              assert marker not in p.read_text(encoding='utf-8'), f'Historical research must remain untouched: {p}'
+
+          css = Path('assets/css/raven-signal-v6.css').read_text(encoding='utf-8')
+          js = Path('assets/js/raven-signal-v6.js').read_text(encoding='utf-8')
+          for token in ['signal-case-lenses','signal-truth-map','signal-narrative-card','signal-money-clarifier','signal-process-rail','signal-source-key']:
+              assert token in css, f'Missing Signal CSS primitive: {token}'
+          for token in ['upgradeHome','upgradeCasefile','upgradeNarratives','upgradeMoney','upgradePeople','upgradeNews','upgradeSources']:
+              assert token in js, f'Missing Signal JS module: {token}'
+
+          print(f'Raven Signal V6 gate PASS — {len(live)} live public pages checked.')
+          PY

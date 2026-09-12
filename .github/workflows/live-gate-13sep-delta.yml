@@ -1,0 +1,63 @@
+name: Live Gate 13 Sep Delta
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/live-gate-13sep-delta.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      BASE: https://raven-trace.github.io/raventrace-my
+    steps:
+      - name: Wait for deployed delta
+        run: |
+          python - <<'PY'
+          import os,time,urllib.request
+          base=os.environ['BASE']
+          checks={
+            '/news/2026/09/09/abdul-azeez-didakwa-rm1935-juta/':['RM193.5 juta bukan jumlah yang didakwa diambil','RM18.6 juta akaun keluarga · BELUM DISELESAIKAN / HOLD'],
+            '/investigations/rci-tabung-haji/narratives/':['“Azeez ambil RM193.5 juta”','Category collapse + number laundering','13 Sep 2026 · 01:00 MYT'],
+            '/investigations/rci-tabung-haji/narratives/political-social-media/':['political intimidation','Apa yang belum terbukti?','13 Sep 2026 · 01:00 MYT'],
+            '/investigations/rci-tabung-haji/sources/':['id="s67"','id="s68"','id="s69"'],
+            '/':['Status mahkamah: 11 Sep','freshness sweep: 12 Sep 20:44 MYT','empat individu telah berdepan pertuduhan','SPRM pula menyebut lima'],
+          }
+          headers={'User-Agent':'RAVEN-Trace-Live-QA/13sep','Cache-Control':'no-cache'}
+          last={}
+          for i in range(60):
+              ok=True
+              for path,toks in checks.items():
+                  try:
+                      req=urllib.request.Request(base+path+'?qa='+str(time.time_ns()),headers=headers)
+                      text=urllib.request.urlopen(req,timeout=15).read().decode('utf-8','replace')
+                      last[path]=text
+                      if not all(tok in text for tok in toks): ok=False
+                  except Exception as e:
+                      ok=False
+                      print('wait',i,path,type(e).__name__,str(e)[:120])
+              if ok:
+                  print('13 SEP DELTA LIVE: PASS')
+                  raise SystemExit(0)
+              time.sleep(5)
+          raise SystemExit('Timed out waiting for deployed delta')
+          PY
+      - name: Verify no legal overclaim
+        run: |
+          python - <<'PY'
+          import os,time,urllib.request
+          base=os.environ['BASE']
+          paths=['/news/2026/09/09/abdul-azeez-didakwa-rm1935-juta/','/investigations/rci-tabung-haji/narratives/','/investigations/rci-tabung-haji/narratives/political-social-media/','/investigations/rci-tabung-haji/sources/']
+          forbidden=['Azeez mengambil RM193.5 juta','RM18.6 juta telah dilucuthakkan','SPRM dikawal politik','Jamil Khir telah didakwa']
+          for path in paths:
+              req=urllib.request.Request(base+path+'?qa2='+str(time.time_ns()),headers={'User-Agent':'RAVEN-Trace-Live-QA/13sep','Cache-Control':'no-cache'})
+              text=urllib.request.urlopen(req,timeout=20).read().decode('utf-8','replace')
+              for tok in forbidden: assert tok not in text, f'{path}: overclaim {tok}'
+          print('LEGAL/NARRATIVE BOUNDARY: PASS')
+          PY

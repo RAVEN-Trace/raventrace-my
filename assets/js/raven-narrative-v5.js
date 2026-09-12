@@ -23,18 +23,35 @@
   const classify = (status = '') => {
     const t = status.toLowerCase();
     if (/inferens|inference|analisis/.test(t)) return 'analysis';
-    if (/tidak disokong|dipertikai|unsupported|bercanggah/.test(t)) return 'unsupported';
+    if (/tidak disokong|dipertikai|unsupported|bercanggah|terlalu mudah/.test(t)) return 'unsupported';
     if (/fakta|posisi politik|dasar/.test(t)) return 'fact';
     return 'claim';
   };
 
+  /*
+   * Do not key this UX to a headline such as “Lapan naratif utama”.
+   * The evidence set is living content and can grow. Detect the narrative
+   * evidence structure itself so a new narrative cannot silently break UX.
+   */
   const sections = qa('.case-section');
-  const section = sections.find((s) => /lapan naratif utama/i.test(s.querySelector('h2')?.textContent || ''));
+  const section = sections.find((candidate) => {
+    const candidateGrid = candidate.querySelector(':scope > .control-grid, .control-grid');
+    if (!candidateGrid) return false;
+    const candidateCards = [...candidateGrid.children].filter((el) => el.tagName === 'ARTICLE');
+    if (candidateCards.length < 2) return false;
+    const structured = candidateCards.filter((card) =>
+      labelled(card, ['Cerita yang dibawa']) &&
+      labelled(card, ['Apa yang boleh disahkan', 'Apa rekod tunjuk']) &&
+      labelled(card, ['Selepas framing dibuang', 'Verdict Raven'])
+    );
+    return structured.length >= Math.min(2, candidateCards.length);
+  });
   if (!section) return;
+
   const grid = section.querySelector('.control-grid');
   if (!grid) return;
 
-  /* Remove the V3.1 dashboard furniture. The content itself stays untouched. */
+  /* Remove V3.1 dashboard furniture. Evidence copy remains canonical. */
   qa('.narrative-status-strip, .narrative-filterbar, .narrative-board', section).forEach((el) => el.remove());
   grid.classList.add('narrative-v5-grid');
 
@@ -58,6 +75,7 @@
 
     const storyP = labelled(card, ['Cerita yang dibawa']);
     const verifiedP = labelled(card, ['Apa yang boleh disahkan', 'Apa rekod tunjuk']);
+    const techniqueP = labelled(card, ['Teknik naratif', 'Teknik framing', 'Mekanisme naratif']);
     const omittedP = labelled(card, ['Apa yang cerita ini tinggalkan', 'Konteks yang sering tertinggal']);
     const verdictP = labelled(card, ['Selepas framing dibuang', 'Verdict Raven']);
     const changeP = labelled(card, ['Bukti apa boleh mengubah penilaian', 'Apa yang boleh mengubah verdict']);
@@ -65,6 +83,7 @@
 
     const story = valueAfterLabel(storyP);
     const verified = valueAfterLabel(verifiedP);
+    const technique = valueAfterLabel(techniqueP);
     const omitted = valueAfterLabel(omittedP);
     const verdict = valueAfterLabel(verdictP);
     const change = valueAfterLabel(changeP);
@@ -77,7 +96,9 @@
       lastVerified = normalize(split[1] || '');
     }
 
-    [storyP, verifiedP, omittedP, verdictP, changeP, confidenceP].filter(Boolean).forEach((p) => p.remove());
+    [storyP, verifiedP, techniqueP, omittedP, verdictP, changeP, confidenceP]
+      .filter(Boolean)
+      .forEach((p) => p.remove());
 
     const title = card.querySelector(':scope > h3');
     if (title) {
@@ -105,6 +126,7 @@
 
     const detailItems = [
       ['Cerita yang dibawa', story],
+      ['Trick / teknik naratif', technique],
       ['Apa yang cerita tak sebut', omitted],
       ['Apa yang boleh ubah penilaian', change]
     ].filter(([, text]) => text);
@@ -146,7 +168,7 @@
       card.append(meta);
     }
 
-    /* Page already has a share action. Do not repeat five social buttons eight times. */
+    /* Page already has a share action. Do not repeat social controls per card. */
     qa(':scope > .raven-sharebar', card).forEach((bar) => bar.remove());
   });
 

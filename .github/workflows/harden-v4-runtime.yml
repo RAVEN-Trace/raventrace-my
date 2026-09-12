@@ -5,6 +5,10 @@ on:
     branches: [main]
     paths:
       - 'scripts/harden_v4_runtime.py'
+      - 'assets/js/raven-publication.js'
+      - 'assets/js/raven-publication-core.js'
+      - 'assets/js/raven-evidence-ux.js'
+      - 'assets/js/raven-narrative.js'
       - '.github/workflows/harden-v4-runtime.yml'
   workflow_dispatch:
 
@@ -23,30 +27,61 @@ jobs:
           python-version: '3.12'
       - name: Apply V4 runtime hardening
         run: python scripts/harden_v4_runtime.py
-      - name: QA V4 runtime contract
+      - name: QA factual-safe runtime contract
         run: |
           python - <<'PY'
           from pathlib import Path
           root=Path('.')
           home=(root/'index.html').read_text(encoding='utf-8')
           assert '<body class="raven-editorial-home">' in home
-          assert 'raven-publication.js?v=4.3.0' in home
+          assert 'raven-publication.js?v=5.0.0' in home
+          assert 'raven-evidence-ux.js?v=3.0.0' in home
+
+          old_refs = [
+              'raven-publication.js?v=1.1.0',
+              'raven-publication.js?v=2.0.0',
+              'raven-publication.js?v=2.1.0',
+              'raven-publication.js?v=4.3.0',
+              'raven-evidence-ux.js?v=2.1.0',
+          ]
           for p in [root/'assets/js/raven.js', root/'assets/js/raven-share.js']:
               text=p.read_text(encoding='utf-8')
-              assert 'raven-publication.js?v=1.1.0' not in text
-              assert 'raven-publication.js?v=2.1.0' not in text
-              assert 'raven-publication.js?v=4.3.0' in text
+              for old in old_refs:
+                  assert old not in text, (p, old)
+              assert 'raven-publication.js?v=5.0.0' in text
+
+          # No runtime layer may own time-sensitive case facts.
+          runtime_files = [
+              root/'assets/js/raven-section.js',
+              root/'assets/js/raven-evidence-ux.js',
+              root/'assets/js/raven-publication-core.js',
+              root/'assets/js/raven-narrative.js',
+          ]
+          forbidden = [
+              '9 Sep 2026', '9 September 2026', '17 September',
+              'Jamil Khir', 'Abdul Azeez', 'Azmi Ahmad',
+              'ravenCaseState', '.section-cutoff', 'Data cut-off',
+              'tiga individu telah didakwa', 'addSourceRow(', 'heroDate.textContent',
+          ]
+          for p in runtime_files:
+              text=p.read_text(encoding='utf-8')
+              for token in forbidden:
+                  assert token not in text, f'{p}: forbidden factual runtime token {token}'
+
+          narrative=(root/'assets/js/raven-narrative.js').read_text(encoding='utf-8')
+          assert '__RAVEN_NARRATIVE_RUNTIME_DEPRECATED__' in narrative
+
           governance=(root/'investigations/rci-tabung-haji/governance/index.html').read_text(encoding='utf-8')
           sources=(root/'investigations/rci-tabung-haji/sources/index.html').read_text(encoding='utf-8')
           assert 'pr11092026_BM' in governance
           assert 'pr11092026_BM' in sources
+
           for p in root.rglob('*.html'):
-              if any(part in {'.git'} for part in p.parts):
-                  continue
               text=p.read_text(encoding='utf-8', errors='ignore')
-              assert 'raven-publication.js?v=1.1.0' not in text
-              assert 'raven-publication.js?v=2.1.0' not in text
-          print('V4 RUNTIME QA: PASS')
+              for old in old_refs:
+                  assert old not in text, f'{p}: stale runtime ref {old}'
+
+          print('FACTUAL-SAFE RUNTIME QA: PASS')
           PY
       - name: Commit generated hardening
         run: |
@@ -57,5 +92,5 @@ jobs:
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
           git add index.html about methodology corrections tips news investigations assets/js/raven.js assets/js/raven-share.js
-          git commit -m 'Harden V4 runtime and upgrade primary TH source'
+          git commit -m 'Apply factual-safe runtime references'
           git push

@@ -5,7 +5,7 @@ on:
     branches: [main]
     paths:
       - '.github/workflows/revise-narrative-forensics-nlp-v4.yml'
-      - 'scripts/revise_narrative_forensics_nlp_v4_1.py'
+      - 'scripts/revise_narrative_forensics_nlp_v4_2.py'
   workflow_dispatch:
 
 permissions:
@@ -17,7 +17,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Apply narrative forensics NLP revision
-        run: python scripts/revise_narrative_forensics_nlp_v4_1.py
+        run: python scripts/revise_narrative_forensics_nlp_v4_2.py
       - name: QA narrative forensics language
         run: |
           python - <<'PY'
@@ -28,7 +28,7 @@ jobs:
           required_social=['FORENSIK POLITIK + MEDIA SOSIAL','Buang parti, buang slogan, buang emosi','Forensik bahasa','CATEGORY COLLAPSE','EMOTIONAL PRIMING','MOTIVE INFLATION','REPETITION RISK','REPRESENTATIVENESS ERROR','Neutralise, bukan counter-spin','Prinsip komunikasi']
           for x in required_main: assert x in main, 'main missing '+x
           for x in required_social: assert x in social, 'social missing '+x
-          print('NARRATIVE FORENSICS NLP V4.1: PASS')
+          print('NARRATIVE FORENSICS NLP V4.2: PASS')
           PY
       - name: Commit generated pages
         run: |

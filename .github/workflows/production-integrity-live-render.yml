@@ -22,27 +22,31 @@ jobs:
     env:
       BASE: https://raven-trace.github.io/raventrace-my
     steps:
-      - name: Wait for current Pages payload
+      - name: Wait for complete current Pages payload
         run: |
           python - <<'PY'
           import os,time,urllib.request
-          url=os.environ['BASE']+'/?liveqa='+str(int(time.time()))
-          expected=['raven-publication.js?v=5.0.0','raven-evidence-ux.js?v=3.0.0','11 September 2026','empat individu telah berdepan pertuduhan']
-          last=''
-          for i in range(36):
+          base=os.environ['BASE']
+          home_expected=['raven-publication.js?v=5.0.0','raven-evidence-ux.js?v=3.0.0','11 September 2026','empat individu telah berdepan pertuduhan']
+          source_expected=['2605735','2605582','2605960','pr11092026_BM','11 September 2026 · 23:37 MYT']
+          last_home=last_sources=''
+          for i in range(48):
               try:
-                  req=urllib.request.Request(url+'&n='+str(i),headers={'User-Agent':'RAVEN-Trace-Live-QA/1.0','Cache-Control':'no-cache'})
-                  with urllib.request.urlopen(req,timeout=15) as r:
-                      text=r.read().decode('utf-8','replace')
-                      last=text
-                      if all(x in text for x in expected):
-                          print('LIVE PAYLOAD READY')
-                          raise SystemExit(0)
+                  headers={'User-Agent':'RAVEN-Trace-Live-QA/1.0','Cache-Control':'no-cache'}
+                  stamp=str(time.time_ns())
+                  hreq=urllib.request.Request(base+'/?liveqa='+stamp,headers=headers)
+                  sreq=urllib.request.Request(base+'/investigations/rci-tabung-haji/sources/?liveqa='+stamp,headers=headers)
+                  last_home=urllib.request.urlopen(hreq,timeout=15).read().decode('utf-8','replace')
+                  last_sources=urllib.request.urlopen(sreq,timeout=15).read().decode('utf-8','replace')
+                  if all(x in last_home for x in home_expected) and all(x in last_sources for x in source_expected):
+                      print('COMPLETE LIVE PAYLOAD READY')
+                      raise SystemExit(0)
               except Exception as e:
                   print('wait',i,type(e).__name__,str(e)[:180])
               time.sleep(5)
-          print(last[:1500])
-          raise SystemExit('Timed out waiting for current Pages payload')
+          print('HOME SAMPLE:',last_home[:800])
+          print('SOURCES SAMPLE:',last_sources[-1200:])
+          raise SystemExit('Timed out waiting for complete current Pages payload')
           PY
 
       - name: Verify homepage live state

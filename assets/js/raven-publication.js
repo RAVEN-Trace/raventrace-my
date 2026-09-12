@@ -1,6 +1,6 @@
 (() => {
-  if (window.__RAVEN_PUBLICATION_LOADER_V41__) return;
-  window.__RAVEN_PUBLICATION_LOADER_V41__ = true;
+  if (window.__RAVEN_PUBLICATION_LOADER_V42__) return;
+  window.__RAVEN_PUBLICATION_LOADER_V42__ = true;
 
   const loadScript = (src, key, done) => {
     const existing = document.querySelector(`script[data-${key}]`);
@@ -21,6 +21,11 @@
     l.dataset[key] = 'true';
     document.head.appendChild(l);
   };
+
+  const existingPublicationCss = document.querySelector('link[href*="/assets/css/raven-publication.css"]');
+  if (existingPublicationCss && !existingPublicationCss.dataset.ravenPublication) {
+    existingPublicationCss.dataset.ravenPublication = 'true';
+  }
 
   const path = location.pathname;
   const isRciCase = path.includes('/raventrace-my/investigations/rci-tabung-haji');

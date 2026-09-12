@@ -23,6 +23,13 @@ jobs:
           python-version: '3.12'
       - name: Add narrative links across public pages
         run: python scripts/ensure_narrative_links_sitewide.py
+      - name: Normalize touched HTML whitespace
+        shell: bash
+        run: |
+          while IFS= read -r file; do
+            [ -z "$file" ] && continue
+            sed -i 's/[[:blank:]]\+$//' "$file"
+          done < <(git diff --name-only -- '*.html')
       - name: Validate diff
         run: git diff --check
       - name: Commit rollout

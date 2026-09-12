@@ -1,0 +1,61 @@
+name: Repair 12 Sep evidence wording
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'scripts/repair_12sep_evidence_wording.py'
+      - '.github/workflows/repair-12sep-evidence-wording.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  repair:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+      - name: Repair evidence wording and source URL
+        run: python scripts/repair_12sep_evidence_wording.py
+      - name: QA repaired wording
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          checks = {
+            'index.html': ['prosiding PAC berkaitan TH dijadual 15 Sep.'],
+            'news/index.html': ['prosiding PAC berkaitan TH dijadual 15 September.','prosiding PAC berhubung Tabung Haji pada 15 September.'],
+            'news/2026/09/12/freshness-sweep-pac-15-sep-rm18m-claim/index.html': [
+              'prosiding PAC TH dijadual 15 Sep',
+              'https://www.bernama.com/en/news.php?id=2605582',
+            ],
+          }
+          forbidden = [
+            'PAC TH bersidang 15 September',
+            'PAC TH bersidang 15 Sep',
+            'https://www.bernama.com/en/region/news.php?id=2605582',
+          ]
+          for f, tokens in checks.items():
+              t = Path(f).read_text(encoding='utf-8')
+              for x in tokens:
+                  assert x in t, f'{f}: missing {x}'
+              for x in forbidden:
+                  assert x not in t, f'{f}: forbidden stale/overstated token {x}'
+          print('12 SEP EVIDENCE WORDING QA: PASS')
+          PY
+      - name: Commit repaired public wording
+        run: |
+          if git diff --quiet; then
+            echo 'No generated changes.'
+            exit 0
+          fi
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add index.html news/index.html news/2026/09/12/freshness-sweep-pac-15-sep-rm18m-claim/index.html
+          git commit -m 'Tighten 12 Sep PAC wording and Bernama source URL'
+          git push

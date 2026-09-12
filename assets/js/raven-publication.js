@@ -1,6 +1,6 @@
 (() => {
-  if (window.__RAVEN_PUBLICATION_LOADER_V43__) return;
-  window.__RAVEN_PUBLICATION_LOADER_V43__ = true;
+  if (window.__RAVEN_PUBLICATION_LOADER_V50__) return;
+  window.__RAVEN_PUBLICATION_LOADER_V50__ = true;
 
   const loadScript = (src, key, done) => {
     const existing = document.querySelector(`script[data-${key}]`);
@@ -23,21 +23,14 @@
   };
 
   const existingPublicationCss = document.querySelector('link[href*="/assets/css/raven-publication.css"]');
-  if (existingPublicationCss && !existingPublicationCss.dataset.ravenPublication) {
-    existingPublicationCss.dataset.ravenPublication = 'true';
-  }
+  if (existingPublicationCss && !existingPublicationCss.dataset.ravenPublication) existingPublicationCss.dataset.ravenPublication = 'true';
 
   const path = location.pathname;
   const isRciCase = path.includes('/raventrace-my/investigations/rci-tabung-haji');
   const isInvestigationsHub = path === '/raventrace-my/investigations/' || path.endsWith('/raventrace-my/investigations/index.html');
   const isNewsroom = path === '/raventrace-my/news/' || path.endsWith('/raventrace-my/news/index.html');
   const isStory = path.startsWith('/raventrace-my/news/') && !isNewsroom;
-  const supportPaths = [
-    '/raventrace-my/methodology/',
-    '/raventrace-my/about/',
-    '/raventrace-my/corrections/',
-    '/raventrace-my/tips/'
-  ];
+  const supportPaths = ['/raventrace-my/methodology/','/raventrace-my/about/','/raventrace-my/corrections/','/raventrace-my/tips/'];
   const isSupport = supportPaths.some((prefix) => path === prefix || path.endsWith(`${prefix}index.html`));
 
   if (isInvestigationsHub) document.body.classList.add('raven-v4-investigations');
@@ -45,17 +38,11 @@
   if (isSupport) document.body.classList.add('raven-v4-support');
   if (isStory) document.body.classList.add('raven-v4-story');
 
-  loadScript('/raventrace-my/assets/js/raven-publication-core.js?v=2.2.0','ravenPublicationCore',()=>{
-    loadScript('/raventrace-my/assets/js/raven-evidence-ux.js?v=2.1.0','ravenEvidenceUx',()=>{
-      if (isRciCase) {
-        loadCss('/raventrace-my/assets/css/raven-v4-case.css?v=4.0.0','ravenV4Case');
-      }
-      if (isInvestigationsHub || isNewsroom) {
-        loadCss('/raventrace-my/assets/css/raven-v4-sections.css?v=4.0.0','ravenV4Sections');
-      }
-      if (isSupport || isStory) {
-        loadCss('/raventrace-my/assets/css/raven-v4-support.css?v=4.0.0','ravenV4Support');
-      }
+  loadScript('/raventrace-my/assets/js/raven-publication-core.js?v=3.0.0','ravenPublicationCore',()=>{
+    loadScript('/raventrace-my/assets/js/raven-evidence-ux.js?v=3.0.0','ravenEvidenceUx',()=>{
+      if (isRciCase) loadCss('/raventrace-my/assets/css/raven-v4-case.css?v=4.0.0','ravenV4Case');
+      if (isInvestigationsHub || isNewsroom) loadCss('/raventrace-my/assets/css/raven-v4-sections.css?v=4.0.0','ravenV4Sections');
+      if (isSupport || isStory) loadCss('/raventrace-my/assets/css/raven-v4-support.css?v=4.0.0','ravenV4Support');
     });
   });
 })();

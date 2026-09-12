@@ -1,0 +1,283 @@
+/* RAVEN Visual Evolution V4 — VANTA//FORGE
+   Scope: presentation only. No factual/content changes.
+   Goal: premium investigative publication > dashboard chrome.
+*/
+
+/* HOME — reduce terminal texture, preserve forensic identity */
+.raven-editorial-home .front-hero{
+  background:linear-gradient(128deg,#070a0e 0%,#0b1117 58%,#0d171e 100%);
+  padding:clamp(3.4rem,6.5vw,6.4rem) 0 clamp(3.8rem,7vw,6.8rem);
+}
+.raven-editorial-home .front-hero::before{
+  opacity:.07;
+  background-size:58px 58px;
+  mask-image:linear-gradient(to right,#000,transparent 68%);
+}
+.raven-editorial-home .front-hero::after{
+  opacity:.55;
+}
+.raven-editorial-home .front-grid{
+  grid-template-columns:minmax(0,1.45fr) minmax(280px,.55fr);
+  gap:clamp(2.5rem,6vw,5.75rem);
+  align-items:end;
+}
+.raven-editorial-home .front-lead h1{
+  max-width:13ch;
+  font-size:clamp(3.15rem,6.15vw,6.15rem);
+  line-height:.93;
+  letter-spacing:-.046em;
+}
+.raven-editorial-home .front-lead h1 em{
+  color:#d7e0e5;
+}
+.raven-editorial-home .front-dek{
+  max-width:69ch;
+  margin-top:1.45rem;
+  color:#c2ccd3;
+  font-size:clamp(1.04rem,1.55vw,1.2rem);
+  line-height:1.68;
+}
+.raven-editorial-home .front-docket{
+  border:0;
+  border-top:1px solid #53616d;
+  background:transparent;
+  box-shadow:none;
+}
+.raven-editorial-home .docket-stamp{
+  padding:1rem 0 1.05rem;
+  border-bottom:1px solid rgba(255,255,255,.14);
+}
+.raven-editorial-home .docket-stat{
+  grid-template-columns:70px 1fr;
+  padding:.95rem 0;
+  border-bottom:1px solid rgba(255,255,255,.12);
+}
+.raven-editorial-home .docket-stat strong{
+  font-size:2.35rem;
+}
+.raven-editorial-home .docket-note{
+  margin:.9rem 0 .35rem;
+  padding:.65rem 0 0;
+  border-top:0;
+}
+.raven-editorial-home .front-docket>p:last-child{
+  margin:.25rem 0 0;
+}
+
+/* Stronger editorial pacing between hero and evidence stream */
+.raven-editorial-home #latest{
+  padding-top:clamp(4rem,8vw,7.25rem);
+  padding-bottom:clamp(4.5rem,8vw,7.5rem);
+}
+.raven-editorial-home #latest .section-head{
+  grid-template-columns:minmax(0,1.15fr) minmax(260px,.48fr);
+  gap:clamp(2rem,5vw,5rem);
+  margin-bottom:clamp(2.5rem,5vw,4rem);
+  align-items:end;
+}
+.raven-editorial-home #latest .section-head h2{
+  max-width:9ch;
+}
+
+/* Updates — one dominant story + compact chronological rail */
+.raven-editorial-home .update-grid{
+  display:grid;
+  grid-template-columns:minmax(0,1.35fr) minmax(300px,.65fr);
+  gap:0 clamp(2.2rem,5vw,4.5rem);
+  border-top:0;
+  align-items:start;
+}
+.raven-editorial-home .update-card,
+.raven-editorial-home .update-card.lead-update{
+  position:relative;
+  grid-column:2;
+  grid-row:auto;
+  min-height:0;
+  margin:0;
+  padding:1.25rem 0 1.45rem;
+  border:0!important;
+  border-top:1px solid var(--line)!important;
+  background:transparent!important;
+  box-shadow:none!important;
+  border-radius:0!important;
+}
+.raven-editorial-home .update-card:first-child{
+  grid-column:1;
+  grid-row:1 / span 4;
+  padding:1.55rem clamp(1.2rem,3vw,2.5rem) 2.4rem 0;
+  border-top:5px solid var(--ink)!important;
+}
+.raven-editorial-home .update-card:first-child h3{
+  max-width:15ch;
+  margin:.55rem 0 1rem;
+  font-family:var(--serif);
+  font-size:clamp(2.25rem,4.2vw,4rem);
+  line-height:1.01;
+  letter-spacing:-.04em;
+}
+.raven-editorial-home .update-card:not(:first-child) h3{
+  margin:.45rem 0 .65rem;
+  font-family:var(--serif);
+  font-size:clamp(1.22rem,1.9vw,1.58rem);
+  line-height:1.12;
+  letter-spacing:-.025em;
+}
+.raven-editorial-home .update-card:not(:first-child) p{
+  margin-bottom:.75rem;
+  color:var(--muted);
+  font-size:.9rem;
+  line-height:1.58;
+}
+.raven-editorial-home .update-card:first-child p{
+  max-width:66ch;
+  font-size:1rem;
+  line-height:1.65;
+}
+.raven-editorial-home .update-index{
+  position:static;
+  display:block;
+  width:auto;
+  height:auto;
+  margin:0 0 .7rem;
+  color:#727b84;
+  border:0;
+  background:transparent;
+  font:900 .67rem/1 var(--mono);
+  letter-spacing:.16em;
+}
+
+/* Newsroom board — preserve dossier index, make interaction quieter */
+.raven-editorial-home .newsroom-board{
+  padding-top:clamp(4.25rem,8vw,7rem);
+  padding-bottom:clamp(4.25rem,8vw,7rem);
+}
+.raven-editorial-home .board-list{
+  border-top:2px solid var(--ink);
+}
+.raven-editorial-home .board-row{
+  min-height:88px;
+  padding:1rem .25rem;
+  transition:background-color .18s ease,color .18s ease,transform .18s ease;
+}
+.raven-editorial-home .board-row:hover{
+  transform:translateX(4px);
+  background:rgba(255,255,255,.28);
+}
+
+/* Public tools — remove card-wall weight */
+.raven-editorial-home .public-tools{
+  border-top:1px solid var(--ink);
+  border-bottom:1px solid var(--line);
+}
+.raven-editorial-home .public-tools article{
+  min-height:220px;
+  padding:1.65rem clamp(1.25rem,2.5vw,2rem);
+  border-right:0;
+  border-bottom:0;
+}
+.raven-editorial-home .public-tools article+article{
+  border-left:1px solid var(--line);
+}
+.raven-editorial-home .public-tools h3{
+  max-width:20ch;
+  font-size:clamp(1.35rem,2.2vw,1.7rem);
+  line-height:1.12;
+}
+
+/* Buttons: publication-like, not app-like */
+.raven-editorial-home .btn{
+  border-radius:0;
+  transition:background-color .18s ease,border-color .18s ease,color .18s ease;
+}
+.raven-editorial-home .dark .btn-primary{
+  box-shadow:none;
+}
+
+/* Tablet */
+@media(max-width:900px){
+  .raven-editorial-home .front-grid{
+    grid-template-columns:1fr;
+    gap:2.4rem;
+    align-items:start;
+  }
+  .raven-editorial-home .front-lead h1{
+    max-width:14ch;
+    font-size:clamp(3rem,9.5vw,5.2rem);
+  }
+  .raven-editorial-home .front-docket{
+    width:min(100%,620px);
+  }
+  .raven-editorial-home .update-grid{
+    grid-template-columns:minmax(0,1fr);
+    gap:0;
+  }
+  .raven-editorial-home .update-card,
+  .raven-editorial-home .update-card.lead-update,
+  .raven-editorial-home .update-card:first-child{
+    grid-column:1;
+    grid-row:auto;
+    padding:1.35rem 0 1.6rem;
+  }
+  .raven-editorial-home .update-card:first-child{
+    padding-top:1.5rem;
+    border-top:5px solid var(--ink)!important;
+  }
+  .raven-editorial-home .update-card:first-child h3{
+    max-width:18ch;
+    font-size:clamp(2.15rem,6vw,3.45rem);
+  }
+}
+
+/* Mobile — tighten first viewport and restore reading rhythm */
+@media(max-width:620px){
+  .raven-editorial-home .front-hero{
+    padding-top:2.65rem;
+    padding-bottom:3.4rem;
+  }
+  .raven-editorial-home .front-hero::before{
+    opacity:.045;
+    background-size:52px 52px;
+  }
+  .raven-editorial-home .front-lead h1{
+    max-width:15ch;
+    font-size:clamp(2.7rem,12.2vw,4rem);
+    line-height:.95;
+  }
+  .raven-editorial-home .front-dek{
+    font-size:1.02rem;
+    line-height:1.62;
+  }
+  .raven-editorial-home #latest .section-head{
+    display:block;
+    margin-bottom:2rem;
+  }
+  .raven-editorial-home #latest .section-head>p{
+    margin-top:1rem;
+  }
+  .raven-editorial-home .update-card:first-child h3{
+    font-size:clamp(2rem,9.6vw,3rem);
+  }
+  .raven-editorial-home .public-tools{
+    grid-template-columns:1fr;
+  }
+  .raven-editorial-home .public-tools article,
+  .raven-editorial-home .public-tools article+article{
+    min-height:0;
+    padding:1.5rem 0;
+    border-left:0;
+    border-top:1px solid var(--line);
+  }
+  .raven-editorial-home .public-tools article:first-child{
+    border-top:0;
+  }
+}
+
+@media(prefers-reduced-motion:reduce){
+  .raven-editorial-home .board-row,
+  .raven-editorial-home .btn{
+    transition:none!important;
+  }
+  .raven-editorial-home .board-row:hover{
+    transform:none;
+  }
+}

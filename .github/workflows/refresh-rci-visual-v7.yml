@@ -59,6 +59,7 @@ jobs:
           python - <<'PY'
           from pathlib import Path
           from PIL import Image
+          import re
 
           src = Path('/tmp/rci-v8.jpg')
           og = Path('assets/og')
@@ -76,25 +77,20 @@ jobs:
               im.save('assets/images/rci-tabung-haji.webp', 'WEBP', quality=84, method=6)
               im.save('assets/art/rci-tabung-haji-hero.webp', 'WEBP', quality=84, method=6)
 
-          # Root share metadata gets a genuinely new URL so Meta/Threads has no
-          # reason to reuse the historical Raven-bird image cache.
+          final = 'https://raven-trace.github.io/raventrace-my/assets/og/rci-tabung-haji-share-v8.jpg'
+          pattern = r'https://raven-trace\.github\.io/raventrace-my/(?:assets/og/rci-tabung-haji-share-v(?:6|7|8)\.jpg|assets/art/rci-tabung-haji-hero\.webp)(?:\?[^\"]*)?'
+
           home = Path('index.html')
           text = home.read_text(encoding='utf-8')
-          replacements = [
-              ('assets/og/rci-tabung-haji-share-v6.jpg?v=20260912-home', 'assets/og/rci-tabung-haji-share-v8.jpg?v=20260912-v8'),
-              ('assets/og/rci-tabung-haji-share-v7.jpg?v=20260912-home', 'assets/og/rci-tabung-haji-share-v8.jpg?v=20260912-v8'),
-              ('assets/og/rci-tabung-haji-share-v7.jpg', 'assets/og/rci-tabung-haji-share-v8.jpg?v=20260912-v8'),
-              ('assets/art/rci-tabung-haji-hero.webp', 'assets/og/rci-tabung-haji-share-v8.jpg?v=20260912-v8'),
-          ]
-          for old, new in replacements:
-              text = text.replace(old, new)
+          text = re.sub(pattern, final, text)
           home.write_text(text, encoding='utf-8')
 
           desk = Path('investigations/index.html')
           text = desk.read_text(encoding='utf-8')
-          text = text.replace(
-              'https://raven-trace.github.io/raventrace-my/assets/images/rci-tabung-haji.webp',
-              'https://raven-trace.github.io/raventrace-my/assets/og/rci-tabung-haji-share-v8.jpg?v=20260912-v8'
+          text = re.sub(
+              r'https://raven-trace\.github\.io/raventrace-my/(?:assets/images/rci-tabung-haji\.webp|assets/og/rci-tabung-haji-share-v(?:6|7|8)\.jpg)(?:\?[^\"]*)?',
+              final,
+              text,
           )
           desk.write_text(text, encoding='utf-8')
           PY
@@ -104,7 +100,6 @@ jobs:
           python - <<'PY'
           from pathlib import Path
           from PIL import Image
-          import re
 
           checks = {
               Path('assets/og/rci-tabung-haji-share-v8.jpg'): ('JPEG', (1200, 630)),
@@ -118,11 +113,13 @@ jobs:
                   im.load()
                   assert (im.format, im.size) == expected, (path, im.format, im.size)
 
+          final = 'https://raven-trace.github.io/raventrace-my/assets/og/rci-tabung-haji-share-v8.jpg'
           home = Path('index.html').read_text(encoding='utf-8')
-          assert 'rci-tabung-haji-share-v8.jpg?v=20260912-v8' in home
+          assert home.count(final) >= 3
           assert 'og:image:width' in home and '1200' in home
+          assert '?v=20260912-v8?' not in home
           desk = Path('investigations/index.html').read_text(encoding='utf-8')
-          assert 'rci-tabung-haji-share-v8.jpg?v=20260912-v8' in desk
+          assert desk.count(final) >= 2
           assert '/raventrace-my/assets/images/rci-tabung-haji.webp' in desk
           print('RCI V8 visual integrity: PASS')
           PY
@@ -142,5 +139,5 @@ jobs:
             echo 'V8 artwork already current.'
             exit 0
           fi
-          git commit -m 'social: publish verified RCI Tabung Haji V8 artwork'
+          git commit -m 'social: normalize verified RCI Tabung Haji V8 artwork'
           git push

@@ -1,0 +1,16 @@
+/* RAVEN SIGNAL V6.0.1 — targeted production polish */
+
+/* Narrative hero is intentionally dark but is not marked with the legacy .dark class.
+   Keep the primary share action visibly actionable against the dark editorial surface. */
+.raven-signal-narrative .section-intro .btn-primary {
+  background: var(--signal-cyan-bright) !important;
+  border-color: var(--signal-cyan-bright) !important;
+  color: #071116 !important;
+}
+
+.raven-signal-narrative .section-intro .btn-primary:hover,
+.raven-signal-narrative .section-intro .btn-primary:focus-visible {
+  background: #7be9f7 !important;
+  border-color: #7be9f7 !important;
+  color: #071116 !important;
+}

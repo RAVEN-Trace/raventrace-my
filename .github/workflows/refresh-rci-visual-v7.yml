@@ -1,0 +1,61 @@
+name: Refresh RCI Visual V7
+
+on:
+  push:
+    paths:
+      - '.github/workflows/refresh-rci-visual-v7.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install Pillow
+        run: python -m pip install --quiet pillow
+
+      - name: Replace canonical RCI page artwork
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          from PIL import Image
+
+          src = Path('assets/images/rci-tabung-haji-v7.jpg')
+          dst = Path('assets/images/rci-tabung-haji.webp')
+
+          with Image.open(src) as im:
+              im = im.convert('RGB')
+              if im.size != (1200, 630):
+                  raise SystemExit(f'Unexpected V7 dimensions: {im.size}')
+              im.save(dst, 'WEBP', quality=82, method=6)
+
+          with Image.open(dst) as check:
+              check.load()
+              assert check.format == 'WEBP'
+              assert check.size == (1200, 630)
+
+          print(f'Refreshed {dst}: {dst.stat().st_size} bytes')
+          PY
+
+      - name: Commit refreshed source visual
+        run: |
+          if git diff --quiet -- assets/images/rci-tabung-haji.webp; then
+            echo 'Canonical artwork already matches V7.'
+            exit 0
+          fi
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add assets/images/rci-tabung-haji.webp
+          git commit -m 'assets: sync canonical RCI page image to V7'
+          git push

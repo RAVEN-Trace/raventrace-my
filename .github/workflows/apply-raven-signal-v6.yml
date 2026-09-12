@@ -1,0 +1,79 @@
+name: Apply Raven Signal V6
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'assets/css/raven-signal-v6.css'
+      - 'assets/js/raven-signal-v6.js'
+      - 'scripts/apply_raven_signal_v6.py'
+      - '.github/workflows/apply-raven-signal-v6.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  apply:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Validate Signal JS syntax
+        run: node --check assets/js/raven-signal-v6.js
+
+      - name: Apply Signal assets to live public pages
+        run: python scripts/apply_raven_signal_v6.py
+
+      - name: Validate public wiring and URL safety
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          root = Path('.')
+          css = 'data-raven-signal-v6'
+          live = []
+          for rel in ['index.html','about','corrections','investigations','methodology','news','tips']:
+              p = root / rel
+              if p.is_file(): live.append(p)
+              elif p.exists():
+                  live += [x for x in p.rglob('index.html') if 'research' not in [q.lower() for q in x.parts]]
+          live = list(dict.fromkeys(live))
+          assert live, 'No live pages found'
+          for p in live:
+              t = p.read_text(encoding='utf-8')
+              assert t.count(css) == 2, f'Signal assets not canonical in {p}'
+              assert '/assets/css/raven-signal-v6.css?v=6.0.0' in t, p
+              assert '/assets/js/raven-signal-v6.js?v=6.0.0' in t, p
+          assert 'https://raven-trace.github.io/raventrace-my/' in Path('index.html').read_text(encoding='utf-8')
+          case = Path('investigations/rci-tabung-haji/index.html').read_text(encoding='utf-8')
+          assert 'https://raven-trace.github.io/raventrace-my/investigations/rci-tabung-haji/' in case
+          assert not Path('rcitabunghaji').exists(), 'Do not migrate the public route yet'
+          for p in root.rglob('research/**/index.html'):
+              assert css not in p.read_text(encoding='utf-8'), f'Historical research mutated: {p}'
+          print(f'Validated {len(live)} live public pages; historical research excluded.')
+          PY
+
+      - name: Validate diff
+        run: git diff --check
+
+      - name: Commit sitewide rollout
+        run: |
+          if git diff --quiet; then
+            echo 'No page wiring changes required'
+            exit 0
+          fi
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add index.html about corrections investigations methodology news tips
+          git commit -m 'design: activate Raven Signal V6 across public pages'
+          git push

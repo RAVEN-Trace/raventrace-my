@@ -66,14 +66,14 @@ if card not in s:
     s = s.replace(marker, marker + card, 1)
 save(p, s)
 
-# Timeline: add confirmed future PAC checkpoint after 14 Sep checkpoint if available.
+# Timeline: add official PAC checkpoint after the current 11 Sep endpoint.
 p, s = load('investigations/rci-tabung-haji/timeline/index.html')
 if '15 Sep</time><h3>PAC Parlimen' not in s:
-    anchor = '<article><time>14 Sep</time>'
+    anchor = '<article><time>11 Sep</time><h3>Audit 4 lawan 5</h3>'
     pos = s.find(anchor)
-    if pos < 0: raise SystemExit('MISSING TIMELINE 14 Sep anchor')
+    if pos < 0: raise SystemExit('MISSING TIMELINE 11 Sep anchor')
     end = s.find('</article>', pos)
-    if end < 0: raise SystemExit('MISSING TIMELINE 14 Sep article end')
+    if end < 0: raise SystemExit('MISSING TIMELINE 11 Sep article end')
     end += len('</article>')
     add = '<article><time>15 Sep</time><h3>PAC Parlimen · checkpoint disahkan</h3><p>Portal rasmi Parlimen menjadualkan Prosiding 5(a) berhubung Lembaga Tabung Haji pada 10 pagi. Jadual prosiding bukan dapatan PAC.</p></article>'
     s = s[:end] + add + s[end:]

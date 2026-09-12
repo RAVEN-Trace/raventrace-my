@@ -1,0 +1,50 @@
+name: Apply 13 Sep Delta Narrative Updates
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/apply-13sep-delta-narrative-updates.yml'
+      - 'scripts/apply_13sep_delta_narrative_updates.py'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  apply:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Apply 13 Sep delta updates
+        run: python scripts/apply_13sep_delta_narrative_updates.py
+      - name: QA editorial boundaries
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          azeez=Path('news/2026/09/09/abdul-azeez-didakwa-rm1935-juta/index.html').read_text(encoding='utf-8')
+          nar=Path('investigations/rci-tabung-haji/narratives/index.html').read_text(encoding='utf-8')
+          pol=Path('investigations/rci-tabung-haji/narratives/political-social-media/index.html').read_text(encoding='utf-8')
+          src=Path('investigations/rci-tabung-haji/sources/index.html').read_text(encoding='utf-8')
+          checks={
+            'azeez':['RM193.5 juta bukan jumlah yang didakwa diambil','RM18.6 juta akaun keluarga · BELUM DISELESAIKAN / HOLD','Pertuduhan bukan sabitan'],
+            'nar':['“Azeez ambil RM193.5 juta”','Category collapse + number laundering','13 Sep 2026 · 01:00 MYT'],
+            'pol':['political intimidation','Apa yang belum terbukti?','belum ada bukti awam yang kami semak yang membuktikan enforcement dalam kes RCI TH dikawal secara politik'],
+            'src':['id="s67"','id="s68"','id="s69"','sumber/naratif disemak 13 Sep 2026 · 01:00 MYT'],
+          }
+          for name,toks in checks.items():
+              text={'azeez':azeez,'nar':nar,'pol':pol,'src':src}[name]
+              for tok in toks: assert tok in text, f'{name}: missing {tok}'
+          forbidden=['Azeez mengambil RM193.5 juta','RM18.6 juta telah dilucuthakkan','SPRM dikawal politik']
+          for text in [azeez,nar,pol,src]:
+              for tok in forbidden: assert tok not in text, 'unsafe overclaim: '+tok
+          print('13 SEP DELTA QA: PASS')
+          PY
+      - name: Commit generated changes
+        run: |
+          if git diff --quiet; then echo 'No changes'; exit 0; fi
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add news/2026/09/09/abdul-azeez-didakwa-rm1935-juta/index.html investigations/rci-tabung-haji/narratives/index.html investigations/rci-tabung-haji/narratives/political-social-media/index.html investigations/rci-tabung-haji/sources/index.html
+          git commit -m 'Add RM193.5m narrative correction and 12 Sep political delta'
+          git push

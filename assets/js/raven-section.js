@@ -66,7 +66,9 @@
     requestAnimationFrame(() => {
       const rail = activeSection.closest('.section-links');
       if (!rail) return;
-      const left = activeSection.offsetLeft - (rail.clientWidth - activeSection.offsetWidth) / 2;
+      // Align close to the leading edge instead of centring the active item.
+      // This preserves context and avoids making the first tabs look missing.
+      const left = activeSection.offsetLeft - 16;
       rail.scrollTo({ left: Math.max(0, left), behavior: 'auto' });
     });
   }

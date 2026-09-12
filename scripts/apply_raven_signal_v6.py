@@ -5,7 +5,7 @@ ROOT = Path(__file__).resolve().parents[1]
 CSS = '<link rel="stylesheet" href="/raventrace-my/assets/css/raven-signal-v6.css?v=6.0.0" data-raven-signal-v6>'
 JS = '<script src="/raventrace-my/assets/js/raven-signal-v6.js?v=6.0.0" defer data-raven-signal-v6></script>'
 NARRATIVE_POLISH = '<link rel="stylesheet" href="/raventrace-my/assets/css/raven-signal-v6-polish.css?v=6.0.1" data-raven-signal-v6-polish>'
-SECTION_JS = '/raventrace-my/assets/js/raven-section.js?v=2.1.0'
+SECTION_JS = '/raventrace-my/assets/js/raven-section.js?v=2.2.0'
 NARRATIVE_REL = Path('investigations/rci-tabung-haji/narratives/index.html')
 
 PUBLIC_ROOTS = [

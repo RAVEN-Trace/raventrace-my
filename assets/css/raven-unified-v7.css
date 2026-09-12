@@ -1,0 +1,535 @@
+/* RAVEN-Trace Unified Design System V7
+   Final presentation and accessibility layer shared by every public page.
+   Colour is semantic: teal=evidence/action, oxblood=disputed, amber=caution. */
+
+:root {
+  --rv7-canvas: #f7f4ed;
+  --rv7-paper: #fffdf8;
+  --rv7-ink: #121418;
+  --rv7-muted: #4a545c;
+  --rv7-line: #b9b5ab;
+  --rv7-line-soft: #d8d3c8;
+  --rv7-dark: #11161c;
+  --rv7-dark-2: #182129;
+  --rv7-on-dark: #f7f4ed;
+  --rv7-on-dark-muted: #c6d0d7;
+  --rv7-teal: #0b5d6b;
+  --rv7-teal-deep: #074955;
+  --rv7-cyan: #38d8ef;
+  --rv7-cyan-soft: #ddefF2;
+  --rv7-oxblood: #7a1f2b;
+  --rv7-oxblood-soft: #f5e9eb;
+  --rv7-amber: #a04a00;
+  --rv7-amber-soft: #fff2d9;
+  --rv7-neutral-soft: #e7ebed;
+  --rv7-focus: #087f98;
+  --rv7-shadow: 0 12px 32px rgba(18, 20, 24, .08);
+  --rv7-shadow-lift: 0 16px 40px rgba(18, 20, 24, .13);
+}
+
+html {
+  color-scheme: light;
+  text-size-adjust: 100%;
+  -webkit-text-size-adjust: 100%;
+  scroll-padding-top: 5rem;
+}
+
+body.raven-v5 {
+  background: var(--rv7-canvas);
+  color: var(--rv7-ink);
+  font-synthesis: none;
+}
+
+body.raven-v5 ::selection {
+  background: var(--rv7-cyan);
+  color: #071116;
+}
+
+body.raven-v5 :where(.paper, .section-content, .article-body, .story-body) {
+  color: var(--rv7-ink);
+}
+
+body.raven-v5 :where(.muted, .source-note, .story-note, .legal) {
+  color: var(--rv7-muted);
+}
+
+body.raven-v5 :where(.article-body, .story-body, .section-content, .case-content) :where(p, li, dd) {
+  line-height: 1.68;
+}
+
+/* Editorial surfaces: a consistent forensic-newsroom identity. */
+body.raven-v5 :where(.article-header, .story-hero, .section-intro, .case-hero, .investigation-desk-hero) {
+  background:
+    radial-gradient(circle at 88% 12%, rgba(56, 216, 239, .09), transparent 28%),
+    var(--rv7-dark) !important;
+  color: var(--rv7-on-dark) !important;
+}
+
+body.raven-v5 :where(.article-header, .story-hero, .section-intro, .case-hero, .investigation-desk-hero)
+  :where(h1, h2, h3, .article-dek, .story-dek, .case-dek, .lede, .section-lead, .section-kicker) {
+  color: var(--rv7-on-dark) !important;
+}
+
+body.raven-v5 :where(.article-header, .story-hero, .section-intro, .case-hero, .investigation-desk-hero)
+  :where(.article-dek, .story-dek, .case-dek, .lede, .v5-human-note, .section-boundary) {
+  color: var(--rv7-on-dark-muted);
+}
+
+body.raven-v5.raven-v5-support .article-header,
+body.raven-v5.raven-v5-support .section-intro {
+  background:
+    radial-gradient(circle at 88% 12%, rgba(56, 216, 239, .09), transparent 28%),
+    var(--rv7-dark) !important;
+  color: var(--rv7-on-dark) !important;
+}
+
+body.raven-v5.raven-v5-support :where(.article-header, .section-intro) h1 {
+  color: var(--rv7-on-dark) !important;
+}
+
+body.raven-v5.raven-v5-support :where(.article-header, .section-intro) :where(.article-dek, .lede) {
+  color: var(--rv7-on-dark-muted) !important;
+}
+
+body.raven-v5 :where(.update-card, .trace-card, .person-card, .method-step, .sidebar-card,
+  .story-side-card, .metric-grid > article, .control-grid > article, details.investment) {
+  border-color: var(--rv7-line);
+}
+
+/* Links: underlining carries meaning even when colour perception is limited. */
+body.raven-v5 main a:not(.btn):not(.v5-path):not(.signal-lens):not(.signal-map-node):not(.raven-share-link):not(.investigation-lead-media):not(.source-story-frame) {
+  color: var(--rv7-teal);
+}
+
+body.raven-v5 main :where(p, li, dd, figcaption) > a,
+body.raven-v5 main :where(.inline-sources, .story-source-list, .source-room, .sources-grid, .article-body, .story-body) a {
+  color: var(--rv7-teal);
+  text-decoration-line: underline;
+  text-decoration-thickness: .1em;
+  text-underline-offset: .18em;
+  text-decoration-color: rgba(11, 93, 107, .52);
+}
+
+body.raven-v5 main :where(p, li, dd, figcaption) > a:hover,
+body.raven-v5 main :where(.inline-sources, .story-source-list, .source-room, .sources-grid, .article-body, .story-body) a:hover {
+  color: var(--rv7-teal-deep);
+  text-decoration-color: currentColor;
+}
+
+body.raven-v5 :where(.dark, .article-header, .story-hero, .section-intro, .case-hero, .investigation-desk-hero)
+  :where(p, li, dd, figcaption) > a,
+body.raven-v5 :where(.dark, .article-header, .story-hero, .section-intro, .case-hero, .investigation-desk-hero)
+  :where(.inline-sources, .story-source-list) a {
+  color: var(--rv7-cyan);
+  text-decoration-color: rgba(56, 216, 239, .58);
+}
+
+body.raven-v5 main a[href^="#s"],
+body.raven-v5 main a[href*="#s"] {
+  color: var(--rv7-teal);
+  font-weight: 850;
+}
+
+body.raven-v5 :where(.dark, .article-header, .story-hero, .section-intro, .case-hero, .investigation-desk-hero)
+  a:not(.btn):not(.filter-btn):not(.signal-lens):not(.v5-path) {
+  color: var(--rv7-cyan);
+}
+
+/* Metadata remains secondary without becoming faint. */
+body.raven-v5 :where(.eyebrow, .story-kicker, .section-kicker, .case-id, .role) {
+  color: var(--rv7-teal);
+}
+
+body.raven-v5 :where(.article-header, .story-hero, .section-intro, .case-hero, .investigation-desk-hero)
+  :where(.eyebrow, .story-kicker, .section-kicker, .case-id, .role) {
+  color: var(--rv7-cyan) !important;
+}
+
+body.raven-v5 :where(.source-grade, .date-chip) {
+  border-color: #8d979d;
+  background: #efeee9;
+  color: #3d474e;
+}
+
+body.raven-v5 :where(.article-header, .story-hero, .section-intro, .case-hero, .investigation-desk-hero)
+  :where(.source-grade, .date-chip) {
+  border-color: #61727e;
+  background: rgba(255, 255, 255, .07);
+  color: #d5dde2 !important;
+}
+
+body.raven-v5 :where(.update-index, .raven-continue-no, .trace-head, .meta-row time) {
+  color: #55616a;
+}
+
+body.raven-v5 :where(.people-grid article > div:first-child > span,
+  details.investment summary > span:first-child, .sources-grid li > span, .section-marker span) {
+  color: var(--rv7-teal);
+}
+
+body.raven-v5 :where(.raven-continue-list small, .raven-question-grid small,
+  .raven-question-grid span, .signal-source-key span, .signal-change-key) {
+  color: var(--rv7-muted);
+}
+
+/* Dark data modules get an explicit fallback colour beneath gradients. */
+body.raven-v5 :where(.v5-truth-intro, .signal-home-hero, .signal-case-lenses,
+  .raven-question-rail.case, #status .process-ladder) {
+  background-color: var(--rv7-dark) !important;
+  color: var(--rv7-on-dark);
+}
+
+body.raven-v5 :where(.v5-truth-intro, .signal-home-hero) :where(.v5-kicker, .v5-path-icon) {
+  color: var(--rv7-cyan);
+}
+
+body.raven-v5 :where(.v5-truth-intro, .signal-home-hero) :where(.v5-dek, .v5-case-now, .v5-path small) {
+  color: var(--rv7-on-dark-muted);
+}
+
+body.raven-v5 :where(.v5-truth-intro, .signal-home-hero) .v5-path {
+  background-color: var(--rv7-dark-2);
+  color: var(--rv7-on-dark);
+}
+
+body.raven-v5 .signal-case-lenses .signal-lens {
+  background-color: var(--rv7-dark);
+  color: var(--rv7-on-dark);
+}
+
+body.raven-v5 .signal-case-lenses .signal-lens small,
+body.raven-v5 .raven-question-rail.case :where(small, span, p) {
+  color: var(--rv7-on-dark-muted);
+}
+
+body.raven-v5 .signal-case-lenses .signal-lens .signal-lens-no,
+body.raven-v5 .raven-question-rail.case :where(.raven-question-head > span, b) {
+  color: var(--rv7-cyan);
+}
+
+/* Primary and secondary actions have explicit on-light/on-dark contracts. */
+body.raven-v5 :where(.btn, button, [role="button"]) {
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+}
+
+body.raven-v5 .btn {
+  min-height: 42px;
+  border-color: #747b80;
+  background: transparent;
+  color: var(--rv7-ink);
+  text-decoration: none;
+}
+
+body.raven-v5 .btn-primary {
+  border-color: var(--rv7-teal) !important;
+  background: var(--rv7-teal) !important;
+  color: #fff !important;
+}
+
+body.raven-v5 .btn-primary:hover {
+  border-color: var(--rv7-teal-deep) !important;
+  background: var(--rv7-teal-deep) !important;
+  color: #fff !important;
+  box-shadow: var(--rv7-shadow-lift);
+}
+
+body.raven-v5 :where(.dark, .article-header, .story-hero, .section-intro, .case-hero, .investigation-desk-hero) .btn {
+  border-color: #7d8c96;
+  color: var(--rv7-on-dark);
+}
+
+body.raven-v5 :where(.dark, .article-header, .story-hero, .section-intro, .case-hero, .investigation-desk-hero) .btn-primary {
+  border-color: var(--rv7-cyan) !important;
+  background: var(--rv7-cyan) !important;
+  color: #071116 !important;
+}
+
+body.raven-v5 :where(.dark, .article-header, .story-hero, .section-intro, .case-hero, .investigation-desk-hero) .btn-primary:hover {
+  border-color: #7be9f7 !important;
+  background: #7be9f7 !important;
+  color: #071116 !important;
+}
+
+body.raven-v5 :where(.btn, .filter-btn, .raven-share-btn, .raven-share-link, .section-links a,
+  .v5-quicklinks a, .raven-question-grid a, .raven-continue-list > a, .reading-nav a) {
+  transition: background-color .16s ease, border-color .16s ease, color .16s ease,
+    box-shadow .16s ease, transform .16s ease;
+}
+
+body.raven-v5 :where(.btn, .filter-btn, .raven-share-btn, .raven-share-link):active {
+  transform: translateY(1px);
+}
+
+/* Filter states are legible without relying on colour alone. */
+body.raven-v5 .filter-btn {
+  min-height: 42px;
+  border: 1px solid #747b80;
+  background: var(--rv7-paper);
+  color: var(--rv7-ink);
+}
+
+body.raven-v5 .filter-btn:hover {
+  border-color: var(--rv7-teal);
+  background: var(--rv7-cyan-soft);
+  color: var(--rv7-teal-deep);
+}
+
+body.raven-v5 .filter-btn.active,
+body.raven-v5 .filter-btn[aria-pressed="true"] {
+  border-color: var(--rv7-teal);
+  background: var(--rv7-teal);
+  color: #fff;
+  box-shadow: inset 0 -3px 0 rgba(0, 0, 0, .22);
+}
+
+body.raven-v5 :where(.article-header, .story-hero, .section-intro, .case-hero) .filter-btn {
+  border-color: #6f808b;
+  background: var(--rv7-dark-2);
+  color: var(--rv7-on-dark);
+}
+
+body.raven-v5 :where(.article-header, .story-hero, .section-intro, .case-hero) .filter-btn:hover {
+  border-color: var(--rv7-cyan);
+  background: #20323b;
+  color: var(--rv7-cyan);
+}
+
+body.raven-v5 :where(.article-header, .story-hero, .section-intro, .case-hero) .filter-btn.active,
+body.raven-v5 :where(.article-header, .story-hero, .section-intro, .case-hero) .filter-btn[aria-pressed="true"] {
+  border-color: var(--rv7-cyan);
+  background: var(--rv7-cyan);
+  color: #071116;
+}
+
+/* Evidence states: hue + text + border, never hue alone. */
+body.raven-v5 .status {
+  border-width: 1px;
+  border-style: solid;
+  box-shadow: none;
+}
+
+body.raven-v5 .status.fact {
+  border-color: #78aeb6;
+  background: var(--rv7-cyan-soft);
+  color: var(--rv7-teal-deep);
+}
+
+body.raven-v5 .status.claim {
+  border-color: #c59350;
+  background: var(--rv7-amber-soft);
+  color: #6b3100;
+}
+
+body.raven-v5 .status.disputed,
+body.raven-v5 .status.danger {
+  border-color: #b36872;
+  background: var(--rv7-oxblood-soft);
+  color: var(--rv7-oxblood);
+}
+
+body.raven-v5 .status.unknown {
+  border-color: #929ba1;
+  background: var(--rv7-neutral-soft);
+  color: #343c42;
+}
+
+body.raven-v5 .status.context,
+body.raven-v5 .status.process {
+  border-color: #82a7b1;
+  background: #e5f0f2;
+  color: #244c5a;
+}
+
+body.raven-v5 .case-warning.light {
+  border: 1px solid #d7c29b;
+  border-left: 5px solid var(--rv7-amber);
+  background: var(--rv7-amber-soft);
+  color: #343c42;
+}
+
+body.raven-v5 .case-warning.light strong {
+  color: #6b3100;
+}
+
+body.raven-v5 .case-warning.light :where(span, p) {
+  color: #3f474d;
+}
+
+/* Confirmed cascade repairs. */
+body.raven-v5.raven-v5-narrative .signal-claim-zone h3,
+body.raven-v5.raven-v5-narrative .narrative-v5-card.signal-claim-zone h3 {
+  color: #fff !important;
+  text-shadow: 0 1px 0 rgba(0, 0, 0, .3);
+}
+
+body.raven-v5.raven-v5-news .article-header .article-dek {
+  color: var(--rv7-on-dark-muted) !important;
+}
+
+body.raven-v5.raven-v5-news .article-header .v5-human-note {
+  border-color: #667782;
+  background: rgba(255, 255, 255, .07);
+  color: var(--rv7-on-dark);
+}
+
+body.raven-v5.raven-v5-narrative main .section-boundary {
+  border: 1px solid var(--rv7-line);
+  border-left: 5px solid var(--rv7-teal);
+  background: #eef1ee;
+  color: #313b42;
+}
+
+body.raven-v5.raven-v5-narrative .section-intro .section-boundary {
+  border-color: #53626c;
+  border-left-color: var(--rv7-cyan);
+  background: rgba(255, 255, 255, .07);
+  color: var(--rv7-on-dark-muted);
+}
+
+/* Share controls are real controls with a generous, consistent target. */
+body.raven-v5 .raven-sharebar {
+  gap: .5rem;
+  border-top-color: var(--rv7-line-soft);
+}
+
+body.raven-v5 :where(.raven-share-btn, .raven-share-link) {
+  min-height: 40px;
+  border-color: #8f9aa0;
+  border-radius: 2px;
+  background: var(--rv7-paper);
+  color: #26343c;
+  font-size: max(.72rem, 12px);
+  text-decoration: none;
+}
+
+body.raven-v5 :where(.raven-share-btn, .raven-share-link):hover {
+  border-color: var(--rv7-teal);
+  background: var(--rv7-cyan-soft);
+  color: var(--rv7-teal-deep);
+}
+
+body.raven-v5 .raven-share-btn.primary {
+  border-color: var(--rv7-teal);
+  background: var(--rv7-teal);
+  color: #fff;
+}
+
+body.raven-v5 :where(.dark, .article-header, .story-hero, .section-intro, .case-hero)
+  :where(.raven-share-btn, .raven-share-link) {
+  border-color: #687984;
+  background: var(--rv7-dark-2);
+  color: var(--rv7-on-dark);
+}
+
+/* Horizontal CASEFILE rail: visible scroll affordance and stable active state. */
+body.raven-v5 .section-links {
+  scrollbar-color: var(--rv7-teal) transparent;
+  scrollbar-width: thin;
+}
+
+body.raven-v5 .section-links a {
+  min-height: 40px;
+  color: #3f4a51;
+  scroll-snap-align: start;
+}
+
+body.raven-v5 main :where(button, summary, .v5-quicklinks a, .raven-question-grid a,
+  .raven-continue-list > a, .reading-nav a) {
+  min-height: 40px;
+}
+
+body.raven-v5 .section-links a:hover {
+  background: #e7eff0;
+  color: var(--rv7-teal-deep);
+}
+
+body.raven-v5 .section-links a[aria-current],
+body.raven-v5 .section-links a.active {
+  border-bottom-color: var(--rv7-teal);
+  color: var(--rv7-ink);
+}
+
+/* Keyboard focus must remain visible on every surface. */
+body.raven-v5 :focus-visible {
+  outline: 3px solid var(--rv7-focus) !important;
+  outline-offset: 3px !important;
+  box-shadow: 0 0 0 2px var(--rv7-paper);
+}
+
+body.raven-v5 :where(.dark, .article-header, .story-hero, .section-intro, .case-hero, .investigation-desk-hero) :focus-visible {
+  outline-color: var(--rv7-cyan) !important;
+  box-shadow: 0 0 0 2px var(--rv7-dark);
+}
+
+body.raven-v5 .skip-link:focus {
+  background: var(--rv7-cyan);
+  color: #071116;
+}
+
+@media (max-width: 760px) {
+  body.raven-v5 :where(.btn, .filter-btn, .raven-share-btn, .raven-share-link, .section-links a,
+    .nav-toggle, .site-nav a, .footer-nav a, .v5-quicklinks a, .raven-question-grid a,
+    .raven-continue-list > a, .reading-nav a, main button, summary) {
+    min-height: 44px;
+  }
+
+  body.raven-v5 :where(.site-nav a, .footer-nav a) {
+    display: inline-flex;
+    align-items: center;
+  }
+
+  body.raven-v5 .section-links {
+    scroll-snap-type: x proximity;
+    padding-inline: 1rem 2.25rem;
+    background-color: rgba(247, 244, 237, .98);
+    background-image:
+      linear-gradient(to right, rgba(247, 244, 237, 1) 35%, rgba(247, 244, 237, 0)),
+      linear-gradient(to left, rgba(247, 244, 237, 1) 35%, rgba(247, 244, 237, 0)),
+      radial-gradient(farthest-side at 0 50%, rgba(18, 20, 24, .24), transparent),
+      radial-gradient(farthest-side at 100% 50%, rgba(18, 20, 24, .24), transparent);
+    background-repeat: no-repeat;
+    background-position: left center, right center, left center, right center;
+    background-size: 42px 100%, 42px 100%, 14px 100%, 14px 100%;
+    background-attachment: local, local, scroll, scroll;
+  }
+
+  body.raven-v5 .section-links::-webkit-scrollbar {
+    height: 4px;
+  }
+
+  body.raven-v5 .section-links::-webkit-scrollbar-thumb {
+    border-radius: 999px;
+    background: var(--rv7-teal);
+  }
+
+  body.raven-v5 .raven-sharebar {
+    gap: .45rem;
+  }
+
+  body.raven-v5 :where(.raven-share-btn, .raven-share-link) {
+    padding: .55rem .7rem;
+    font-size: .72rem;
+  }
+
+  body.raven-v5 :where(.article-body, .story-body, .section-content, .case-content) :where(p, li, dd) {
+    line-height: 1.72;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  body.raven-v5 *,
+  body.raven-v5 *::before,
+  body.raven-v5 *::after {
+    scroll-behavior: auto !important;
+    transition-duration: .01ms !important;
+    animation-duration: .01ms !important;
+    animation-iteration-count: 1 !important;
+  }
+}
+
+@media (forced-colors: active) {
+  body.raven-v5 :where(.btn, .filter-btn, .raven-share-btn, .raven-share-link, .status) {
+    border: 2px solid ButtonText;
+  }
+}

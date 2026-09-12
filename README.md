@@ -24,6 +24,17 @@ Public-facing output should be understandable to teenagers, older readers and pe
 - `/corrections/` — public correction ledger
 - `/about/` — mission, editorial identity and accountability framing
 
+## Unified Design System V7
+
+Every public page loads `assets/css/raven-unified-v7.css` as the final static presentation layer.
+
+- Archival ivory and near-black provide the editorial base.
+- Teal means evidence, navigation or action; oxblood means disputed; amber means caution.
+- Normal text targets WCAG AA contrast of at least 4.5:1, while large text targets at least 3:1.
+- Important mobile controls use a 44px minimum target; desktop component controls use 40px.
+- Inline links remain underlined, keyboard focus remains visible and evidence states use text plus borders—not colour alone.
+- `scripts/raven-v7-qa.mjs` checks all 32 public pages at mobile and desktop sizes for contrast, overflow, target size, accessible names, duplicate IDs and invalid anchors.
+
 ## Editorial method
 
 Every published item distinguishes facts supported by the available record, attributed claims, inferences, speculation, unknowns and disputed points. Sources are graded A–X by their value for the specific claim being tested, and confidence is stated when material.
@@ -50,7 +61,7 @@ The active CASEFILE Source Room includes a client-side navigator that leaves the
 - Direct links such as `#s31` automatically reveal the relevant source even when a filter is active.
 - Source-type tags are navigation aids only. They do not replace the A–X evidence grade and do not expand what a source can prove.
 
-## Share System v2.1
+## Share System v2.6
 
 Material story cards receive a compact share toolbar.
 
@@ -59,6 +70,7 @@ Material story cards receive a compact share toolbar.
 - **Salin** copies headline, summary, status, original source when available, and the Raven URL.
 - **Artikel** appears when that update has a dedicated static story page.
 - **Sumber** opens the original reporting/source rather than a social-share service.
+- JavaScript-only social actions are buttons rather than fake `href="#"` links.
 - Story pages use dedicated canonical URLs plus article-level Open Graph metadata and timestamps where relevant.
 - Matching Homepage and Newsroom cards route to the dedicated story URL; other evidence items keep stable deep anchors.
 

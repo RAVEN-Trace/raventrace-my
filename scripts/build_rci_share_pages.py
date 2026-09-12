@@ -80,6 +80,7 @@ def build():
 <meta name="twitter:image:alt" content="Ilustrasi editorial RCI Tabung Haji — RAVEN-Trace. Bukan foto bukti.">
 <link rel="stylesheet" href="/raventrace-my/assets/css/raven.css?v=3.0.0">
 <link rel="stylesheet" href="/raventrace-my/assets/css/raven-section.css?v=1.0.0">
+<link rel="stylesheet" href="/raventrace-my/assets/css/raven-unified-v7.css?v=7.0.0" data-raven-unified>
 </head><body class="case-share-page">
 <a class="skip-link" href="#main">Terus ke kandungan</a>
 {header}
@@ -92,8 +93,8 @@ def build():
 <nav class="section-links container" aria-label="Bahagian siasatan">{nav}</nav>
 <article class="section-content container">{body}</article></main>
 {footer}
-<script src="/raventrace-my/assets/js/raven-section.js?v=1.0.0" defer></script>
-<script src="/raventrace-my/assets/js/raven-share.js?v=2.5.0" data-raven-share defer></script>
+<script src="/raventrace-my/assets/js/raven-section.js?v=2.2.0" defer></script>
+<script src="/raventrace-my/assets/js/raven-share.js?v=2.6.0" data-raven-share defer></script>
 </body></html>'''
   output = ROOT / 'investigations/rci-tabung-haji' / key / 'index.html'
   output.parent.mkdir(parents=True, exist_ok=True)

@@ -13,6 +13,17 @@
   const isSupport = ['/raventrace-my/methodology/','/raventrace-my/about/','/raventrace-my/corrections/','/raventrace-my/tips/'].some((p) => path === p || path.endsWith(`${p}index.html`));
 
   document.body.classList.add('raven-v5');
+  document.body.classList.add('raven-v7');
+
+  // Every public page should include this stylesheet statically. Keep a
+  // runtime fallback so future pages cannot silently miss the final layer.
+  if (!q('link[data-raven-unified]')) {
+    const unified = document.createElement('link');
+    unified.rel = 'stylesheet';
+    unified.href = '/raventrace-my/assets/css/raven-unified-v7.css?v=7.0.0';
+    unified.dataset.ravenUnified = 'true';
+    document.head.appendChild(unified);
+  }
   if (isRoot) document.body.classList.add('raven-v5-home');
   if (isInvestigationsHub) document.body.classList.add('raven-v5-investigations');
   if (isNews) document.body.classList.add('raven-v5-news');

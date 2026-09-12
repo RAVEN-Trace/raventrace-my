@@ -184,14 +184,15 @@
   };
 
   const socialLink = (label, handler) => {
-    const link = document.createElement('a');
-    link.className = 'raven-share-link';
-    link.href = '#';
-    link.target = '_blank';
-    link.rel = 'noopener noreferrer';
-    link.textContent = label;
-    link.addEventListener('click', handler);
-    return link;
+    // These controls only exist after JavaScript runs, so they are actions,
+    // not navigation links. Buttons avoid fake href="#" destinations and
+    // provide the correct keyboard/assistive-technology semantics.
+    const button = document.createElement('button');
+    button.type = 'button';
+    button.className = 'raven-share-link';
+    button.textContent = label;
+    button.addEventListener('click', handler);
+    return button;
   };
 
   const buildBar = (item) => {

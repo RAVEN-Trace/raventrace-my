@@ -1,4 +1,4 @@
-name: Raven Reader Funnel V1.0.1 QA
+name: Raven Reader Funnel V1.1.0 QA
 
 on:
   push:
@@ -55,13 +55,13 @@ jobs:
               const url = `${base}${path}?funnelqa=${Date.now()}-${Math.random()}${hash}`;
               await page.goto(url, { waitUntil: 'networkidle', timeout: 45000 });
               const ready = await page.evaluate(() =>
-                !!document.querySelector('link[href*="raven-funnel-v1.css?v=1.0.1"]') &&
-                !!document.querySelector('script[src*="raven-funnel-v1.js?v=1.0.1"]')
+                !!document.querySelector('link[href*="raven-funnel-v1.css?v=1.1.0"]') &&
+                !!document.querySelector('script[src*="raven-funnel-v1.js?v=1.1.0"]')
               );
               if (ready) return url;
               await sleep(3500);
             }
-            throw new Error(`production did not expose Funnel V1.0.1: ${path}`);
+            throw new Error(`production did not expose Funnel V1.1.0: ${path}`);
           }
 
           const luminance = (rgb) => {

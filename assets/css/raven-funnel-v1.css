@@ -94,10 +94,15 @@
 .raven-evidence-actions a:first-child {
   border-color: #087f98;
   background: #087f98;
-  color: #fff;
+  color: #fff !important;
 }
 .raven-evidence-actions a:hover { border-color: #087f98; color: #087f98; }
-.raven-evidence-actions a:first-child:hover { background: #075f73; color: #fff; }
+.raven-evidence-actions a:first-child:hover,
+.raven-evidence-actions a:first-child:focus-visible {
+  background: #075f73;
+  border-color: #075f73;
+  color: #fff !important;
+}
 
 .raven-source-target {
   scroll-margin-top: 7rem;

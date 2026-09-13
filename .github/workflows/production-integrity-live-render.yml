@@ -7,6 +7,8 @@ on:
     paths:
       - '.github/workflows/production-integrity-live-render.yml'
       - 'index.html'
+      - 'about/**'
+      - 'methodology/**'
       - 'investigations/**'
       - 'news/**'
       - 'assets/js/**'
@@ -23,19 +25,21 @@ jobs:
     env:
       BASE: https://raven-trace.github.io/raventrace-my
     steps:
-      - name: Wait for complete Public Language V2.2 Pages payload
+      - name: Wait for complete Public Language V2.3 Pages payload
         run: |
           python - <<'PY'
           import os,time,urllib.request
           base=os.environ['BASE']
-          headers={'User-Agent':'RAVEN-Trace-Live-QA/PublicLanguageV2.2','Cache-Control':'no-cache'}
+          headers={'User-Agent':'RAVEN-Trace-Live-QA/PublicLanguageV2.3','Cache-Control':'no-cache'}
           checks={
-            '/':['semakan terbaru: 12 Sep 20:44 MYT','empat individu telah berdepan pertuduhan','SPRM pula menyebut lima','prosiding PAC berkaitan TH dijadual 15 Sep.','raven-v5.css?v=5.0.0','raven-unified-v7.css?v=7.0.5'],
+            '/':['semakan terbaru: 12 Sep 20:44 MYT','empat individu telah berdepan pertuduhan','SPRM pula menyebut lima','prosiding PAC berkaitan TH dijadual 15 Sep.','REKOD TAK SEPADAN','raven-v5.css?v=5.0.0','raven-unified-v7.css?v=7.0.5'],
             '/news/':['Newsroom · semakan terbaru 12 Sep 2026 · 20:44 MYT','SEMAKAN TERBARU','REKOD TAK SEPADAN','prosiding PAC berkaitan TH dijadual 15 September.'],
             '/investigations/rci-tabung-haji/':['JEJAK / 12-01','12 Sep 2026 · semakan terbaru','PAC TH dijadual 15 September','SPRM menyebut lima'],
-            '/investigations/rci-tabung-haji/updates/':['RCI TABUNG HAJI · PERKEMBANGAN KES','12 Sep 2026 · semakan 20:44 MYT','Raven kata macam mana?','15 Sep','RM18.6 juta'],
-            '/investigations/rci-tabung-haji/narratives/':['AUDIT NARATIF','Orang tengah cakap macam-macam','Raven kata macam mana?','Apa trick cerita ni?','13 Sep 2026 · 01:00 MYT'],
-            '/investigations/rci-tabung-haji/narratives/political-social-media/':['AUDIT NARATIF POLITIK + MEDIA SOSIAL','Petunjuk media sosial','DIA TUNJUK YANG INI JE','EH, BENDA NI TAK SAMA','Betulkan cerita, bukan balas slogan dengan slogan'],
+            '/investigations/rci-tabung-haji/updates/':['RCI TABUNG HAJI · PERKEMBANGAN KES','12 Sep 2026 · semakan 20:44 MYT','Raven kata macam mana?','Apa yang belum boleh disahkan?','15 Sep','RM18.6 juta'],
+            '/investigations/rci-tabung-haji/narratives/':['AUDIT NARATIF','Orang tengah cakap macam-macam','Raven kata macam mana?','Apa trick cerita ni?','Naratif utama — ketepikan cara cerita dibawa. Tengok apa yang tinggal.','Penerangan awam yang terikat pada bukti','13 Sep 2026 · 01:00 MYT'],
+            '/investigations/rci-tabung-haji/narratives/political-social-media/':['AUDIT NARATIF POLITIK + MEDIA SOSIAL','Petunjuk media sosial','DIA TUNJUK YANG INI JE','EH, BENDA NI TAK SAMA','Betulkan cerita, bukan balas slogan dengan slogan','Siapa bawa cerita apa?','sampel dan cara ukur yang jelas'],
+            '/about/':['Cari yang benar.','Pecahkan cerita.','Cara kerja RAVEN-Trace','Kebebasan editorial + penggunaan AI'],
+            '/methodology/':['Cara Raven bekerja','A · Sumber asal / bukti langsung','metadata','Cari sumber asal'],
             '/investigations/rci-tabung-haji/sources/':['id="s65"','id="s66"','parlimen.gov.my/pac/senarai-mesyuarat'],
           }
           for attempt in range(60):
@@ -48,17 +52,17 @@ jobs:
                   except Exception as e:
                       ok=False; print('wait',attempt,path,type(e).__name__,str(e)[:120])
               if ok:
-                  print('PUBLIC LANGUAGE V2.2 + CORE FACTUAL PAYLOAD READY')
+                  print('PUBLIC LANGUAGE V2.3 + CORE FACTUAL PAYLOAD READY')
                   raise SystemExit(0)
               time.sleep(5)
-          raise SystemExit('Timed out waiting for Public Language V2.2 Pages payload')
+          raise SystemExit('Timed out waiting for Public Language V2.3 Pages payload')
           PY
 
       - name: Verify legal and factual boundary
         run: |
           python - <<'PY'
           import os,urllib.request,time
-          base=os.environ['BASE']; h={'User-Agent':'RAVEN-Trace-Live-QA/PublicLanguageV2.2','Cache-Control':'no-cache'}
+          base=os.environ['BASE']; h={'User-Agent':'RAVEN-Trace-Live-QA/PublicLanguageV2.3','Cache-Control':'no-cache'}
           checks={
             '/':['empat individu telah berdepan pertuduhan','SPRM pula menyebut lima','Ditahan ≠ direman ≠ didakwa ≠ bersalah'],
             '/investigations/rci-tabung-haji/':['14</dt><dd>kertas siasatan SPRM','Pertuduhan bukan sabitan','RM193.5 juta'],
@@ -77,20 +81,20 @@ jobs:
           print('LEGAL/FACTUAL BOUNDARY: PASS')
           PY
 
-      - name: Verify public-language residue is absent
+      - name: Verify Public Language V2.3 residue is absent
         run: |
           python - <<'PY'
           import os,time,urllib.request
-          base=os.environ['BASE']; h={'User-Agent':'RAVEN-Trace-Live-QA/PublicLanguageV2.2','Cache-Control':'no-cache'}
-          paths=['/','/news/','/investigations/rci-tabung-haji/updates/','/news/2026/09/12/freshness-sweep-pac-15-sep-rm18m-claim/','/investigations/rci-tabung-haji/narratives/','/investigations/rci-tabung-haji/narratives/political-social-media/']
-          stale=['Category collapse + number laundering','ANALISIS / INFERENCE · MOTIF TIDAK DIBUKTIKAN','comparative selective-enforcement analysis','counter-narrative','accounting treatment','selective targeting','signal yang diperhatikan','pemberat engagement','DISPUTED RECORD','Chronology mahkamah']
+          base=os.environ['BASE']; h={'User-Agent':'RAVEN-Trace-Live-QA/PublicLanguageV2.3','Cache-Control':'no-cache'}
+          paths=['/','/news/','/about/','/methodology/','/investigations/rci-tabung-haji/updates/','/news/2026/09/12/freshness-sweep-pac-15-sep-rm18m-claim/','/investigations/rci-tabung-haji/narratives/','/investigations/rci-tabung-haji/narratives/political-social-media/']
+          stale=['Category collapse + number laundering','ANALISIS / INFERENCE · MOTIF TIDAK DIBUKTIKAN','comparative selective-enforcement analysis','counter-narrative','accounting treatment','selective targeting','signal yang diperhatikan','pemberat engagement','DISPUTED RECORD','Chronology mahkamah','dokumen primer penuh','frame yang paling sedap didengar','metodologi sampel','pelaporan beratribusi','Generalisasi sentimen platform','Peta aktor','sintesis politik','menetapkan motif agensi','RAVEN-Trace Protocol','Independence & AI-assisted disclosure','DIPERTIKAIKAN · REKOD','Apa perlu ditahan?']
           for path in paths:
               req=urllib.request.Request(base+path+'?qa='+str(time.time_ns()),headers=h)
               text=urllib.request.urlopen(req,timeout=20).read().decode('utf-8','replace')
               for x in stale: assert x not in text, f'{path}: stale public phrase {x}'
               if path in ['/','/news/','/investigations/rci-tabung-haji/updates/','/news/2026/09/12/freshness-sweep-pac-15-sep-rm18m-claim/']:
                   assert 'freshness sweep' not in text.lower(), f'{path}: operational wording still public'
-          print('PUBLIC LANGUAGE RESIDUE: PASS')
+          print('PUBLIC LANGUAGE V2.3 RESIDUE: PASS')
           PY
 
       - name: Verify factual runtime assets remain inert
@@ -101,7 +105,7 @@ jobs:
           assets=['/assets/js/raven-evidence-ux.js?v=3.0.0','/assets/js/raven-publication-core.js?v=3.0.0','/assets/js/raven-narrative.js?v=2.0.0']
           forbidden=['Jamil Khir','Abdul Azeez','Azmi Ahmad','9 September 2026','18:29 MYT','ravenCaseState','.section-cutoff']
           for path in assets:
-              req=urllib.request.Request(base+path+'&qa='+str(time.time_ns()),headers={'User-Agent':'RAVEN-Trace-Live-QA/PublicLanguageV2.2','Cache-Control':'no-cache'})
+              req=urllib.request.Request(base+path+'&qa='+str(time.time_ns()),headers={'User-Agent':'RAVEN-Trace-Live-QA/PublicLanguageV2.3','Cache-Control':'no-cache'})
               text=urllib.request.urlopen(req,timeout=20).read().decode('utf-8','replace')
               for x in forbidden: assert x not in text, f'{path}: factual mutator token present: {x}'
           print('RUNTIME INERT: PASS')

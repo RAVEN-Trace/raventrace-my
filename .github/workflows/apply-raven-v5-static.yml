@@ -45,7 +45,7 @@ jobs:
             t=p.read_text(encoding='utf-8')
             assert 'raven-v5.css?v=5.0.0' in t, p
             assert 'raven-v5.js?v=5.1.2' in t, p
-            assert 'raven-unified-v7.css?v=7.0.2' in t, p
+            assert 'raven-unified-v7.css?v=7.0.3' in t, p
           print('RAVEN V5 STATIC TAGS: PASS')
           PY
 

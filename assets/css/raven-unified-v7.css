@@ -1,4 +1,4 @@
-/* RAVEN-Trace Unified Design System V7.0.2
+/* RAVEN-Trace Unified Design System V7.0.3
    Final presentation and accessibility layer shared by every public page.
    Colour is semantic: teal=evidence/action, oxblood=disputed, amber=caution. */
 
@@ -472,8 +472,7 @@ body.raven-v5 :where(.section-marker span, .person-card .role,
   .control-grid > article > h3, .brief-grid > article > b,
   .institution-grid > article > b, .story-fact-grid > article > b,
   .board-row > span, .person-avatar, .signal-verdict-label,
-  .timeline-item > time, .raven-context-copy > span,
-  .raven-question-head > span) {
+  .timeline-item > time, .raven-context-copy > span) {
   color: var(--rv7-teal-deep) !important;
 }
 
@@ -489,9 +488,11 @@ body.raven-v5 .raven-share-btn.primary :where(span, strong) {
 }
 
 body.raven-v5 .raven-question-rail.case .raven-question-grid a strong,
+body.raven-v5 .raven-question-rail.case .raven-question-head > span,
 body.raven-v5 .reading-nav a,
 body.raven-v5 .raven-lens-open,
-body.raven-v5 .signal-home-hero .signal-grid span {
+body.raven-v5 .signal-home-hero .signal-grid span,
+body.raven-v5 .signal-strip .signal-grid > span {
   color: var(--rv7-cyan) !important;
 }
 
@@ -504,15 +505,28 @@ body.raven-v5 .signal-map-node > span {
   color: var(--rv7-teal-deep) !important;
 }
 
+body.raven-v5 .investigation-meta-grid > div > b,
+body.raven-v5.case-page .confidence-grid > article > span,
+body.raven-v5.case-page .history-line article > time {
+  color: var(--rv7-teal-deep) !important;
+}
+
+body.raven-v5 .process-ladder > li.active small {
+  color: #465158 !important;
+}
+
 body.raven-v5 :where(.article-header, .story-hero, .section-intro) .v5-human-note {
   border-color: #667782 !important;
   background: rgba(255, 255, 255, .07) !important;
   color: var(--rv7-on-dark) !important;
 }
 
-body.raven-v5 > section a,
-body.raven-v5 figcaption a {
+body.raven-v5 > section a {
   color: var(--rv7-teal-deep) !important;
+}
+
+body.raven-v5 :where(.story-art, .editorial-art, .source-story-visual) figcaption a {
+  color: var(--rv7-cyan) !important;
 }
 
 /* Keyboard focus must remain visible on every surface. */
@@ -536,7 +550,7 @@ body.raven-v5 .skip-link:focus {
   body.raven-v5 :where(.btn, .filter-btn, .raven-share-btn, .raven-share-link, .section-links a,
     .nav-toggle, .site-nav a, .footer-nav a, .v5-quicklinks a, .raven-question-grid a,
     .raven-continue-list > a, .reading-nav a, main button, summary) {
-    min-height: 44px;
+    min-height: 44px !important;
   }
 
   body.raven-v5 :where(.site-nav a, .footer-nav a) {

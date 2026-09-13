@@ -1,4 +1,4 @@
-name: Raven Reader Funnel V1.2.0 QA
+name: Raven Reader Funnel Compatibility QA
 
 on:
   push:
@@ -7,9 +7,10 @@ on:
       - '.github/workflows/raven-funnel-v1-qa.yml'
       - 'assets/css/raven-funnel-v1.css'
       - 'assets/js/raven-funnel-v1.js'
+      - 'assets/css/raven-reader-v13.css'
+      - 'assets/js/raven-reader-v13.js'
       - 'scripts/apply_raven_funnel_v1.py'
-      - 'index.html'
-      - 'investigations/**'
+      - 'investigations/rci-tabung-haji/narratives/**'
   workflow_dispatch:
 
 permissions:
@@ -26,32 +27,105 @@ jobs:
       - name: Validate source syntax
         run: |
           node --check assets/js/raven-funnel-v1.js
+          node --check assets/js/raven-reader-v13.js
           python -m py_compile scripts/apply_raven_funnel_v1.py
       - name: Install Playwright
         run: |
           npm install --no-save playwright@1.55.0
           npx playwright install --with-deps chromium
-      - name: Verify production funnel V1.2.0
+      - name: Verify production funnel compatibility
         run: |
           node - <<'JS'
-          const { chromium }=require('playwright');
+          const { chromium } = require('playwright');
           (async()=>{
-            const base='https://raven-trace.github.io/raventrace-my'; const sleep=ms=>new Promise(r=>setTimeout(r,ms));
-            const browser=await chromium.launch(); const errors=[]; const check=(c,m)=>{if(!c)errors.push(m)};
-            async function openCurrent(page,path){for(let i=0;i<30;i++){await page.goto(`${base}${path}?funnelqa=${Date.now()}-${Math.random()}`,{waitUntil:'domcontentloaded',timeout:45000}); const ready=await page.evaluate(()=>!!document.querySelector('link[href*="raven-funnel-v1.css?v=1.2.0"]')&&!!document.querySelector('script[src*="raven-funnel-v1.js?v=1.2.0"]')); if(ready)return; await sleep(3000)} throw new Error(`V1.2.0 not deployed: ${path}`)}
-            for(const viewport of [{width:390,height:844},{width:1440,height:900}]){const ctx=await browser.newContext({viewport}); const page=await ctx.newPage(); await openCurrent(page,'/investigations/rci-tabung-haji/narratives/'); await page.waitForSelector('.raven-evidence-bridge',{timeout:15000}); const m=await page.evaluate(()=>({cards:document.querySelectorAll('.narrative-v5-card[id^="naratif-"]').length,bridges:document.querySelectorAll('.raven-evidence-bridge').length,sources:document.querySelectorAll('#sources .sources-grid > li[id^="source-"]').length,overflow:document.documentElement.scrollWidth-document.documentElement.clientWidth,api:!!window.ravenReadMetrics})); check(m.cards>=8,`cards ${m.cards}`); check(m.cards===m.bridges,`bridges ${m.bridges}/${m.cards}`); check(m.sources>=5,`sources ${m.sources}`); check(m.overflow<=4,`overflow ${m.overflow}`); check(m.api,'metrics API missing'); await ctx.close()}
-            await browser.close(); console.log(JSON.stringify({errors},null,2)); if(errors.length)throw new Error(errors.join('\n'));
+            const base='https://raven-trace.github.io/raventrace-my';
+            const sleep=ms=>new Promise(r=>setTimeout(r,ms));
+            const browser=await chromium.launch();
+            const errors=[]; const report={};
+            const check=(c,m)=>{ if(!c) errors.push(m); };
+
+            async function openCurrent(page,path){
+              for(let i=0;i<36;i++){
+                await page.goto(`${base}${path}?funnelcompat=${Date.now()}-${Math.random()}`,{waitUntil:'domcontentloaded',timeout:45000});
+                const ready=await page.evaluate(()=>
+                  !!document.querySelector('link[href*="raven-funnel-v1.css?v=1.2.0"]') &&
+                  !!document.querySelector('script[src*="raven-funnel-v1.js?v=1.2.0"]') &&
+                  !!window.ravenReadMetrics
+                );
+                if(ready) return;
+                await sleep(3000);
+              }
+              throw new Error(`Funnel runtime not deployed: ${path}`);
+            }
+
+            const visible = el => !!el && getComputedStyle(el).display !== 'none' && getComputedStyle(el).visibility !== 'hidden' && el.getBoundingClientRect().height > 0;
+
+            for(const viewport of [{width:390,height:844,name:'mobile'},{width:1440,height:900,name:'desktop'}]){
+              const ctx=await browser.newContext({viewport:{width:viewport.width,height:viewport.height}});
+              const page=await ctx.newPage();
+              await openCurrent(page,'/investigations/rci-tabung-haji/narratives/');
+              await page.waitForSelector('.raven-evidence-bridge',{state:'attached',timeout:15000});
+              await page.waitForTimeout(350);
+
+              const initial=await page.evaluate((label)=>{
+                const cards=[...document.querySelectorAll('.narrative-v5-card[id^="naratif-"]')];
+                const bridges=[...document.querySelectorAll('.raven-evidence-bridge')];
+                const first=bridges[0];
+                const isVisible=el=>!!el && getComputedStyle(el).display!=='none' && getComputedStyle(el).visibility!=='hidden' && el.getBoundingClientRect().height>0;
+                return {
+                  viewport:label,
+                  cards:cards.length,
+                  bridges:bridges.length,
+                  sources:document.querySelectorAll('#sources .sources-grid > li[id^="source-"]').length,
+                  firstBridgeVisible:isVisible(first),
+                  primaryLinks:document.querySelectorAll('.raven-evidence-bridge a[data-raven-event="primary_source_click"]').length,
+                  caseLinks:document.querySelectorAll('.raven-evidence-bridge a[data-raven-event="case_continuation"]').length,
+                  overflow:document.documentElement.scrollWidth-document.documentElement.clientWidth,
+                  api:!!window.ravenReadMetrics
+                };
+              },viewport.name);
+
+              check(initial.cards>=8,`${viewport.name}: cards ${initial.cards}`);
+              check(initial.cards===initial.bridges,`${viewport.name}: bridges ${initial.bridges}/${initial.cards}`);
+              check(initial.sources>=5,`${viewport.name}: sources ${initial.sources}`);
+              check(initial.primaryLinks===initial.cards,`${viewport.name}: primary-source links ${initial.primaryLinks}/${initial.cards}`);
+              check(initial.caseLinks===initial.cards,`${viewport.name}: case continuation links ${initial.caseLinks}/${initial.cards}`);
+              check(initial.overflow<=4,`${viewport.name}: overflow ${initial.overflow}`);
+              check(initial.api,`${viewport.name}: metrics API missing`);
+
+              if(viewport.width<=720){
+                check(initial.firstBridgeVisible===false,'mobile: evidence bridge should be hidden in default scan state');
+                const summary=page.locator('.narrative-v5-card .narrative-v5-details > summary').first();
+                await summary.click();
+                await page.waitForTimeout(180);
+                const revealed=await page.evaluate(()=>{
+                  const bridge=document.querySelector('.narrative-v5-card .raven-evidence-bridge');
+                  return !!bridge && getComputedStyle(bridge).display!=='none' && bridge.getBoundingClientRect().height>0;
+                });
+                check(revealed,'mobile: evidence bridge did not reveal after opening narrative details');
+                initial.revealedAfterDetails=revealed;
+              } else {
+                check(initial.firstBridgeVisible===true,'desktop: evidence bridge should be visible');
+              }
+
+              report[viewport.name]=initial;
+              await ctx.close();
+            }
+
+            await browser.close();
+            console.log(JSON.stringify({report,errors},null,2));
+            if(errors.length) throw new Error(errors.join('\n'));
           })();
           JS
       - name: Upload Funnel QA marker
         if: always()
         run: |
           mkdir -p funnel-qa
-          printf '{"version":"1.2.0","status":"workflow completed"}\n' > funnel-qa/report.json
+          printf '{"contract":"funnel-compatibility","reader":"1.3.1","status":"workflow completed"}\n' > funnel-qa/report.json
       - name: Upload Funnel QA evidence
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: raven-reader-funnel-v1-qa
+          name: raven-reader-funnel-compatibility-qa
           path: funnel-qa/
           retention-days: 14

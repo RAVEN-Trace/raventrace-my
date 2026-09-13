@@ -65,7 +65,7 @@ jobs:
           base=os.environ['BASE']; h={'User-Agent':'RAVEN-Trace-Live-QA/PublicLanguageV2.3','Cache-Control':'no-cache'}
           checks={
             '/':['empat individu telah berdepan pertuduhan','SPRM pula menyebut lima','Ditahan ≠ direman ≠ didakwa ≠ bersalah'],
-            '/investigations/rci-tabung-haji/':['14</dt><dd>kertas siasatan SPRM','Pertuduhan bukan sabitan','19 daripada 25'],
+            '/investigations/rci-tabung-haji/':['14</dt><dd>kertas siasatan SPRM','18</dt><dd>individu ditahan','Pertuduhan bukan sabitan'],
             '/investigations/rci-tabung-haji/narratives/':['RM193.5 juta','REKOD PERTUDUHAN TAK SOKONG DAKWAAN INI','Pertuduhan bukan sabitan','Tak jumpa bukti'],
             '/news/2026/09/12/freshness-sweep-pac-15-sep-rm18m-claim/':['RM18.6 juta','BELUM SELESAI','15 September 2026','24 Sep'],
           }

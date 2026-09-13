@@ -29,7 +29,7 @@ jobs:
           python - <<'PY'
           from pathlib import Path
           req = {
-            'index.html': ['SEMAKAN BUKTI · 13 SEP', 'home-2026-09-13-deep-verification', 'final-forfeiture'],
+            'index.html': ['SEMAKAN BUKTI · 13 SEP', 'home-2026-09-13-deep-verification', 'RM18m/RM18.6m'],
             'news/index.html': ['news-2026-09-13-deep-verification', '13 SEP 2026', 'Deep verification'],
             'news/2026/09/13/deep-verification-rci-th/index.html': ['Lima benda yang Raven ubah', 'Empat court-confirmed', 'RM18m/RM18.6m', 'DISPUTED / UNKNOWN'],
             'news/2026/09/12/freshness-sweep-pac-15-sep-rm18m-claim/index.html': ['EDITORIAL UPDATE · 13 SEP', 'FINAL FORFEITURE CLAIM TIDAK DISOKONG'],

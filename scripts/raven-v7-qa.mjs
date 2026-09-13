@@ -42,7 +42,7 @@ async function openDeployed(page, route) {
     await page.goto(url, { waitUntil: 'domcontentloaded', timeout: 45000 });
     const ready = await page.evaluate(() =>
       document.body.classList.contains('raven-v7') &&
-      Boolean(document.querySelector('link[href*="raven-unified-v7.css?v=7.0.4"]'))
+      Boolean(document.querySelector('link[href*="raven-unified-v7.css?v=7.0.5"]'))
     );
     if (ready) return url;
     await delay(5000);
@@ -132,7 +132,7 @@ async function auditPage(page, view, item) {
       duplicateIds: [...new Set(duplicateIds)],
       missingAnchors: [...new Set(missingAnchors)],
       fakeShareLinks: document.querySelectorAll('.raven-share-link[href="#"]').length,
-      unifiedCss: Boolean(document.querySelector('link[href*="raven-unified-v7.css?v=7.0.4"]')),
+      unifiedCss: Boolean(document.querySelector('link[href*="raven-unified-v7.css?v=7.0.5"]')),
       skipLink: Boolean(document.querySelector('.skip-link'))
     };
   }, { mobile: view.name === 'mobile' });

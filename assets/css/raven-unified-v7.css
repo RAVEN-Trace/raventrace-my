@@ -1,4 +1,4 @@
-/* RAVEN-Trace Unified Design System V7.0.4
+/* RAVEN-Trace Unified Design System V7.0.5
    Final presentation and accessibility layer shared by every public page.
    Colour is semantic: teal=evidence/action, oxblood=disputed, amber=caution. */
 
@@ -440,7 +440,7 @@ body.raven-v5 .section-links a {
 
 body.raven-v5 main :where(button, summary, .v5-quicklinks a, .raven-question-grid a,
   .raven-continue-list > a, .reading-nav a) {
-  min-height: 40px !important;
+  min-height: 40px;
 }
 
 body.raven-v5 .section-links a:hover {
@@ -500,10 +500,6 @@ body.raven-v5 .raven-question-rail.desk .raven-question-head > span {
   color: var(--rv7-teal-deep) !important;
 }
 
-body.raven-v5 .raven-case-nav-toggle {
-  min-height: 40px !important;
-}
-
 body.raven-v5 .raven-question-rail.case .raven-question-grid :where(small, span),
 body.raven-v5 :where(.evidence-band, .measure) .evidence-row > div > span {
   color: var(--rv7-on-dark-muted) !important;
@@ -535,6 +531,13 @@ body.raven-v5 > section a {
 
 body.raven-v5 :where(.story-art, .editorial-art, .source-story-visual) figcaption a {
   color: var(--rv7-cyan) !important;
+}
+
+@media (min-width: 761px) {
+  body.raven-v5 .raven-case-nav-toggle,
+  body.raven-v5 .narrative-v5-filterbar button {
+    min-height: 40px !important;
+  }
 }
 
 /* Keyboard focus must remain visible on every surface. */

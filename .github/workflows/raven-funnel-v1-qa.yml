@@ -1,4 +1,4 @@
-name: Raven Reader Funnel Compatibility QA
+name: Raven Reader Funnel V1.2.1 Compatibility QA
 
 on:
   push:
@@ -46,19 +46,17 @@ jobs:
 
             async function openCurrent(page,path){
               for(let i=0;i<36;i++){
-                await page.goto(`${base}${path}?funnelcompat=${Date.now()}-${Math.random()}`,{waitUntil:'domcontentloaded',timeout:45000});
+                await page.goto(`${base}${path}?funnelcompat121=${Date.now()}-${Math.random()}`,{waitUntil:'domcontentloaded',timeout:45000});
                 const ready=await page.evaluate(()=>
-                  !!document.querySelector('link[href*="raven-funnel-v1.css?v=1.2.0"]') &&
-                  !!document.querySelector('script[src*="raven-funnel-v1.js?v=1.2.0"]') &&
+                  !!document.querySelector('link[href*="raven-funnel-v1.css?v=1.2.1"]') &&
+                  !!document.querySelector('script[src*="raven-funnel-v1.js?v=1.2.1"]') &&
                   !!window.ravenReadMetrics
                 );
                 if(ready) return;
                 await sleep(3000);
               }
-              throw new Error(`Funnel runtime not deployed: ${path}`);
+              throw new Error(`Funnel V1.2.1 runtime not deployed: ${path}`);
             }
-
-            const visible = el => !!el && getComputedStyle(el).display !== 'none' && getComputedStyle(el).visibility !== 'hidden' && el.getBoundingClientRect().height > 0;
 
             for(const viewport of [{width:390,height:844,name:'mobile'},{width:1440,height:900,name:'desktop'}]){
               const ctx=await browser.newContext({viewport:{width:viewport.width,height:viewport.height}});
@@ -80,6 +78,8 @@ jobs:
                   firstBridgeVisible:isVisible(first),
                   primaryLinks:document.querySelectorAll('.raven-evidence-bridge a[data-raven-event="primary_source_click"]').length,
                   caseLinks:document.querySelectorAll('.raven-evidence-bridge a[data-raven-event="case_continuation"]').length,
+                  css121:!!document.querySelector('link[href*="raven-funnel-v1.css?v=1.2.1"]'),
+                  js121:!!document.querySelector('script[src*="raven-funnel-v1.js?v=1.2.1"]'),
                   overflow:document.documentElement.scrollWidth-document.documentElement.clientWidth,
                   api:!!window.ravenReadMetrics
                 };
@@ -90,6 +90,7 @@ jobs:
               check(initial.sources>=5,`${viewport.name}: sources ${initial.sources}`);
               check(initial.primaryLinks===initial.cards,`${viewport.name}: primary-source links ${initial.primaryLinks}/${initial.cards}`);
               check(initial.caseLinks===initial.cards,`${viewport.name}: case continuation links ${initial.caseLinks}/${initial.cards}`);
+              check(initial.css121 && initial.js121,`${viewport.name}: V1.2.1 cache keys missing`);
               check(initial.overflow<=4,`${viewport.name}: overflow ${initial.overflow}`);
               check(initial.api,`${viewport.name}: metrics API missing`);
 
@@ -121,11 +122,11 @@ jobs:
         if: always()
         run: |
           mkdir -p funnel-qa
-          printf '{"contract":"funnel-compatibility","reader":"1.3.1","status":"workflow completed"}\n' > funnel-qa/report.json
+          printf '{"contract":"funnel-compatibility","funnel":"1.2.1","reader":"1.3.1","status":"workflow completed"}\n' > funnel-qa/report.json
       - name: Upload Funnel QA evidence
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: raven-reader-funnel-compatibility-qa
+          name: raven-reader-funnel-v121-compatibility-qa
           path: funnel-qa/
           retention-days: 14

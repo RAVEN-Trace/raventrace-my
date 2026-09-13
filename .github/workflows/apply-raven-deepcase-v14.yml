@@ -1,0 +1,69 @@
+name: Apply Raven Deep Case V1.4.0
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'assets/css/raven-deepcase-v14.css'
+      - 'assets/js/raven-deepcase-v14.js'
+      - 'scripts/apply_raven_deepcase_v14.py'
+      - '.github/workflows/apply-raven-deepcase-v14.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  apply:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Validate Deep Case source
+        run: |
+          node --check assets/js/raven-deepcase-v14.js
+          python -m py_compile scripts/apply_raven_deepcase_v14.py
+      - name: Apply Deep Case assets
+        run: python scripts/apply_raven_deepcase_v14.py
+      - name: Validate rollout
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          root=Path('.')
+          targets=[
+            root/'investigations/rci-tabung-haji/governance/index.html',
+            root/'investigations/rci-tabung-haji/investments/index.html',
+            root/'investigations/rci-tabung-haji/tracks/index.html',
+            root/'investigations/rci-tabung-haji/disputed-record/index.html',
+            root/'investigations/rci-tabung-haji/sources/index.html',
+          ]
+          for p in targets:
+              t=p.read_text(encoding='utf-8')
+              assert t.count('data-raven-deepcase-v14') == 2, p
+              assert '/assets/css/raven-deepcase-v14.css?v=1.4.0' in t, p
+              assert '/assets/js/raven-deepcase-v14.js?v=1.4.0' in t, p
+          for p in root.rglob('investigations/rci-tabung-haji/research/**/index.html'):
+              assert 'data-raven-deepcase-v14' not in p.read_text(encoding='utf-8'), p
+          print('Raven Deep Case V1.4.0 rollout validation PASS')
+          PY
+          git diff --check
+      - name: Commit rollout
+        run: |
+          if git diff --quiet; then echo 'No page changes required'; exit 0; fi
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add investigations/rci-tabung-haji/governance/index.html \
+                  investigations/rci-tabung-haji/investments/index.html \
+                  investigations/rci-tabung-haji/tracks/index.html \
+                  investigations/rci-tabung-haji/disputed-record/index.html \
+                  investigations/rci-tabung-haji/sources/index.html
+          git commit -m 'ux: activate Raven Deep Case V1.4.0'
+          git push

@@ -22,15 +22,13 @@
 
 ## Current evidence boundary
 
-- No verified 12 September development changes the court-read charge count: four individuals remain verified as having charges read in court, while MACC's separate count of five remains unresolved.
-- The former-minister prosecution announcement remains a **14 September checkpoint** until charges are actually read in court.
-- Parliament's official PAC schedule lists **Prosiding 5(a) berhubung Lembaga Tabung Haji** for **15 September 2026 at 10:00 AM**. A scheduled proceeding is not a PAC finding.
-- The post-remand outcome for the two AMLA-track individuals remains **BELUM DIKETAHUI** in the reliable public sources reviewed.
-- The viral claim that more than RM18.6 million in TH accounts belonging to Abdul Azeez's family was forfeited remains **BELUM SELESAI**. His lawyer has denied the claim, but that denial is not independent proof of the source of the funds.
-- The RM193.5 million figure in Abdul Azeez's current charge is treated as the **value of TH's investment in Putrajaya Perdana**, not as an amount the charge alleges was paid, taken, or deposited into Abdul Azeez's or his family's accounts.
-- Abdul Azeez has pleaded not guilty. The charge remains unproven unless and until decided by the court.
-- The supplied political/social-media research memo remains **Gred C · bahan penyelidikan** overall. Individual political statements may be Grade B when independently corroborated.
-- Platform-wide “sentiment” claims remain non-representative without a clear sample and auditable measurement method.
+- Cut-off for this lock: **13 September 2026 deep verification**.
+- Court-confirmed charge-reading count: **4 individuals**. MACC/SPRM separately stated **5**; the former COO charge-reading was reported postponed to 24 September. Preserve this as a source conflict rather than flattening it.
+- The viral claim that RM18m/RM18.6m in family TH accounts was finally forfeited is **unsupported / materially misleading**: a 2021 forfeiture application existed, but the government withdrew the application in March 2022.
+- The official nearly-RM13b figure is a loss/burden construct (~RM10.2b government/UJSB + RM2.6b TH impairment), not proof that RM13b was stolen.
+- RCI process chronology: work completed 19 Jul 2022; report to Yang di-Pertuan Agong 30 Aug; Cabinet 14 Dec; public release 29 Jul 2026.
+- Political weaponisation vs government-independence claims remain **DISPUTED / UNKNOWN** absent decision-chain evidence.
+- Financial recovery indicators and historical accountability are separate tracks.
 
 ## Public Language V2.3 lock
 

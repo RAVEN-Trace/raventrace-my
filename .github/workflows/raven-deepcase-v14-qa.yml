@@ -1,0 +1,187 @@
+name: Raven Deep Case V1.4 Production QA
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'assets/css/raven-deepcase-v14.css'
+      - 'assets/js/raven-deepcase-v14.js'
+      - '.github/workflows/raven-deepcase-v14-qa.yml'
+      - 'investigations/rci-tabung-haji/governance/**'
+      - 'investigations/rci-tabung-haji/investments/**'
+      - 'investigations/rci-tabung-haji/tracks/**'
+      - 'investigations/rci-tabung-haji/disputed-record/**'
+      - 'investigations/rci-tabung-haji/sources/**'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  deepcase-qa:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Validate JS syntax
+        run: node --check assets/js/raven-deepcase-v14.js
+      - name: Install Playwright
+        run: |
+          npm install --no-save playwright@1.55.0
+          npx playwright install --with-deps chromium
+      - name: Verify production Deep Case V1.4.0
+        run: |
+          mkdir -p deepcase-qa
+          node - <<'JS'
+          const { chromium } = require('playwright');
+          const fs = require('fs');
+          (async()=>{
+            const base='https://raven-trace.github.io/raventrace-my';
+            const sleep=(ms)=>new Promise(r=>setTimeout(r,ms));
+            const browser=await chromium.launch();
+            const errors=[]; const report={};
+            const check=(c,m)=>{ if(!c) errors.push(m); };
+
+            async function openCurrent(page,path){
+              for(let i=0;i<40;i++){
+                await page.goto(`${base}${path}?deepcaseqa=${Date.now()}-${Math.random()}`,{waitUntil:'domcontentloaded',timeout:45000});
+                await page.waitForTimeout(250);
+                const ready=await page.evaluate(() =>
+                  Boolean(window.__RAVEN_DEEPCASE_V14__) &&
+                  document.body.classList.contains('raven-deepcase-v14') &&
+                  Boolean(document.querySelector('link[href*="raven-deepcase-v14.css?v=1.4.0"]'))
+                );
+                if(ready) return;
+                await sleep(3000);
+              }
+              throw new Error(`Deep Case V1.4.0 not deployed: ${path}`);
+            }
+
+            async function inspectCompact(name,path,selector,min,{source=true}={}){
+              const ctx=await browser.newContext({viewport:{width:390,height:844}});
+              const page=await ctx.newPage();
+              await openCurrent(page,path);
+              await page.waitForTimeout(450);
+              const m=await page.evaluate(({selector})=>({
+                count:document.querySelectorAll(selector).length,
+                collapsed:document.querySelectorAll(`${selector}.raven-deepcase-collapsed`).length,
+                sourceCollapsed:!!document.querySelector('.raven-deepcase-source-room.raven-deepcase-source-collapsed'),
+                overflow:document.documentElement.scrollWidth-document.documentElement.clientWidth,
+                scrollY:window.scrollY,
+                height:document.documentElement.scrollHeight
+              }),{selector});
+              check(m.count>=min,`${name}: expected >=${min} scan nodes, got ${m.count}`);
+              check(m.collapsed>=min,`${name}: compact nodes not collapsed (${m.collapsed}/${m.count})`);
+              if(source) check(m.sourceCollapsed,`${name}: Source Room not collapsed`);
+              check(m.overflow<=4,`${name}: horizontal overflow ${m.overflow}`);
+              check(m.scrollY<=4,`${name}: unexpected auto-scroll ${m.scrollY}`);
+              report[name]=m;
+              await page.screenshot({path:`deepcase-qa/mobile-${name}.png`,fullPage:true});
+              await ctx.close();
+            }
+
+            await inspectCompact('governance','/investigations/rci-tabung-haji/governance/','.raven-governance-scan',6);
+            await inspectCompact('tracks','/investigations/rci-tabung-haji/tracks/','.raven-track-scan',3);
+            await inspectCompact('disputed','/investigations/rci-tabung-haji/disputed-record/','.raven-disputed-scan',5);
+
+            {
+              const ctx=await browser.newContext({viewport:{width:390,height:844}});
+              const page=await ctx.newPage();
+              await openCurrent(page,'/investigations/rci-tabung-haji/investments/');
+              await page.waitForTimeout(450);
+              const m=await page.evaluate(()=>({
+                items:document.querySelectorAll('#investments details.investment').length,
+                browser:!!document.querySelector('.raven-investment-browser'),
+                sourceCollapsed:!!document.querySelector('.raven-deepcase-source-room.raven-deepcase-source-collapsed'),
+                overflow:document.documentElement.scrollWidth-document.documentElement.clientWidth
+              }));
+              check(m.items===14,`investments: expected 14 records, got ${m.items}`);
+              check(m.browser,'investments: browser missing');
+              check(m.sourceCollapsed,'investments: Source Room not collapsed');
+              check(m.overflow<=4,`investments: horizontal overflow ${m.overflow}`);
+              await page.fill('.raven-investment-browser input[type="search"]','Al-Rawda');
+              await page.waitForTimeout(100);
+              const visible=await page.evaluate(()=>[...document.querySelectorAll('#investments details.investment')].filter(x=>!x.hidden).length);
+              check(visible>=1 && visible<14,`investments: search filter ineffective (${visible})`);
+              report.investments={...m,filteredVisible:visible};
+              await page.screenshot({path:'deepcase-qa/mobile-investments.png',fullPage:true});
+              await ctx.close();
+            }
+
+            {
+              const ctx=await browser.newContext({viewport:{width:390,height:844}});
+              const page=await ctx.newPage();
+              await openCurrent(page,'/investigations/rci-tabung-haji/sources/');
+              await page.waitForTimeout(450);
+              const m=await page.evaluate(()=>({
+                rows:document.querySelectorAll('#sources .sources-grid > li[id]').length,
+                browser:!!document.querySelector('.raven-source-browser'),
+                sourceCollapsed:!!document.querySelector('.raven-deepcase-source-collapsed'),
+                overflow:document.documentElement.scrollWidth-document.documentElement.clientWidth
+              }));
+              check(m.rows>=50,`sources: expected >=50 rows, got ${m.rows}`);
+              check(m.browser,'sources: evidence browser missing');
+              check(!m.sourceCollapsed,'sources: canonical Source Room must stay open');
+              check(m.overflow<=4,`sources: horizontal overflow ${m.overflow}`);
+              await page.fill('.raven-source-browser input[type="search"]','Madinah');
+              await page.waitForTimeout(100);
+              const visible=await page.evaluate(()=>[...document.querySelectorAll('#sources .sources-grid > li[id]')].filter(x=>!x.hidden).length);
+              check(visible>=1 && visible<m.rows,`sources: search filter ineffective (${visible}/${m.rows})`);
+              report.sources={...m,filteredVisible:visible};
+              await page.screenshot({path:'deepcase-qa/mobile-sources.png',fullPage:true});
+              await ctx.close();
+            }
+
+            {
+              const ctx=await browser.newContext({viewport:{width:390,height:844}});
+              const page=await ctx.newPage();
+              await openCurrent(page,'/investigations/rci-tabung-haji/governance/');
+              await page.goto(`${base}/investigations/rci-tabung-haji/governance/?deepcaseqa=${Date.now()}#s39`,{waitUntil:'domcontentloaded'});
+              await page.waitForTimeout(700);
+              const m=await page.evaluate(()=>({
+                hash:location.hash,
+                exists:!!document.querySelector('#s39'),
+                roomOpen:!document.querySelector('#sources')?.classList.contains('raven-deepcase-source-collapsed'),
+                targetVisible:!!document.querySelector('#s39') && getComputedStyle(document.querySelector('#s39')).display!=='none'
+              }));
+              check(m.hash==='#s39','governance deep-link hash lost');
+              check(m.exists,'governance source target missing');
+              check(m.roomOpen,'governance source deep-link did not open Source Room');
+              check(m.targetVisible,'governance source target hidden');
+              report.governanceSourceDeepLink=m;
+              await ctx.close();
+            }
+
+            {
+              const ctx=await browser.newContext({viewport:{width:1440,height:900}});
+              const page=await ctx.newPage();
+              await openCurrent(page,'/investigations/rci-tabung-haji/governance/');
+              await page.waitForTimeout(350);
+              const m=await page.evaluate(()=>({
+                firstCardVisible:getComputedStyle(document.querySelector('.raven-governance-scan')).display!=='none',
+                firstParagraphVisible:getComputedStyle(document.querySelector('.raven-governance-scan p')).display!=='none',
+                overflow:document.documentElement.scrollWidth-document.documentElement.clientWidth
+              }));
+              check(m.firstCardVisible && m.firstParagraphVisible,'desktop governance should remain full dossier');
+              check(m.overflow<=4,`desktop governance overflow ${m.overflow}`);
+              report.desktopGovernance=m;
+              await page.screenshot({path:'deepcase-qa/desktop-governance.png',fullPage:true});
+              await ctx.close();
+            }
+
+            fs.writeFileSync('deepcase-qa/report.json',JSON.stringify({report,errors},null,2));
+            await browser.close();
+            console.log(JSON.stringify({report,errors},null,2));
+            if(errors.length) throw new Error(errors.join('\n'));
+          })();
+          JS
+      - name: Upload rendered QA evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: raven-deepcase-v14-qa
+          path: deepcase-qa/
+          retention-days: 14

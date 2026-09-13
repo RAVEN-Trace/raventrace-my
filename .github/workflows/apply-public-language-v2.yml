@@ -1,0 +1,80 @@
+name: Apply Raven Public Language V2
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'scripts/apply_public_language_v2.py'
+      - 'assets/js/raven-narrative-v5.js'
+      - '.github/workflows/apply-public-language-v2.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  apply:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Validate Narrative transformer syntax
+        run: node --check assets/js/raven-narrative-v5.js
+
+      - name: Apply Raven Public Language V2
+        run: python scripts/apply_public_language_v2.py
+
+      - name: Editorial invariants
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          main=Path('investigations/rci-tabung-haji/narratives/index.html').read_text(encoding='utf-8')
+          social=Path('investigations/rci-tabung-haji/narratives/political-social-media/index.html').read_text(encoding='utf-8')
+          home=Path('index.html').read_text(encoding='utf-8')
+          method=Path('methodology/index.html').read_text(encoding='utf-8')
+          about=Path('about/index.html').read_text(encoding='utf-8')
+
+          # Findings/status/routing must remain intact.
+          for tok in ['RM193.5 juta','14 kertas siasatan','Pertuduhan bukan sabitan','naratif-azeez-ambil-rm193-5-juta','naratif-sakau-duit-umat-islam']:
+              assert tok in main, tok
+          assert 'https://raven-trace.github.io/raventrace-my/' in home
+          assert 'rcitabunghaji' not in home
+
+          # Public-language V2 signatures.
+          for tok in ['Orang tengah cakap macam-macam. Yang mana cerita, yang mana bukti?','Cara Raven check','REKOD PERTUDUHAN TAK SOKONG DAKWAAN INI','KENYATAAN ITU SAH · KESIMPULAN BESARNYA BELUM TENTU']:
+              assert tok in main, tok
+          for tok in ['DIA TUNJUK YANG INI JE','EH, BENDA NI TAK SAMA','DIA BAGI KITA RASA DULU','VIRAL TAK BERMAKSUD SUARA SEMUA ORANG']:
+              assert tok in social, tok
+          assert social.count('<span>05</span>') == 1
+          assert 'Prinsip komunikasi' not in social
+          assert 'Kenapa Raven mula dengan fakta, bukan dengan mengulang mitos?' in method
+          assert 'Cari yang benar.<br>Pecahkan cerita.' in about
+
+          # Stale analyst-first public copy must be gone from the two narrative pages.
+          forbidden=['Category collapse + number laundering','ANALISIS / INFERENCE · MOTIF TIDAK DIBUKTIKAN','policy position, bukan finding undang-undang','comparative selective-enforcement analysis','evidence pack undang-undang','deep-research baharu']
+          for tok in forbidden:
+              assert tok not in main, f'main stale: {tok}'
+              assert tok not in social, f'social stale: {tok}'
+          print('PUBLIC LANGUAGE V2 EDITORIAL INVARIANTS: PASS')
+          PY
+          git diff --check
+
+      - name: Commit public copy rollout
+        run: |
+          if git diff --quiet; then
+            echo 'No Public Language V2 changes required'
+            exit 0
+          fi
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add index.html about/index.html methodology/index.html investigations/rci-tabung-haji/narratives/index.html investigations/rci-tabung-haji/narratives/political-social-media/index.html
+          git commit -m 'content: activate Raven Public Language V2'
+          git push

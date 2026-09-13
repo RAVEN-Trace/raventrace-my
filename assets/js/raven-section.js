@@ -9,7 +9,6 @@
    * CASEFILE facts after load.
    */
 
-  // Load shared section UX safeguards once.
   if (!q('link[data-raven-site-integrity]')) {
     const link = document.createElement('link');
     link.rel = 'stylesheet';
@@ -18,7 +17,14 @@
     document.head.appendChild(link);
   }
 
-  // Analytics fallback for standalone CASEFILE pages that do not include it in HTML.
+  if (!q('script[data-raven-reader-v13]')) {
+    const reader = document.createElement('script');
+    reader.src = '/raventrace-my/assets/js/raven-reader-v13.js?v=1.3.0';
+    reader.defer = true;
+    reader.dataset.ravenReaderV13 = 'true';
+    document.head.appendChild(reader);
+  }
+
   if (!q('script[src*="lytcdn.com/lyt.js"]')) {
     const analytics = document.createElement('script');
     analytics.async = true;
@@ -27,7 +33,6 @@
     document.head.appendChild(analytics);
   }
 
-  // Section share button. Global site navigation is intentionally owned by raven.js.
   q('[data-section-share]')?.addEventListener('click', async (event) => {
     const button = event.currentTarget;
     const payload = {
@@ -47,7 +52,6 @@
     }
   });
 
-  // Investment records disclosure control.
   q('[data-expand-investments]')?.addEventListener('click', (event) => {
     const items = qa('details.investment');
     const open = !items.every((item) => item.open);
@@ -56,18 +60,11 @@
     event.currentTarget.textContent = open ? 'Tutup semua rekod' : 'Buka semua rekod';
   });
 
-  /*
-   * Keep the active CASEFILE tab visible on narrow screens WITHOUT moving the
-   * document vertically. scrollIntoView() was previously used here and can
-   * pull the whole page down to the horizontal rail on load.
-   */
   const activeSection = q('.section-links a[aria-current]');
   if (activeSection && matchMedia('(max-width: 760px)').matches) {
     requestAnimationFrame(() => {
       const rail = activeSection.closest('.section-links');
       if (!rail) return;
-      // Align close to the leading edge instead of centring the active item.
-      // This preserves context and avoids making the first tabs look missing.
       const left = activeSection.offsetLeft - 16;
       rail.scrollTo({ left: Math.max(0, left), behavior: 'auto' });
     });

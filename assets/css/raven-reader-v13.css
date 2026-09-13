@@ -1,0 +1,31 @@
+/* RAVEN READER V1.3 — section-page scan architecture */
+.raven-reader-card-toggle,.raven-source-room-toggle{display:none}
+.raven-question-rail,.raven-news-desk,.raven-status-first-note,.raven-money-distinction,.raven-timeline-phase-nav{margin-block:1.2rem 1.7rem}
+.raven-question-rail{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:.65rem;padding:1rem;border:1px solid #d7d2c8;background:#f8f6f0}
+.raven-question-rail>p{grid-column:1/-1;margin:0 0 .15rem;color:#424a50}
+.raven-question-rail>a{display:grid;grid-template-columns:auto 1fr;gap:.7rem;align-items:start;min-height:54px;padding:.75rem;border-top:1px solid #c9c5bc;color:#11171d;text-decoration:none}
+.raven-question-rail>a span,.raven-timeline-phase-nav a span{color:#087f98;font:900 .7rem/1.2 var(--sans);letter-spacing:.08em}
+.raven-question-rail>a strong{font:800 .9rem/1.3 var(--sans)}
+.raven-news-desk{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));border-block:1px solid #c9c5bc}
+.raven-news-desk>div{padding:1rem;border-right:1px solid #d8d2c7}.raven-news-desk>div:last-child{border-right:0}
+.raven-news-desk strong{display:block;color:#11171d;font:900 1.45rem/1 var(--sans)}.raven-news-desk span{display:block;margin-top:.35rem;color:#5a6167;font:750 .78rem/1.3 var(--sans)}
+.raven-status-first-note{display:flex;gap:.7rem 1rem;align-items:baseline;flex-wrap:wrap;padding:.9rem 1rem;border-left:4px solid #087f98;background:#eef8fa;color:#18333a}
+.raven-status-first-note strong{font:900 .82rem/1.2 var(--sans);text-transform:uppercase;letter-spacing:.05em}.raven-status-first-note span{font:700 .84rem/1.45 var(--sans)}
+.raven-money-distinction{display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:.55rem;padding:1rem;border-block:1px solid #c9c5bc;background:#fbfaf6;color:#172027;font:850 .82rem/1.2 var(--sans)}.raven-money-distinction b{color:#a46500;font-size:1.1rem}
+.raven-timeline-phase-nav{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:.7rem}
+.raven-timeline-phase-nav a{display:grid;grid-template-columns:auto 1fr;gap:.7rem;min-height:58px;align-items:center;padding:.85rem 1rem;border:1px solid #c9c5bc;background:#fbfaf6;color:#11171d;text-decoration:none}.raven-timeline-phase-nav a strong{font:850 .9rem/1.25 var(--sans)}
+@media(max-width:720px){
+.raven-reader-compact.raven-reader-card-collapsed>:not(.raven-reader-keep){display:none!important}
+.raven-reader-card-toggle,.raven-source-room-toggle{display:flex;width:100%;min-height:46px;align-items:center;justify-content:space-between;gap:1rem;margin:.75rem 0 0;padding:.72rem .85rem;border:1px solid #a8cfd7;border-radius:.45rem;background:#eef8fa;color:#0b4653;font:850 .82rem/1.2 var(--sans);text-align:left;cursor:pointer}
+.raven-reader-card-toggle b,.raven-source-room-toggle b{font:900 1.15rem/1 var(--sans)}
+.raven-reader-card-toggle:focus-visible,.raven-source-room-toggle:focus-visible{outline:3px solid rgba(8,127,152,.25);outline-offset:2px}
+.raven-reader-compact:not(.raven-reader-card-collapsed)>.raven-reader-card-toggle{margin-bottom:.65rem}
+.raven-reader-source-room.raven-reader-source-collapsed>:not(.section-marker):not(h2):not(.raven-source-room-toggle){display:none!important}.raven-reader-source-room{scroll-margin-top:5.5rem}
+.raven-question-rail{grid-template-columns:1fr;padding:.85rem}.raven-question-rail>a{min-height:48px}
+.raven-news-desk{grid-template-columns:1fr}.raven-news-desk>div{display:grid;grid-template-columns:3rem 1fr;align-items:center;gap:.75rem;padding:.7rem .8rem;border-right:0;border-bottom:1px solid #d8d2c7}.raven-news-desk>div:last-child{border-bottom:0}.raven-news-desk span{margin:0}
+body.raven-reader-newsroom .timeline-item>div.raven-reader-compact{padding-bottom:.85rem}
+body.raven-reader-newsroom .timeline-item>div.raven-reader-card-collapsed>p,body.raven-reader-newsroom .timeline-item>div.raven-reader-card-collapsed>a,body.raven-reader-newsroom .timeline-item>div.raven-reader-card-collapsed>br{display:none!important}
+body.raven-reader-people .person-card,body.raven-reader-money .metric-grid>article,body.raven-reader-political .control-grid>article{padding-block:1rem!important}
+.raven-money-distinction{justify-content:flex-start;gap:.4rem .55rem;padding:.85rem;font-size:.76rem}
+.raven-timeline-phase-nav{grid-template-columns:1fr}body.raven-reader-timeline .history-line>article{padding-block:.85rem!important}body.raven-reader-timeline .history-line>article time{margin-bottom:.25rem}
+.raven-reader-compact:target{scroll-margin-top:5.5rem;outline:2px solid rgba(8,127,152,.28);outline-offset:4px}}

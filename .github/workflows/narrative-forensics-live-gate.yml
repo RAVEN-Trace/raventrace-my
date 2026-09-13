@@ -18,16 +18,16 @@ jobs:
     env:
       BASE: https://raven-trace.github.io/raventrace-my
     steps:
-      - name: Wait for Narrative Public Language V2 deployment
+      - name: Wait for Narrative Public Language V2.1 deployment
         run: |
           python - <<'PY'
           import os,time,urllib.request
           base=os.environ['BASE']
           paths={
-            '/investigations/rci-tabung-haji/narratives/':['AUDIT NARATIF','Orang tengah cakap macam-macam','Cara Raven check','Peraturan Raven'],
-            '/investigations/rci-tabung-haji/narratives/political-social-media/':['FORENSIK POLITIK + MEDIA SOSIAL','DIA TUNJUK YANG INI JE','EH, BENDA NI TAK SAMA','DIA BAGI KITA RASA DULU','KITA NAMPAK TINDAKAN. NIAT? BELUM TENTU','VIRAL TAK BERMAKSUD SUARA SEMUA ORANG']
+            '/investigations/rci-tabung-haji/narratives/':['AUDIT NARATIF','Orang tengah cakap macam-macam','Cara Raven check','Raven kata macam mana?','Peraturan Raven'],
+            '/investigations/rci-tabung-haji/narratives/political-social-media/':['AUDIT NARATIF POLITIK + MEDIA SOSIAL','DIA TUNJUK YANG INI JE','EH, BENDA NI TAK SAMA','DIA BAGI KITA RASA DULU','KITA NAMPAK TINDAKAN. NIAT? BELUM TENTU','VIRAL TAK BERMAKSUD SUARA SEMUA ORANG','Petunjuk media sosial']
           }
-          headers={'User-Agent':'RAVEN-Trace-Narrative-QA/PublicLanguageV2','Cache-Control':'no-cache'}
+          headers={'User-Agent':'RAVEN-Trace-Narrative-QA/PublicLanguageV2.1','Cache-Control':'no-cache'}
           for attempt in range(60):
               ok=True
               for path,tokens in paths.items():
@@ -38,32 +38,32 @@ jobs:
                   except Exception:
                       ok=False
               if ok:
-                  print('NARRATIVE PUBLIC LANGUAGE V2 LIVE PAYLOAD READY')
+                  print('NARRATIVE PUBLIC LANGUAGE V2.1 LIVE PAYLOAD READY')
                   raise SystemExit(0)
               time.sleep(5)
-          raise SystemExit('Timed out waiting for Narrative Public Language V2')
+          raise SystemExit('Timed out waiting for Narrative Public Language V2.1')
           PY
       - name: Verify public language and evidence boundaries
         run: |
           python - <<'PY'
           import os,time,urllib.request
           base=os.environ['BASE']
-          headers={'User-Agent':'RAVEN-Trace-Narrative-QA/PublicLanguageV2','Cache-Control':'no-cache'}
+          headers={'User-Agent':'RAVEN-Trace-Narrative-QA/PublicLanguageV2.1','Cache-Control':'no-cache'}
           def get(path):
               req=urllib.request.Request(base+path+'?qa='+str(time.time_ns()),headers=headers)
               return urllib.request.urlopen(req,timeout=20).read().decode('utf-8','replace')
           main=get('/investigations/rci-tabung-haji/narratives/')
           social=get('/investigations/rci-tabung-haji/narratives/political-social-media/')
-          main_required=['Orang tengah cakap macam-macam. Yang mana cerita, yang mana bukti?','Cara Raven check','Apa yang boleh disahkan?','Selepas framing dibuang:','Pertuduhan bukan sabitan','REKOD PERTUDUHAN TAK SOKONG DAKWAAN INI']
-          social_required=['Buang parti, buang slogan, buang emosi','DIA TUNJUK YANG INI JE','EH, BENDA NI TAK SAMA','DIA BAGI KITA RASA DULU','KITA NAMPAK TINDAKAN. NIAT? BELUM TENTU','VIRAL TAK BERMAKSUD SUARA SEMUA ORANG','Viral? Ya. Wakil seluruh Malaysia? Belum tentu.']
+          main_required=['Orang tengah cakap macam-macam. Yang mana cerita, yang mana bukti?','Cara Raven check','Apa yang boleh disahkan?','Raven kata macam mana?','Apa trick cerita ni?','Apa bukti yang boleh ubah keputusan Raven?','Pertuduhan bukan sabitan','REKOD PERTUDUHAN TAK SOKONG DAKWAAN INI']
+          social_required=['Buang parti, buang slogan, buang emosi','DIA TUNJUK YANG INI JE','EH, BENDA NI TAK SAMA','DIA BAGI KITA RASA DULU','KITA NAMPAK TINDAKAN. NIAT? BELUM TENTU','VIRAL TAK BERMAKSUD SUARA SEMUA ORANG','Viral? Ya. Wakil seluruh Malaysia? Belum tentu.','Betulkan cerita, bukan balas slogan dengan slogan']
           for x in main_required: assert x in main, 'main missing '+x
           for x in social_required: assert x in social, 'social missing '+x
-          forbidden=['Category collapse + number laundering','ANALISIS / INFERENCE · MOTIF TIDAK DIBUKTIKAN','policy position, bukan finding undang-undang','comparative selective-enforcement analysis','Prinsip komunikasi']
+          forbidden=['Category collapse + number laundering','ANALISIS / INFERENCE · MOTIF TIDAK DIBUKTIKAN','policy position, bukan finding undang-undang','comparative selective-enforcement analysis','counter-narrative','accounting treatment','selective targeting','signal yang diperhatikan','pemberat engagement','Prinsip komunikasi']
           for x in forbidden:
               assert x not in main, 'main stale jargon '+x
               assert x not in social, 'social stale jargon '+x
           assert social.count('<span>05</span>') == 1, 'duplicate section 05 remains'
           assert '<span>06</span><p>Apa yang perlu dibuktikan seterusnya' in social
           assert '<span>07</span><p>Sumber silang' in social
-          print('NARRATIVE PUBLIC LANGUAGE V2 LANGUAGE/EVIDENCE: PASS')
+          print('NARRATIVE PUBLIC LANGUAGE V2.1 LANGUAGE/EVIDENCE: PASS')
           PY

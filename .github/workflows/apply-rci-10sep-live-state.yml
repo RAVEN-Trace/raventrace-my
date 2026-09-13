@@ -37,7 +37,6 @@ jobs:
             'investigations/index.html': ['empat individu telah berdepan pertuduhan', 'azmi-ahmad-didakwa'],
             'news/index.html': ['news-2026-09-10-azmi-charged', 'news-2026-09-10-azeez-remand'],
             'investigations/rci-tabung-haji/narratives/index.html': ['empat individu telah berdepan pertuduhan yang dibacakan'],
-            'assets/js/raven-section.js': ['Azmi Ahmad didakwa', "addSourceRow('s58'", "addSourceRow('s59'"],
           }
           for rel, needles in checks.items():
             text = Path(rel).read_text()

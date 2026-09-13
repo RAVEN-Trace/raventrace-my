@@ -1,4 +1,4 @@
-/* RAVEN-Trace Unified Design System V7.0.1
+/* RAVEN-Trace Unified Design System V7.0.2
    Final presentation and accessibility layer shared by every public page.
    Colour is semantic: teal=evidence/action, oxblood=disputed, amber=caution. */
 
@@ -450,8 +450,9 @@ body.raven-v5 .section-links a:hover {
 
 body.raven-v5 .section-links a[aria-current],
 body.raven-v5 .section-links a.active {
-  border-bottom-color: var(--rv7-teal);
-  color: var(--rv7-ink);
+  border-bottom-color: var(--rv7-cyan) !important;
+  background: var(--rv7-dark) !important;
+  color: var(--rv7-on-dark) !important;
 }
 
 @media (min-width: 761px) {
@@ -459,6 +460,59 @@ body.raven-v5 .section-links a.active {
     flex-wrap: wrap;
     overflow-x: visible;
   }
+}
+
+/* Legacy-layer closure: named component contracts below intentionally carry
+   higher priority than historic page-specific colour declarations. */
+body.raven-v5 .site-footer .legal {
+  color: #b8c3ca !important;
+}
+
+body.raven-v5 :where(.section-marker span, .person-card .role,
+  .control-grid > article > h3, .brief-grid > article > b,
+  .institution-grid > article > b, .story-fact-grid > article > b,
+  .board-row > span, .person-avatar, .signal-verdict-label,
+  .timeline-item > time, .raven-context-copy > span,
+  .raven-question-head > span) {
+  color: var(--rv7-teal-deep) !important;
+}
+
+body.raven-v5 :where(.section-marker p, .update-index,
+  [data-continuity] > small, [data-continuity] > span,
+  .raven-deeper-link small, .raven-context-links small,
+  .raven-context-links span, .raven-continue-list small) {
+  color: #465158 !important;
+}
+
+body.raven-v5 .raven-share-btn.primary :where(span, strong) {
+  color: #fff !important;
+}
+
+body.raven-v5 .raven-question-rail.case .raven-question-grid a strong,
+body.raven-v5 .reading-nav a,
+body.raven-v5 .raven-lens-open,
+body.raven-v5 .signal-home-hero .signal-grid span {
+  color: var(--rv7-cyan) !important;
+}
+
+body.raven-v5 .raven-question-rail.case .raven-question-grid :where(small, span),
+body.raven-v5 :where(.evidence-band, .measure) .evidence-row > div > span {
+  color: var(--rv7-on-dark-muted) !important;
+}
+
+body.raven-v5 .signal-map-node > span {
+  color: var(--rv7-teal-deep) !important;
+}
+
+body.raven-v5 :where(.article-header, .story-hero, .section-intro) .v5-human-note {
+  border-color: #667782 !important;
+  background: rgba(255, 255, 255, .07) !important;
+  color: var(--rv7-on-dark) !important;
+}
+
+body.raven-v5 > section a,
+body.raven-v5 figcaption a {
+  color: var(--rv7-teal-deep) !important;
 }
 
 /* Keyboard focus must remain visible on every surface. */

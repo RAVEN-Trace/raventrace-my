@@ -20,10 +20,28 @@
   if (!q('link[data-raven-unified]')) {
     const unified = document.createElement('link');
     unified.rel = 'stylesheet';
-    unified.href = '/raventrace-my/assets/css/raven-unified-v7.css?v=7.0.1';
+    unified.href = '/raventrace-my/assets/css/raven-unified-v7.css?v=7.0.2';
     unified.dataset.ravenUnified = 'true';
     document.head.appendChild(unified);
   }
+
+  // Publication and continuity modules may attach their own stylesheets at
+  // runtime. Keep the unified contract as the final stylesheet in the cascade.
+  const pinUnifiedStyles = () => {
+    const unified = q('link[data-raven-unified]');
+    const styles = qa('link[rel="stylesheet"]', document.head);
+    if (unified && styles.at(-1) !== unified) document.head.appendChild(unified);
+  };
+  const headObserver = new MutationObserver(pinUnifiedStyles);
+  headObserver.observe(document.head, { childList: true });
+  pinUnifiedStyles();
+  window.addEventListener('load', () => {
+    pinUnifiedStyles();
+    window.setTimeout(() => {
+      pinUnifiedStyles();
+      headObserver.disconnect();
+    }, 2500);
+  }, { once: true });
   if (isRoot) document.body.classList.add('raven-v5-home');
   if (isInvestigationsHub) document.body.classList.add('raven-v5-investigations');
   if (isNews) document.body.classList.add('raven-v5-news');

@@ -34,9 +34,9 @@ jobs:
             'investigations/rci-tabung-haji/people/index.html': ['Datuk Azmi Ahmad', 'Didakwa · belum sabit'],
             'investigations/rci-tabung-haji/timeline/index.html': ['10 Sep', 'Azmi didakwa', 'Reman hibah Abdul Azeez tamat'],
             'investigations/rci-tabung-haji/tracks/index.html': ['PDRM · hibah 2017 + AMLA'],
-            'investigations/index.html': ['4 individu didakwa setakat 10 Sep', 'azmi-ahmad-didakwa'],
+            'investigations/index.html': ['empat individu telah berdepan pertuduhan', 'azmi-ahmad-didakwa'],
             'news/index.html': ['news-2026-09-10-azmi-charged', 'news-2026-09-10-azeez-remand'],
-            'investigations/rci-tabung-haji/narratives/index.html': ['Setakat 10 September, empat individu telah didakwa'],
+            'investigations/rci-tabung-haji/narratives/index.html': ['empat individu telah berdepan pertuduhan yang dibacakan'],
             'assets/js/raven-section.js': ['Azmi Ahmad didakwa', "addSourceRow('s58'", "addSourceRow('s59'"],
           }
           for rel, needles in checks.items():

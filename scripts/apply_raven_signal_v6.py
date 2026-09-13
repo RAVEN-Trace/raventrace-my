@@ -5,6 +5,7 @@ ROOT = Path(__file__).resolve().parents[1]
 CSS = '<link rel="stylesheet" href="/raventrace-my/assets/css/raven-signal-v6.css?v=6.0.0" data-raven-signal-v6>'
 JS = '<script src="/raventrace-my/assets/js/raven-signal-v6.js?v=6.0.0" defer data-raven-signal-v6></script>'
 NARRATIVE_POLISH = '<link rel="stylesheet" href="/raventrace-my/assets/css/raven-signal-v6-polish.css?v=6.0.1" data-raven-signal-v6-polish>'
+UNIFIED = '<link rel="stylesheet" href="/raventrace-my/assets/css/raven-unified-v7.css?v=7.0.1" data-raven-unified>'
 SECTION_JS = '/raventrace-my/assets/js/raven-section.js?v=2.2.0'
 NARRATIVE_REL = Path('investigations/rci-tabung-haji/narratives/index.html')
 
@@ -32,19 +33,19 @@ def is_live_public(path: Path) -> bool:
 def normalize_narrative_rule(text: str) -> str:
     """Keep the Narrative closing principle inside the article/main, never after the footer."""
     pattern = re.compile(
-        r'<section class="case-section" id="narrative-rule">.*?</section>',
+        r'\s*<section class="case-section" id="narrative-rule">.*?</section>\s*',
         re.S,
     )
     match = pattern.search(text)
     if not match:
         return text
 
-    block = match.group(0)
-    text = text[:match.start()] + text[match.end():]
+    block = match.group(0).strip()
+    text = text[:match.start()].rstrip() + '\n' + text[match.end():].lstrip()
     anchor = '</article></main>'
     if anchor not in text:
         raise RuntimeError('Narrative closing main/article anchor missing')
-    text = text.replace(anchor, f'{block}\n{anchor}', 1)
+    text = text.replace(anchor, f'\n{block}\n{anchor}', 1)
     return text
 
 
@@ -69,6 +70,7 @@ for path in paths:
     text = re.sub(r'\s*<link[^>]+data-raven-signal-v6(?!-polish)[^>]*>\s*', '\n', text)
     text = re.sub(r'\s*<script[^>]+data-raven-signal-v6[^>]*></script>\s*', '\n', text)
     text = re.sub(r'\s*<link[^>]+data-raven-signal-v6-polish[^>]*>\s*', '\n', text)
+    text = re.sub(r'\s*<link[^>]+data-raven-unified[^>]*>\s*', '\n', text)
 
     # Standalone investigation pages use raven-section.js. Canonicalise its
     # cache key so the horizontal-only tab-centering fix reaches mobile users.
@@ -90,12 +92,17 @@ for path in paths:
     head_assets = CSS
     if is_narrative:
         head_assets += '\n' + NARRATIVE_POLISH
+    # Unified V7 is the final visual contract and must win the cascade after
+    # every legacy and Signal layer.
+    head_assets += '\n' + UNIFIED
     text = text.replace('</head>', f'{head_assets}\n</head>', 1)
     # Put Signal last so it can progressively enhance V5/Narrative V5.2.1 output.
     text = text.replace('</body>', f'{JS}\n</body>', 1)
 
     if text.count('data-raven-signal-v6') != (3 if is_narrative else 2):
         raise RuntimeError(f'Unexpected Signal tag count in {path.relative_to(ROOT)}')
+    if text.count('data-raven-unified') != 1:
+        raise RuntimeError(f'Unified V7 stylesheet must appear exactly once in {path.relative_to(ROOT)}')
 
     if is_narrative:
         if text.count('data-raven-signal-v6-polish') != 1:

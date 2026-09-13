@@ -27,8 +27,8 @@ jobs:
           from pathlib import Path
           t=Path('index.html').read_text(encoding='utf-8')
           required=[
-            'data-raven-home="1.0.1"',
-            'raven-home-v1.css?v=1.0.1',
+            'data-raven-home="1.0.2"',
+            'raven-home-v1.css?v=1.0.2',
             'Cerita boleh dibentuk. Bukti tak boleh dipaksa.',
             'class="front-hero home-active-case"',
             '14 pelaburan disyor diperiksa RCI',
@@ -69,13 +69,13 @@ jobs:
               for(let i=0;i<40;i++){
                 await page.goto(`${base}?homeqa=${Date.now()}-${Math.random()}`,{waitUntil:'domcontentloaded',timeout:45000});
                 const ready=await page.evaluate(()=>
-                  document.body?.dataset?.ravenHome==='1.0.1' &&
-                  !!document.querySelector('link[href*="raven-home-v1.css?v=1.0.1"]')
+                  document.body?.dataset?.ravenHome==='1.0.2' &&
+                  !!document.querySelector('link[href*="raven-home-v1.css?v=1.0.2"]')
                 );
                 if(ready) return;
                 await sleep(3000);
               }
-              throw new Error('Homepage V1.0.1 production marker not deployed');
+              throw new Error('Homepage V1.0.2 production marker not deployed');
             }
 
             for(const viewport of [{name:'mobile',width:390,height:844},{name:'desktop',width:1440,height:900}]){
@@ -109,6 +109,7 @@ jobs:
                   trustStrips:document.querySelectorAll('.home-trust-strip').length,
                   visibleSharebars:[...document.querySelectorAll('main .raven-sharebar')].filter(visible).length,
                   visibleCaseArt:[...document.querySelectorAll('.home-active-case .editorial-art')].filter(visible).length,
+                  visiblePolicyNotes:[...document.querySelectorAll('#latest .source-image-policy')].filter(visible).length,
                   newsroomBoards:document.querySelectorAll('.newsroom-board').length,
                   publicTools:document.querySelectorAll('.public-tools').length,
                   duplicateIds:[...new Set(dups)],
@@ -120,7 +121,7 @@ jobs:
                   azeezBoundary:/Abdul Azeez didakwa pada 9 September dan mengaku tidak bersalah\./.test(mainText),
                   heroTitle:document.querySelector('.v5-truth-intro h1')?.textContent?.trim(),
                   ogTitle:document.querySelector('meta[property="og:title"]')?.content || '',
-                  cssHome:!!document.querySelector('link[href*="raven-home-v1.css?v=1.0.1"]')
+                  cssHome:!!document.querySelector('link[href*="raven-home-v1.css?v=1.0.2"]')
                 };
               },viewport.name);
 
@@ -135,6 +136,7 @@ jobs:
               check(data.trustStrips===1,`${viewport.name}: trust strips ${data.trustStrips}`);
               check(data.visibleSharebars===0,`${viewport.name}: visible homepage sharebars ${data.visibleSharebars}`);
               check(data.visibleCaseArt===0,`${viewport.name}: duplicate active-case illustration still visible`);
+              check(data.visiblePolicyNotes===0,`${viewport.name}: visual-policy note should not appear on homepage`);
               check(data.newsroomBoards===0,`${viewport.name}: duplicate newsroom board remains`);
               check(data.publicTools===0,`${viewport.name}: old public-tools block remains`);
               check(data.duplicateIds.length===0,`${viewport.name}: duplicate IDs ${data.duplicateIds.join(', ')}`);
@@ -168,6 +170,6 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: raven-home-truth-navigator-v101-qa
+          name: raven-home-truth-navigator-v102-qa
           path: home-qa/
           retention-days: 14

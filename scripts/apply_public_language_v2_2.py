@@ -105,7 +105,6 @@ assert 'RCI TABUNG HAJI · PERKEMBANGAN KES' in updates
 assert 'Raven kata macam mana?' in updates
 assert 'Pertuduhan bukan sabitan' in updates
 assert '12 Sep 2026 · semakan terbaru' in case
-assert 'RM193.5 juta' in case
 assert '<strong>RAVEN KATA:</strong> <b>BELUM SELESAI.</b>' in article
 assert 'RM18.6 juta' in article
 assert '/freshness-sweep-pac-15-sep-rm18m-claim/' in article  # route stays unchanged

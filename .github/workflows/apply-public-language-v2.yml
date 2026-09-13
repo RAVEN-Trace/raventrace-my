@@ -1,4 +1,4 @@
-name: Apply Raven Public Language V2.2
+name: Apply Raven Public Language V2.3
 
 on:
   push:
@@ -6,6 +6,7 @@ on:
     paths:
       - 'scripts/apply_public_language_v2_1.py'
       - 'scripts/apply_public_language_v2_2.py'
+      - 'scripts/apply_public_language_v2_3.py'
       - 'assets/js/raven-narrative-v5.js'
       - '.github/workflows/apply-public-language-v2.yml'
   workflow_dispatch:
@@ -30,13 +31,14 @@ jobs:
       - name: Validate Narrative transformer syntax
         run: node --check assets/js/raven-narrative-v5.js
 
-      # V2 is the one-time bootstrap and is already canonical in main.
-      # Current rollouts start from the V2 baseline and apply idempotent deep-clean passes.
       - name: Apply Raven Public Language V2.1 deep-clean
         run: python scripts/apply_public_language_v2_1.py
 
       - name: Apply Raven Public Language V2.2 sitewide cleanup
         run: python scripts/apply_public_language_v2_2.py
+
+      - name: Apply Raven Public Language V2.3 micro-clean
+        run: python scripts/apply_public_language_v2_3.py
 
       - name: Editorial invariants
         run: |
@@ -52,7 +54,7 @@ jobs:
           method=Path('methodology/index.html').read_text(encoding='utf-8')
           about=Path('about/index.html').read_text(encoding='utf-8')
 
-          # Findings/status/routing must remain intact.
+          # Findings/status/routing remain invariant.
           for tok in ['RM193.5 juta','14 kertas siasatan','Pertuduhan bukan sabitan','naratif-azeez-ambil-rm193-5-juta','naratif-sakau-duit-umat-islam']:
               assert tok in main, tok
           for tok in ['RM18.6 juta','15 September 2026']:
@@ -61,42 +63,46 @@ jobs:
           assert 'rcitabunghaji' not in home
           assert '/freshness-sweep-pac-15-sep-rm18m-claim/' in article
 
-          # Public-language signatures.
-          for tok in ['Orang tengah cakap macam-macam. Yang mana cerita, yang mana bukti?','Cara Raven check','REKOD PERTUDUHAN TAK SOKONG DAKWAAN INI','KENYATAAN ITU SAH · KESIMPULAN BESARNYA BELUM TENTU','Raven kata macam mana?','Apa trick cerita ni?','Apa bukti yang boleh ubah keputusan Raven?']:
+          # Raven public-language signatures.
+          for tok in ['Orang tengah cakap macam-macam. Yang mana cerita, yang mana bukti?','Cara Raven check','REKOD PERTUDUHAN TAK SOKONG DAKWAAN INI','KENYATAAN ITU SAH · KESIMPULAN BESARNYA BELUM TENTU','Raven kata macam mana?','Apa trick cerita ni?','Apa bukti yang boleh ubah keputusan Raven?','Naratif utama — ketepikan cara cerita dibawa. Tengok apa yang tinggal.','Penerangan awam yang terikat pada bukti']:
               assert tok in main, tok
-          for tok in ['DIA TUNJUK YANG INI JE','EH, BENDA NI TAK SAMA','DIA BAGI KITA RASA DULU','VIRAL TAK BERMAKSUD SUARA SEMUA ORANG','Petunjuk media sosial','Betulkan cerita, bukan balas slogan dengan slogan']:
+          for tok in ['DIA TUNJUK YANG INI JE','EH, BENDA NI TAK SAMA','DIA BAGI KITA RASA DULU','VIRAL TAK BERMAKSUD SUARA SEMUA ORANG','Petunjuk media sosial','Betulkan cerita, bukan balas slogan dengan slogan','Siapa bawa cerita apa?','sampel dan cara ukur yang jelas']:
               assert tok in social, tok
           assert 'semakan terbaru: 12 Sep 20:44 MYT' in home
           assert 'SEMAKAN TERBARU' in news and 'REKOD TAK SEPADAN' in news
           assert 'RCI TABUNG HAJI · PERKEMBANGAN KES' in updates
           assert 'Raven kata macam mana?' in updates
+          assert 'Apa yang belum boleh disahkan?' in updates
           assert '12 Sep 2026 · semakan terbaru' in case
           assert '<strong>RAVEN KATA:</strong> <b>BELUM SELESAI.</b>' in article
           assert social.count('<span>05</span>') == 1
           assert 'Prinsip komunikasi' not in social
           assert 'Kenapa Raven mula dengan fakta, bukan dengan mengulang mitos?' in method
+          assert 'Cara Raven bekerja' in method
+          assert 'A · Sumber asal / bukti langsung' in method
           assert 'Cari yang benar.<br>Pecahkan cerita.' in about
+          assert 'Kebebasan editorial + penggunaan AI' in about
 
-          # Stale analyst-first public copy must be gone from key public pages.
-          narrative_forbidden=['Category collapse + number laundering','ANALISIS / INFERENCE · MOTIF TIDAK DIBUKTIKAN','policy position, bukan finding undang-undang','comparative selective-enforcement analysis','evidence pack undang-undang','deep-research baharu','counter-narrative','accounting treatment','selective targeting','signal yang diperhatikan','pemberat engagement']
-          for tok in narrative_forbidden:
-              assert tok not in main, f'main stale: {tok}'
-              assert tok not in social, f'social stale: {tok}'
+          # Stale analyst-first public copy must be absent from key surfaces.
+          forbidden=['Category collapse + number laundering','ANALISIS / INFERENCE · MOTIF TIDAK DIBUKTIKAN','policy position, bukan finding undang-undang','comparative selective-enforcement analysis','evidence pack undang-undang','deep-research baharu','counter-narrative','accounting treatment','selective targeting','signal yang diperhatikan','pemberat engagement','dokumen primer penuh','frame yang paling sedap didengar','metodologi sampel','pelaporan beratribusi','Generalisasi sentimen platform','Peta aktor','sintesis politik','menetapkan motif agensi','RAVEN-Trace Protocol','Independence & AI-assisted disclosure','DIPERTIKAIKAN · REKOD','Apa perlu ditahan?']
+          for label,text in [('main',main),('social',social),('home',home),('updates',updates),('method',method),('about',about)]:
+              for tok in forbidden:
+                  assert tok not in text, f'{label} stale: {tok}'
           for label,text in [('home',home),('news',news),('updates',updates),('article',article)]:
               for tok in ['freshness sweep','DISPUTED RECORD','Chronology mahkamah']:
                   assert tok not in text, f'{label} stale: {tok}'
-          print('PUBLIC LANGUAGE V2.2 EDITORIAL INVARIANTS: PASS')
+          print('PUBLIC LANGUAGE V2.3 EDITORIAL INVARIANTS: PASS')
           PY
           git diff --check
 
       - name: Commit public copy rollout
         run: |
           if git diff --quiet; then
-            echo 'No Public Language V2.2 changes required'
+            echo 'No Public Language V2.3 changes required'
             exit 0
           fi
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
           git add index.html news/index.html news/2026/09/12/freshness-sweep-pac-15-sep-rm18m-claim/index.html about/index.html methodology/index.html investigations/rci-tabung-haji/index.html investigations/rci-tabung-haji/updates/index.html investigations/rci-tabung-haji/narratives/index.html investigations/rci-tabung-haji/narratives/political-social-media/index.html
-          git commit -m 'content: activate Raven Public Language V2.2'
+          git commit -m 'content: activate Raven Public Language V2.3'
           git push

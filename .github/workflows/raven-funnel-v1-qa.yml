@@ -1,4 +1,4 @@
-name: Raven Reader Funnel V1 QA
+name: Raven Reader Funnel V1.0.1 QA
 
 on:
   push:
@@ -51,18 +51,31 @@ jobs:
           const check = (condition, message) => { if (!condition) errors.push(message); };
 
           async function openCurrent(page, path, hash = '') {
-            for (let attempt = 0; attempt < 20; attempt++) {
+            for (let attempt = 0; attempt < 24; attempt++) {
               const url = `${base}${path}?funnelqa=${Date.now()}-${Math.random()}${hash}`;
               await page.goto(url, { waitUntil: 'networkidle', timeout: 45000 });
               const ready = await page.evaluate(() =>
-                !!document.querySelector('link[href*="raven-funnel-v1.css?v=1.0.0"]') &&
-                !!document.querySelector('script[src*="raven-funnel-v1.js?v=1.0.0"]')
+                !!document.querySelector('link[href*="raven-funnel-v1.css?v=1.0.1"]') &&
+                !!document.querySelector('script[src*="raven-funnel-v1.js?v=1.0.1"]')
               );
               if (ready) return url;
               await sleep(3500);
             }
-            throw new Error(`production did not expose Funnel V1: ${path}`);
+            throw new Error(`production did not expose Funnel V1.0.1: ${path}`);
           }
+
+          const luminance = (rgb) => {
+            const nums = rgb.match(/[\d.]+/g)?.slice(0,3).map(Number) || [0,0,0];
+            const channels = nums.map((v) => {
+              const s = v / 255;
+              return s <= .03928 ? s / 12.92 : Math.pow((s + .055) / 1.055, 2.4);
+            });
+            return .2126 * channels[0] + .7152 * channels[1] + .0722 * channels[2];
+          };
+          const contrast = (fg, bg) => {
+            const a = luminance(fg), b = luminance(bg);
+            return (Math.max(a,b) + .05) / (Math.min(a,b) + .05);
+          };
 
           async function inspectNarrative(viewName, viewport) {
             const context = await browser.newContext({ viewport, deviceScaleFactor: 1 });
@@ -74,6 +87,9 @@ jobs:
               const cards = [...document.querySelectorAll('.narrative-v5-card[id^="naratif-"]')];
               const sourceRows = [...document.querySelectorAll('#sources .sources-grid > li[id^="source-"]')];
               const bridges = [...document.querySelectorAll('.raven-evidence-bridge')];
+              const firstBridge = bridges[0];
+              const firstPrimary = firstBridge?.querySelector('.raven-evidence-actions a:first-child');
+              const style = firstPrimary ? getComputedStyle(firstPrimary) : null;
               return {
                 width: document.documentElement.clientWidth,
                 scrollWidth: document.documentElement.scrollWidth,
@@ -95,7 +111,11 @@ jobs:
                 metricsApi: !!window.ravenReadMetrics && typeof window.ravenReadMetrics.getSession === 'function',
                 narrativeNavInstrumented: [...document.querySelectorAll('a[href*="/narratives/"]')].some((a) => a.dataset.ravenEvent === 'narrative_entry'),
                 firstCardId: cards[0]?.id || null,
-                firstCardTitle: cards[0]?.querySelector('h3')?.textContent?.trim() || null
+                firstCardTitle: cards[0]?.querySelector('h3')?.textContent?.trim() || null,
+                firstSourceTitle: firstBridge?.querySelector('.raven-evidence-source-title')?.textContent?.trim() || null,
+                firstSourceHref: firstPrimary?.href || null,
+                firstPrimaryColor: style?.color || null,
+                firstPrimaryBg: style?.backgroundColor || null
               };
             });
 
@@ -112,9 +132,17 @@ jobs:
             check(metrics.caseContinuation, `${viewName}: CASEFILE continuation wrong`);
             check(metrics.metricsApi, `${viewName}: Raven Read Metrics API missing`);
             check(metrics.narrativeNavInstrumented, `${viewName}: narrative entry instrumentation missing`);
+            check(/azeez/i.test(metrics.firstCardTitle || ''), `${viewName}: first narrative fixture changed unexpectedly`);
+            check(/didakwa|pertuduhan/i.test(metrics.firstSourceTitle || ''), `${viewName}: Azeez narrative mapped to wrong source: ${metrics.firstSourceTitle}`);
+            check(!/pas gesa|baitul maqdis/i.test(metrics.firstSourceTitle || ''), `${viewName}: PAS source leaked into Azeez evidence bridge`);
+            if (metrics.firstPrimaryColor && metrics.firstPrimaryBg) {
+              check(contrast(metrics.firstPrimaryColor, metrics.firstPrimaryBg) >= 4.5, `${viewName}: primary evidence CTA contrast below 4.5:1 (${contrast(metrics.firstPrimaryColor, metrics.firstPrimaryBg).toFixed(2)})`);
+            } else {
+              check(false, `${viewName}: primary evidence CTA computed colours unavailable`);
+            }
 
             await page.screenshot({ path: `funnel-qa/${viewName}-narrative.png`, fullPage: true });
-            report[viewName] = { url, ...metrics };
+            report[viewName] = { url, ...metrics, firstPrimaryContrast: metrics.firstPrimaryColor && metrics.firstPrimaryBg ? contrast(metrics.firstPrimaryColor, metrics.firstPrimaryBg) : null };
 
             if (metrics.firstCardId) {
               const deep = await context.newPage();

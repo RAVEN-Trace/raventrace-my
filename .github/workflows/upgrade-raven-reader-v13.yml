@@ -1,0 +1,48 @@
+name: Upgrade Raven Reader V1.3
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'scripts/upgrade_raven_reader_v13.py'
+      - '.github/workflows/upgrade-raven-reader-v13.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  upgrade:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Apply Raven Reader V1.3 migration
+        run: python scripts/upgrade_raven_reader_v13.py
+      - name: Validate migrated assets
+        run: |
+          node --check assets/js/raven-funnel-v1.js
+          python -m py_compile scripts/apply_raven_funnel_v1.py scripts/upgrade_raven_reader_v13.py
+          grep -q 'RAVEN READER V1.3' assets/js/raven-funnel-v1.js
+          grep -q 'RAVEN READER V1.3' assets/css/raven-funnel-v1.css
+          grep -q 'raven-funnel-v1.css?v=1.3.0' scripts/apply_raven_funnel_v1.py
+          grep -q "state:'attached'" .github/workflows/raven-funnel-v1-qa.yml
+          git diff --check
+      - name: Commit migration
+        run: |
+          if git diff --quiet; then
+            echo 'Reader V1.3 already applied'
+            exit 0
+          fi
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add assets/css/raven-funnel-v1.css assets/js/raven-funnel-v1.js scripts/apply_raven_funnel_v1.py .github/workflows/apply-raven-funnel-v1.yml .github/workflows/raven-funnel-v1-qa.yml
+          git commit -m 'ux: evolve Raven Reader to V1.3 scan architecture'
+          git push

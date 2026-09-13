@@ -1,0 +1,85 @@
+name: Raven Reader V1.3 Production QA
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'assets/css/raven-funnel-v1.css'
+      - 'assets/js/raven-funnel-v1.js'
+      - 'scripts/apply_raven_funnel_v1.py'
+      - '.github/workflows/raven-reader-v13-qa.yml'
+      - 'investigations/**'
+      - 'news/**'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  reader-v13:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Install Playwright
+        run: |
+          npm install --no-save playwright@1.55.0
+          npx playwright install --with-deps chromium
+      - name: Verify production Reader V1.3
+        run: |
+          node - <<'JS'
+          const { chromium } = require('playwright');
+          (async()=>{
+            const base='https://raven-trace.github.io/raventrace-my';
+            const sleep=(ms)=>new Promise(r=>setTimeout(r,ms));
+            const browser=await chromium.launch();
+            const errors=[]; const report={};
+            const check=(c,m)=>{ if(!c) errors.push(m); };
+            async function openCurrent(page,path){
+              for(let i=0;i<36;i++){
+                await page.goto(`${base}${path}?readerv13=${Date.now()}-${Math.random()}`,{waitUntil:'domcontentloaded',timeout:45000});
+                const ready=await page.evaluate(()=>!!document.querySelector('link[href*="raven-funnel-v1.css?v=1.3.0"]')&&!!document.querySelector('script[src*="raven-funnel-v1.js?v=1.3.0"]'));
+                if(ready) return;
+                await sleep(3000);
+              }
+              throw new Error(`Reader V1.3 not deployed: ${path}`);
+            }
+            async function inspect(name,path,selector,min=1){
+              const ctx=await browser.newContext({viewport:{width:390,height:844}}); const page=await ctx.newPage();
+              await openCurrent(page,path); await page.waitForTimeout(350);
+              const m=await page.evaluate((selector)=>({
+                count:document.querySelectorAll(selector).length,
+                collapsed:document.querySelectorAll(`${selector}.raven-reader-card-collapsed`).length,
+                sourceCollapsed:!!document.querySelector('.raven-reader-source-room.raven-reader-source-collapsed'),
+                overflow:document.documentElement.scrollWidth-document.documentElement.clientWidth,
+                height:document.documentElement.scrollHeight
+              }),selector);
+              check(m.count>=min,`${name}: expected >=${min} scan nodes, got ${m.count}`);
+              check(m.collapsed>=min,`${name}: compact nodes not collapsed on mobile (${m.collapsed}/${m.count})`);
+              check(m.overflow<=4,`${name}: horizontal overflow ${m.overflow}`);
+              report[name]=m;
+              await ctx.close();
+            }
+            await inspect('political','/investigations/rci-tabung-haji/narratives/political-social-media/','.raven-political-scan',5);
+            await inspect('newsroom','/news/','.raven-news-scan',5);
+            await inspect('people','/investigations/rci-tabung-haji/people/','.raven-person-scan',8);
+            await inspect('money','/investigations/rci-tabung-haji/money/','.raven-money-scan',6);
+            await inspect('timeline','/investigations/rci-tabung-haji/timeline/','.raven-timeline-scan',10);
+
+            const ctx=await browser.newContext({viewport:{width:390,height:844}}); const deep=await ctx.newPage();
+            await openCurrent(deep,'/investigations/rci-tabung-haji/timeline/');
+            await deep.goto(`${base}/investigations/rci-tabung-haji/timeline/?readerv13=${Date.now()}#timeline-b-01`,{waitUntil:'domcontentloaded'});
+            await deep.waitForTimeout(500);
+            const deepState=await deep.evaluate(()=>({hash:location.hash,collapsed:document.querySelector('#timeline-b-01')?.classList.contains('raven-reader-card-collapsed')}));
+            check(deepState.hash==='#timeline-b-01','timeline deep-link hash lost');
+            check(deepState.collapsed===false,'timeline deep-link did not reveal compact item');
+            await ctx.close();
+
+            await browser.close();
+            console.log(JSON.stringify({report,errors},null,2));
+            if(errors.length) throw new Error(errors.join('\n'));
+          })();
+          JS

@@ -4,7 +4,6 @@ import sys
 
 ROOT = Path(__file__).resolve().parents[1]
 HUB = '/raventrace-my/investigations/rci-tabung-haji/narratives/'
-SUB = '/raventrace-my/investigations/rci-tabung-haji/narratives/political-social-media/'
 PUBLIC_ROOTS = ('about', 'corrections', 'investigations', 'methodology', 'news', 'tips')
 NAV_RE = re.compile(r'<nav\b[^>]*class="[^"]*\bsite-nav\b[^"]*"[^>]*>(.*?)</nav>', re.S)
 
@@ -19,11 +18,11 @@ def public_html_files():
 
 
 def contextual(rel: str) -> bool:
-    # Every RCI evidence/data surface should deep-link to the narrative lens,
-    # except pages already inside the narrative section itself.
+    # RCI evidence/data surfaces and published RCI newsroom stories should expose
+    # Audit Naratif both globally and contextually. The V6 truth-navigation model
+    # no longer requires every surface to route through one political/social subpage.
     if rel.startswith('investigations/rci-tabung-haji/') and '/narratives/' not in rel:
         return True
-    # Every published RCI newsroom story gets the same direct narrative route.
     if rel.startswith('news/2026/') and rel.endswith('/index.html'):
         return True
     return False
@@ -42,10 +41,11 @@ for path in files:
         errors.append(f'{rel}: Audit Naratif hub missing from primary site-nav')
 
     if contextual(rel):
-        if SUB not in text:
-            errors.append(f'{rel}: political/social narrative deep-link missing')
-        if 'data-narrative-route' not in text:
-            errors.append(f'{rel}: contextual narrative route module missing')
+        # One link is the global navigation. A second occurrence must appear in
+        # the case/section navigation or contextual continuation route.
+        hub_links = text.count(f'href="{HUB}"')
+        if hub_links < 2:
+            errors.append(f'{rel}: contextual Audit Naratif route missing (found {hub_links} hub link)')
 
 if errors:
     print('NARRATIVE DISCOVERABILITY: FAIL')
@@ -54,4 +54,4 @@ if errors:
     sys.exit(1)
 
 print(f'NARRATIVE DISCOVERABILITY: PASS — {len(files)} public HTML pages expose Audit Naratif')
-print('Contextual RCI/news pages also expose the political + social media narrative subpage')
+print('Contextual RCI/news pages expose a second direct route to the Audit Naratif hub')

@@ -1,10 +1,11 @@
-name: Apply Raven Public Language V2
+name: Apply Raven Public Language V2.1
 
 on:
   push:
     branches: [main]
     paths:
       - 'scripts/apply_public_language_v2.py'
+      - 'scripts/apply_public_language_v2_1.py'
       - 'assets/js/raven-narrative-v5.js'
       - '.github/workflows/apply-public-language-v2.yml'
   workflow_dispatch:
@@ -32,6 +33,9 @@ jobs:
       - name: Apply Raven Public Language V2
         run: python scripts/apply_public_language_v2.py
 
+      - name: Apply Raven Public Language V2.1 deep-clean
+        run: python scripts/apply_public_language_v2_1.py
+
       - name: Editorial invariants
         run: |
           python - <<'PY'
@@ -48,10 +52,10 @@ jobs:
           assert 'https://raven-trace.github.io/raventrace-my/' in home
           assert 'rcitabunghaji' not in home
 
-          # Public-language V2 signatures.
-          for tok in ['Orang tengah cakap macam-macam. Yang mana cerita, yang mana bukti?','Cara Raven check','REKOD PERTUDUHAN TAK SOKONG DAKWAAN INI','KENYATAAN ITU SAH · KESIMPULAN BESARNYA BELUM TENTU']:
+          # Public-language signatures.
+          for tok in ['Orang tengah cakap macam-macam. Yang mana cerita, yang mana bukti?','Cara Raven check','REKOD PERTUDUHAN TAK SOKONG DAKWAAN INI','KENYATAAN ITU SAH · KESIMPULAN BESARNYA BELUM TENTU','Raven kata macam mana?','Apa trick cerita ni?','Apa bukti yang boleh ubah keputusan Raven?']:
               assert tok in main, tok
-          for tok in ['DIA TUNJUK YANG INI JE','EH, BENDA NI TAK SAMA','DIA BAGI KITA RASA DULU','VIRAL TAK BERMAKSUD SUARA SEMUA ORANG']:
+          for tok in ['DIA TUNJUK YANG INI JE','EH, BENDA NI TAK SAMA','DIA BAGI KITA RASA DULU','VIRAL TAK BERMAKSUD SUARA SEMUA ORANG','Petunjuk media sosial','Betulkan cerita, bukan balas slogan dengan slogan']:
               assert tok in social, tok
           assert social.count('<span>05</span>') == 1
           assert 'Prinsip komunikasi' not in social
@@ -59,22 +63,22 @@ jobs:
           assert 'Cari yang benar.<br>Pecahkan cerita.' in about
 
           # Stale analyst-first public copy must be gone from the two narrative pages.
-          forbidden=['Category collapse + number laundering','ANALISIS / INFERENCE · MOTIF TIDAK DIBUKTIKAN','policy position, bukan finding undang-undang','comparative selective-enforcement analysis','evidence pack undang-undang','deep-research baharu']
+          forbidden=['Category collapse + number laundering','ANALISIS / INFERENCE · MOTIF TIDAK DIBUKTIKAN','policy position, bukan finding undang-undang','comparative selective-enforcement analysis','evidence pack undang-undang','deep-research baharu','counter-narrative','accounting treatment','selective targeting','signal yang diperhatikan','pemberat engagement']
           for tok in forbidden:
               assert tok not in main, f'main stale: {tok}'
               assert tok not in social, f'social stale: {tok}'
-          print('PUBLIC LANGUAGE V2 EDITORIAL INVARIANTS: PASS')
+          print('PUBLIC LANGUAGE V2.1 EDITORIAL INVARIANTS: PASS')
           PY
           git diff --check
 
       - name: Commit public copy rollout
         run: |
           if git diff --quiet; then
-            echo 'No Public Language V2 changes required'
+            echo 'No Public Language V2.1 changes required'
             exit 0
           fi
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
           git add index.html about/index.html methodology/index.html investigations/rci-tabung-haji/narratives/index.html investigations/rci-tabung-haji/narratives/political-social-media/index.html
-          git commit -m 'content: activate Raven Public Language V2'
+          git commit -m 'content: activate Raven Public Language V2.1'
           git push

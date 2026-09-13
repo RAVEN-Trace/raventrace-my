@@ -113,8 +113,75 @@
   outline-offset: 5px;
 }
 
+/* ---------------------------------------------------------
+   CASEFILE mobile progressive disclosure.
+   Desktop remains a full dossier. Mobile becomes a sequence of
+   questions: briefing first, then readers explicitly open depth.
+   --------------------------------------------------------- */
+.raven-reader-toggle {
+  display: none;
+}
+
 /* Semantic instrumentation is intentionally invisible. */
 [data-raven-event] { --raven-event-wired: 1; }
+
+@media (max-width: 720px) {
+  body.raven-reader-v8 .case-content > .case-section.raven-reader-collapsible {
+    scroll-margin-top: 5.5rem;
+  }
+
+  body.raven-reader-v8 .case-content > .case-section.raven-reader-collapsible {
+    padding-block: 1.15rem;
+  }
+
+  body.raven-reader-v8 .case-content > .case-section.raven-reader-collapsed
+    > :not(.section-marker):not(h2):not(.raven-reader-toggle) {
+    display: none !important;
+  }
+
+  body.raven-reader-v8 .case-content > .case-section.raven-reader-collapsed h2 {
+    margin-bottom: 0;
+  }
+
+  .raven-reader-toggle {
+    display: flex;
+    width: 100%;
+    min-height: 48px;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-top: .9rem;
+    padding: .8rem .95rem;
+    border: 1px solid #9bc9d2;
+    border-radius: .55rem;
+    background: #eef8fa;
+    color: #0c3f4a;
+    font: 850 .88rem/1.2 var(--sans);
+    text-align: left;
+    cursor: pointer;
+  }
+
+  .raven-reader-toggle b {
+    flex: 0 0 auto;
+    font: 900 1.25rem/1 var(--sans);
+  }
+
+  .raven-reader-toggle:hover,
+  .raven-reader-toggle:focus-visible {
+    border-color: #087f98;
+    background: #e4f4f7;
+    color: #073f4c;
+  }
+
+  .raven-reader-toggle:focus-visible {
+    outline: 3px solid rgba(8,127,152,.24);
+    outline-offset: 2px;
+  }
+
+  .raven-reader-collapsible:not(.raven-reader-collapsed) > .raven-reader-toggle {
+    margin-bottom: 1rem;
+  }
+}
 
 @media (max-width: 620px) {
   .raven-evidence-actions { display: grid; grid-template-columns: 1fr; }
@@ -125,4 +192,5 @@
 
 @media (prefers-reduced-motion: reduce) {
   .raven-funnel-ready [id^="naratif-"] { scroll-behavior: auto; }
+  .raven-reader-collapsible { scroll-behavior: auto; }
 }

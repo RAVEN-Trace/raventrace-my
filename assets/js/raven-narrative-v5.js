@@ -24,7 +24,7 @@
     const t = status.toLowerCase();
     if (/inferens|inference|analisis|motif.*belum/.test(t)) return 'analysis';
     if (/tidak disokong|tak sokong|dipertikai|unsupported|bercanggah|terlalu mudah|belum sepadan/.test(t)) return 'unsupported';
-    if (/fakta|posisi.*direkodkan|tindakan.*berlaku|dasar/.test(t)) return 'fact';
+    if (/fakta|posisi.*direkodkan|pendirian.*direkodkan|tindakan.*berlaku|dasar/.test(t)) return 'fact';
     return 'claim';
   };
 
@@ -78,7 +78,7 @@
     const omittedP = labelled(card, ['Apa yang cerita ini tinggalkan', 'Apa yang cerita tak sebut', 'Konteks yang sering tertinggal']);
     const verdictP = labelled(card, ['Selepas framing dibuang', 'Raven kata macam mana', 'Verdict Raven']);
     const changeP = labelled(card, ['Bukti apa boleh mengubah penilaian', 'Apa bukti yang boleh ubah keputusan Raven', 'Apa yang boleh mengubah verdict']);
-    const confidenceP = labelled(card, ['Tahap keyakinan', 'Confidence']);
+    const confidenceP = labelled(card, ['Tahap keyakinan', 'Keyakinan Raven', 'Confidence']);
 
     const story = valueAfterLabel(storyP);
     const verified = valueAfterLabel(verifiedP);
@@ -187,7 +187,7 @@
     <div class="narrative-v5-overview-chips">
       <span>${counts.unsupported || 0} tak disokong / dipertikai</span>
       <span>${counts.analysis || 0} analisis</span>
-      <span>${counts.fact || 0} fakta / posisi</span>
+      <span>${counts.fact || 0} fakta / pendirian</span>
     </div>`;
 
   const filter = document.createElement('div');
@@ -198,7 +198,7 @@
     ['claim', 'Dakwaan'],
     ['unsupported', 'Tak disokong'],
     ['analysis', 'Analisis'],
-    ['fact', 'Fakta / posisi']
+    ['fact', 'Fakta / pendirian']
   ];
   options.forEach(([key, label], i) => {
     const button = document.createElement('button');

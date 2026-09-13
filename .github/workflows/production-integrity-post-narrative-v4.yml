@@ -21,9 +21,9 @@ jobs:
         run: |
           python - <<'PY'
           import os,time,urllib.request
-          b=os.environ['BASE']; h={'User-Agent':'RAVEN-Trace-Integrity/4.2','Cache-Control':'no-cache'}
+          b=os.environ['BASE']; h={'User-Agent':'RAVEN-Trace-Integrity/PublicLanguageV2.2','Cache-Control':'no-cache'}
           checks={
-            '/':['Status mahkamah: 11 Sep · freshness sweep: 12 Sep 20:44 MYT','empat individu telah berdepan pertuduhan','SPRM pula menyebut lima','prosiding PAC berkaitan TH dijadual 15 Sep.'],
+            '/':['Status mahkamah: 11 Sep · semakan terbaru: 12 Sep 20:44 MYT','empat individu telah berdepan pertuduhan','SPRM pula menyebut lima','prosiding PAC berkaitan TH dijadual 15 Sep.'],
             '/investigations/rci-tabung-haji/':['JEJAK / 12-01','PAC TH dijadual 15 September','SPRM menyebut lima'],
             '/investigations/rci-tabung-haji/people/':['Didakwa · belum sabit','Tindakan mahkamah dijadual · 14 Sep'],
             '/investigations/rci-tabung-haji/tracks/':['AMLA','BELUM DIKETAHUI'],
@@ -33,33 +33,33 @@ jobs:
               req=urllib.request.Request(b+path+'?qa='+str(time.time_ns()),headers=h)
               text=urllib.request.urlopen(req,timeout=20).read().decode('utf-8','replace')
               for x in tokens: assert x in text, f'{path}: missing {x}'
-              print(path,'PASS')
+          print('CORE PRODUCTION STATE: PASS')
           PY
-      - name: Verify Narrative Forensics V4.2 live state
+      - name: Verify Narrative Public Language V2.2 state
         run: |
           python - <<'PY'
           import os,time,urllib.request
-          b=os.environ['BASE']; h={'User-Agent':'RAVEN-Trace-Integrity/4.2','Cache-Control':'no-cache'}
+          b=os.environ['BASE']; h={'User-Agent':'RAVEN-Trace-Integrity/PublicLanguageV2.2','Cache-Control':'no-cache'}
           def get(path):
               req=urllib.request.Request(b+path+'?qa='+str(time.time_ns()),headers=h)
               return urllib.request.urlopen(req,timeout=20).read().decode('utf-8','replace')
           main=get('/investigations/rci-tabung-haji/narratives/')
           social=get('/investigations/rci-tabung-haji/narratives/political-social-media/')
-          req_main=['FORENSIK NARATIF','Apa yang cerita cuba buat kita percaya','Urutan Raven','AMARAN NARATIF','Selepas framing dibuang:','Peraturan Raven','Pertuduhan bukan sabitan']
-          req_social=['FORENSIK POLITIK + MEDIA SOSIAL','Buang parti, buang slogan, buang emosi','Forensik bahasa','CATEGORY COLLAPSE','EMOTIONAL PRIMING','MOTIVE INFLATION','REPETITION RISK','REPRESENTATIVENESS ERROR','Neutralise, bukan counter-spin','Prinsip komunikasi','signal yang diperhatikan']
+          req_main=['AUDIT NARATIF','Orang tengah cakap macam-macam','Cara Raven check','Raven kata macam mana?','Apa trick cerita ni?','Peraturan Raven','Pertuduhan bukan sabitan']
+          req_social=['AUDIT NARATIF POLITIK + MEDIA SOSIAL','Buang parti, buang slogan, buang emosi','Macam mana bahasa mainkan persepsi?','DIA TUNJUK YANG INI JE','EH, BENDA NI TAK SAMA','DIA BAGI KITA RASA DULU','KITA NAMPAK TINDAKAN. NIAT? BELUM TENTU','ULANG BANYAK KALI TAK JADIKAN IA BETUL','VIRAL TAK BERMAKSUD SUARA SEMUA ORANG','Betulkan cerita, bukan balas slogan dengan slogan','Petunjuk media sosial']
           for x in req_main: assert x in main, 'main missing '+x
           for x in req_social: assert x in social, 'social missing '+x
-          forbidden=['Siapa kata apa — dan apa rekod tunjuk?','Peta naratif politik & media sosial — RCI Tabung Haji','<b>Frame:</b>','<b>Gap:</b>','<b>Confidence:</b>','<b>Siapa menggunakan naratif ini?</b>','5 individu telah didakwa']
+          forbidden=['Category collapse + number laundering','SELECTION EFFECT','CATEGORY COLLAPSE','EMOTIONAL PRIMING','MOTIVE INFLATION','REPETITION RISK','REPRESENTATIVENESS ERROR','Neutralise, bukan counter-spin','counter-narrative','signal yang diperhatikan','5 individu telah didakwa']
           for x in forbidden:
               assert x not in main, 'main stale/unsafe '+x
               assert x not in social, 'social stale/unsafe '+x
-          print('NARRATIVE FORENSICS V4.2: PASS')
+          print('NARRATIVE PUBLIC LANGUAGE V2.2: PASS')
           PY
       - name: Verify factual runtime remains inert
         run: |
           python - <<'PY'
           import os,time,urllib.request
-          b=os.environ['BASE']; h={'User-Agent':'RAVEN-Trace-Integrity/4.2','Cache-Control':'no-cache'}
+          b=os.environ['BASE']; h={'User-Agent':'RAVEN-Trace-Integrity/PublicLanguageV2.2','Cache-Control':'no-cache'}
           for p in ['/assets/js/raven-evidence-ux.js?v=3.0.0','/assets/js/raven-publication-core.js?v=3.0.0','/assets/js/raven-narrative.js?v=2.0.0']:
               req=urllib.request.Request(b+p+'&qa='+str(time.time_ns()),headers=h)
               text=urllib.request.urlopen(req,timeout=20).read().decode('utf-8','replace')

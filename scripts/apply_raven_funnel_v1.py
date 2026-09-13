@@ -63,8 +63,11 @@ def add_narrative_ids(text: str) -> str:
 
     body = match.group(2)
     used: set[str] = set()
+    seen_cards = 0
 
     def repl_article(m: re.Match[str]) -> str:
+        nonlocal seen_cards
+        seen_cards += 1
         attrs = m.group(1) or ''
         title = m.group(2)
         existing = re.search(r'\bid="([^"]+)"', attrs)
@@ -75,8 +78,8 @@ def add_narrative_ids(text: str) -> str:
         return f'<article id="{slug}"{attrs}><h3>{title}</h3>'
 
     body2 = re.sub(r'<article([^>]*)><h3>(.*?)</h3>', repl_article, body, flags=re.S)
-    if body2 == body:
-        raise RuntimeError('No narrative article IDs were added or detected')
+    if seen_cards < 8:
+        raise RuntimeError(f'Expected >=8 narrative cards, got {seen_cards}')
     return text[:match.start(2)] + body2 + text[match.end(2):]
 
 
@@ -91,8 +94,11 @@ def add_source_ids(text: str) -> str:
 
     body = match.group(2)
     used: set[str] = set()
+    seen_sources = 0
 
     def repl_li(m: re.Match[str]) -> str:
+        nonlocal seen_sources
+        seen_sources += 1
         attrs = m.group(1) or ''
         inner = m.group(2)
         existing = re.search(r'\bid="([^"]+)"', attrs)
@@ -105,8 +111,8 @@ def add_source_ids(text: str) -> str:
         return f'<li id="{slug}"{attrs}>{inner}</li>'
 
     body2 = re.sub(r'<li([^>]*)>(.*?)</li>', repl_li, body, flags=re.S)
-    if body2 == body:
-        raise RuntimeError('No source IDs were added or detected')
+    if seen_sources < 5:
+        raise RuntimeError(f'Expected >=5 source rows, got {seen_sources}')
     return text[:match.start(2)] + body2 + text[match.end(2):]
 
 

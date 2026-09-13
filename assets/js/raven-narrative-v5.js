@@ -22,16 +22,15 @@
   };
   const classify = (status = '') => {
     const t = status.toLowerCase();
-    if (/inferens|inference|analisis/.test(t)) return 'analysis';
-    if (/tidak disokong|dipertikai|unsupported|bercanggah|terlalu mudah/.test(t)) return 'unsupported';
-    if (/fakta|posisi politik|dasar/.test(t)) return 'fact';
+    if (/inferens|inference|analisis|motif.*belum/.test(t)) return 'analysis';
+    if (/tidak disokong|tak sokong|dipertikai|unsupported|bercanggah|terlalu mudah|belum sepadan/.test(t)) return 'unsupported';
+    if (/fakta|posisi.*direkodkan|tindakan.*berlaku|dasar/.test(t)) return 'fact';
     return 'claim';
   };
 
   /*
-   * Do not key this UX to a headline such as “Lapan naratif utama”.
    * The evidence set is living content and can grow. Detect the narrative
-   * evidence structure itself so a new narrative cannot silently break UX.
+   * structure itself so a new narrative cannot silently break the reading UX.
    */
   const sections = qa('.case-section');
   const section = sections.find((candidate) => {
@@ -42,7 +41,7 @@
     const structured = candidateCards.filter((card) =>
       labelled(card, ['Cerita yang dibawa']) &&
       labelled(card, ['Apa yang boleh disahkan', 'Apa rekod tunjuk']) &&
-      labelled(card, ['Selepas framing dibuang', 'Verdict Raven'])
+      labelled(card, ['Selepas framing dibuang', 'Raven kata macam mana', 'Verdict Raven'])
     );
     return structured.length >= Math.min(2, candidateCards.length);
   });
@@ -51,7 +50,6 @@
   const grid = section.querySelector('.control-grid');
   if (!grid) return;
 
-  /* Remove V3.1 dashboard furniture. Evidence copy remains canonical. */
   qa('.narrative-status-strip, .narrative-filterbar, .narrative-board', section).forEach((el) => el.remove());
   grid.classList.add('narrative-v5-grid');
 
@@ -63,11 +61,6 @@
     card.classList.add('narrative-v5-card');
     card.id ||= `naratif-${String(index + 1).padStart(2, '0')}`;
 
-    /*
-     * V3.1 runs before this transformer on the legacy page. Recover any
-     * evidence paragraphs it may have moved into its disclosure, then remove
-     * all legacy helper UI so readers never get two “open details” controls.
-     */
     qa(':scope > details:not(.narrative-v5-details)', card).forEach((legacy) => {
       qa('.narrative-detail > p', legacy).forEach((p) => card.appendChild(p));
       legacy.remove();
@@ -81,10 +74,10 @@
 
     const storyP = labelled(card, ['Cerita yang dibawa']);
     const verifiedP = labelled(card, ['Apa yang boleh disahkan', 'Apa rekod tunjuk']);
-    const techniqueP = labelled(card, ['Teknik naratif', 'Teknik framing', 'Mekanisme naratif']);
-    const omittedP = labelled(card, ['Apa yang cerita ini tinggalkan', 'Konteks yang sering tertinggal']);
-    const verdictP = labelled(card, ['Selepas framing dibuang', 'Verdict Raven']);
-    const changeP = labelled(card, ['Bukti apa boleh mengubah penilaian', 'Apa yang boleh mengubah verdict']);
+    const techniqueP = labelled(card, ['Teknik naratif', 'Teknik framing', 'Mekanisme naratif', 'Apa trick cerita ni']);
+    const omittedP = labelled(card, ['Apa yang cerita ini tinggalkan', 'Apa yang cerita tak sebut', 'Konteks yang sering tertinggal']);
+    const verdictP = labelled(card, ['Selepas framing dibuang', 'Raven kata macam mana', 'Verdict Raven']);
+    const changeP = labelled(card, ['Bukti apa boleh mengubah penilaian', 'Apa bukti yang boleh ubah keputusan Raven', 'Apa yang boleh mengubah verdict']);
     const confidenceP = labelled(card, ['Tahap keyakinan', 'Confidence']);
 
     const story = valueAfterLabel(storyP);
@@ -97,7 +90,7 @@
     let confidence = valueAfterLabel(confidenceP);
     let lastVerified = '';
     if (confidence) {
-      const split = confidence.split(/·\s*Last verified:\s*/i);
+      const split = confidence.split(/·\s*(?:Last verified|Disemak terakhir):\s*/i);
       confidence = normalize(split[0] || '');
       lastVerified = normalize(split[1] || '');
     }
@@ -117,7 +110,7 @@
     if (verdict) {
       const box = document.createElement('div');
       box.className = 'narrative-v5-verdict';
-      box.innerHTML = '<span>Selepas framing dibuang</span><p></p>';
+      box.innerHTML = '<span>Raven kata macam mana?</span><p></p>';
       box.querySelector('p').textContent = verdict;
       card.append(box);
     }
@@ -132,9 +125,9 @@
 
     const detailItems = [
       ['Cerita yang dibawa', story],
-      ['Trick / teknik naratif', technique],
+      ['Apa trick cerita ni?', technique],
       ['Apa yang cerita tak sebut', omitted],
-      ['Apa yang boleh ubah penilaian', change]
+      ['Apa bukti yang boleh ubah keputusan?', change]
     ].filter(([, text]) => text);
 
     if (detailItems.length) {
@@ -174,7 +167,6 @@
       card.append(meta);
     }
 
-    /* Page already has a share action. Do not repeat social controls per card. */
     qa(':scope > .raven-sharebar', card).forEach((bar) => bar.remove());
   });
 

@@ -70,7 +70,7 @@ jobs:
             '/':['empat individu telah berdepan pertuduhan','SPRM pula menyebut lima'],
             '/investigations/rci-tabung-haji/':['RCI finding ≠ sabitan','Pertuduhan ≠ bersalah','Kerugian ≠ kecurian'],
             '/investigations/rci-tabung-haji/people/':['Pertuduhan bukan sabitan','Reman bukan pertuduhan'],
-            '/investigations/rci-tabung-haji/money/':['Kerugian besar tidak dengan sendiri membuktikan kecurian','Bukan automatic theft finding'],
+            '/investigations/rci-tabung-haji/money/':['Kerugian besar tidak dengan sendiri membuktikan kecurian','bukan automatic theft finding'],
             '/investigations/rci-tabung-haji/narratives/':['loss ≠ theft','application ≠ final forfeiture order','timing politik tidak membuktikan political direction'],
           }
           for path,tokens in checks.items():

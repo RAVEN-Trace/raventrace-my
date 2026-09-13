@@ -1,4 +1,4 @@
-# Full rendered verification refreshed for Public Language V2.3
+# Full rendered verification refreshed for Public Language V2.3 + Raven Reader V8
 name: Raven Unified V7 Visual QA
 
 on:
@@ -9,6 +9,7 @@ on:
       - 'assets/css/**'
       - 'assets/js/**'
       - 'scripts/raven-v7-qa.mjs'
+      - 'scripts/raven-reader-v8-qa.mjs'
       - '**/*.html'
   workflow_dispatch:
 
@@ -34,6 +35,10 @@ jobs:
       - name: Audit all public pages at mobile and desktop sizes
         run: |
           node scripts/raven-v7-qa.mjs
+
+      - name: Audit CASEFILE progressive disclosure
+        run: |
+          node scripts/raven-reader-v8-qa.mjs
 
       - name: Upload rendered QA evidence
         if: always()

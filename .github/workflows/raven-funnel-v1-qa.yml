@@ -1,0 +1,183 @@
+name: Raven Reader Funnel V1 QA
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/raven-funnel-v1-qa.yml'
+      - 'assets/css/raven-funnel-v1.css'
+      - 'assets/js/raven-funnel-v1.js'
+      - 'scripts/apply_raven_funnel_v1.py'
+      - 'index.html'
+      - 'investigations/**'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  rendered-funnel-qa:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Validate source syntax
+        run: |
+          node --check assets/js/raven-funnel-v1.js
+          python -m py_compile scripts/apply_raven_funnel_v1.py
+
+      - name: Install Playwright
+        run: |
+          npm install --no-save playwright@1.55.0
+          npx playwright install --with-deps chromium
+
+      - name: Verify production funnel
+        run: |
+          mkdir -p funnel-qa
+          cat > funnel-qa/verify.mjs <<'JS'
+          import { chromium } from 'playwright';
+          import fs from 'fs';
+
+          const base = 'https://raven-trace.github.io/raventrace-my';
+          const narrativePath = '/investigations/rci-tabung-haji/narratives/';
+          const browser = await chromium.launch();
+          const errors = [];
+          const report = {};
+          const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+          const check = (condition, message) => { if (!condition) errors.push(message); };
+
+          async function openCurrent(page, path, hash = '') {
+            for (let attempt = 0; attempt < 20; attempt++) {
+              const url = `${base}${path}?funnelqa=${Date.now()}-${Math.random()}${hash}`;
+              await page.goto(url, { waitUntil: 'networkidle', timeout: 45000 });
+              const ready = await page.evaluate(() =>
+                !!document.querySelector('link[href*="raven-funnel-v1.css?v=1.0.0"]') &&
+                !!document.querySelector('script[src*="raven-funnel-v1.js?v=1.0.0"]')
+              );
+              if (ready) return url;
+              await sleep(3500);
+            }
+            throw new Error(`production did not expose Funnel V1: ${path}`);
+          }
+
+          async function inspectNarrative(viewName, viewport) {
+            const context = await browser.newContext({ viewport, deviceScaleFactor: 1 });
+            const page = await context.newPage();
+            const url = await openCurrent(page, narrativePath);
+            await page.waitForSelector('.raven-evidence-bridge', { timeout: 15000 });
+
+            const metrics = await page.evaluate(() => {
+              const cards = [...document.querySelectorAll('.narrative-v5-card[id^="naratif-"]')];
+              const sourceRows = [...document.querySelectorAll('#sources .sources-grid > li[id^="source-"]')];
+              const bridges = [...document.querySelectorAll('.raven-evidence-bridge')];
+              return {
+                width: document.documentElement.clientWidth,
+                scrollWidth: document.documentElement.scrollWidth,
+                cards: cards.length,
+                uniqueCardIds: new Set(cards.map((c) => c.id)).size,
+                sourceRows: sourceRows.length,
+                uniqueSourceIds: new Set(sourceRows.map((s) => s.id)).size,
+                bridges: bridges.length,
+                copyControls: document.querySelectorAll('.raven-narrative-sharelink[data-raven-event="narrative_deeplink_copy"]').length,
+                bridgeTwoActions: bridges.every((b) => b.querySelectorAll('.raven-evidence-actions a').length === 2),
+                externalPrimary: bridges.every((b) => {
+                  const a = b.querySelector('.raven-evidence-actions a:first-child');
+                  return a && (a.dataset.ravenEvent === 'primary_source_click') && (/^https?:\/\//.test(a.href) || /#sources$/.test(a.href));
+                }),
+                caseContinuation: bridges.every((b) => {
+                  const a = b.querySelector('.raven-evidence-actions a:nth-child(2)');
+                  return a && a.dataset.ravenEvent === 'case_continuation' && a.href.includes('/investigations/rci-tabung-haji/#briefing');
+                }),
+                metricsApi: !!window.ravenReadMetrics && typeof window.ravenReadMetrics.getSession === 'function',
+                narrativeNavInstrumented: [...document.querySelectorAll('a[href*="/narratives/"]')].some((a) => a.dataset.ravenEvent === 'narrative_entry'),
+                firstCardId: cards[0]?.id || null,
+                firstCardTitle: cards[0]?.querySelector('h3')?.textContent?.trim() || null
+              };
+            });
+
+            check(metrics.width === viewport.width, `${viewName}: width ${metrics.width} != ${viewport.width}`);
+            check(metrics.scrollWidth <= metrics.width + 4, `${viewName}: horizontal overflow ${metrics.scrollWidth} > ${metrics.width}`);
+            check(metrics.cards >= 8, `${viewName}: only ${metrics.cards} narrative cards`);
+            check(metrics.cards === metrics.uniqueCardIds, `${viewName}: narrative IDs not unique`);
+            check(metrics.sourceRows >= 5, `${viewName}: only ${metrics.sourceRows} source rows`);
+            check(metrics.sourceRows === metrics.uniqueSourceIds, `${viewName}: source IDs not unique`);
+            check(metrics.bridges === metrics.cards, `${viewName}: evidence bridges ${metrics.bridges}/${metrics.cards}`);
+            check(metrics.copyControls === metrics.cards, `${viewName}: copy controls ${metrics.copyControls}/${metrics.cards}`);
+            check(metrics.bridgeTwoActions, `${viewName}: a bridge does not have exactly 2 next steps`);
+            check(metrics.externalPrimary, `${viewName}: primary evidence link is not exact/outbound or Source Room fallback`);
+            check(metrics.caseContinuation, `${viewName}: CASEFILE continuation wrong`);
+            check(metrics.metricsApi, `${viewName}: Raven Read Metrics API missing`);
+            check(metrics.narrativeNavInstrumented, `${viewName}: narrative entry instrumentation missing`);
+
+            await page.screenshot({ path: `funnel-qa/${viewName}-narrative.png`, fullPage: true });
+            report[viewName] = { url, ...metrics };
+
+            if (metrics.firstCardId) {
+              const deep = await context.newPage();
+              const deepUrl = await openCurrent(deep, narrativePath, `#${metrics.firstCardId}`);
+              await deep.waitForSelector(`#${metrics.firstCardId}`, { timeout: 15000 });
+              await deep.waitForTimeout(500);
+              const deepState = await deep.evaluate((id) => {
+                const target = document.getElementById(id);
+                const rect = target?.getBoundingClientRect();
+                return {
+                  hash: location.hash,
+                  top: rect?.top ?? null,
+                  hasBridge: !!target?.querySelector('.raven-evidence-bridge'),
+                  eventSeen: window.ravenReadMetrics?.events?.some((e) => e.name === 'narrative_deeplink_land' && e.narrative === id) || false
+                };
+              }, metrics.firstCardId);
+              check(deepState.hash === `#${metrics.firstCardId}`, `${viewName}: deep-link hash lost`);
+              check(deepState.top !== null && deepState.top >= -10 && deepState.top < Math.min(220, viewport.height * .35), `${viewName}: deep-link target not positioned near top (${deepState.top})`);
+              check(deepState.hasBridge, `${viewName}: deep-linked card missing evidence bridge`);
+              check(deepState.eventSeen, `${viewName}: deep-link landing metric hook missing`);
+              await deep.screenshot({ path: `funnel-qa/${viewName}-deeplink.png`, fullPage: false });
+              report[`${viewName}DeepLink`] = { deepUrl, ...deepState };
+              await deep.close();
+            }
+
+            await page.close();
+            await context.close();
+          }
+
+          async function inspectHome() {
+            const context = await browser.newContext({ viewport: { width: 390, height: 844 } });
+            const page = await context.newPage();
+            const url = await openCurrent(page, '/');
+            await page.waitForTimeout(300);
+            const state = await page.evaluate(() => ({
+              metricsApi: !!window.ravenReadMetrics,
+              narrativeEntry: [...document.querySelectorAll('a[href*="/narratives/"]')].some((a) => a.dataset.ravenEvent === 'narrative_entry'),
+              width: document.documentElement.clientWidth,
+              scrollWidth: document.documentElement.scrollWidth
+            }));
+            check(state.metricsApi, 'home: Raven Read Metrics missing');
+            check(state.narrativeEntry, 'home: Narrative link not instrumented');
+            check(state.scrollWidth <= state.width + 4, 'home: horizontal overflow');
+            report.home = { url, ...state };
+            await page.close();
+            await context.close();
+          }
+
+          await inspectHome();
+          await inspectNarrative('mobile', { width: 390, height: 844 });
+          await inspectNarrative('desktop', { width: 1440, height: 900 });
+          await browser.close();
+
+          fs.writeFileSync('funnel-qa/report.json', JSON.stringify({ report, errors }, null, 2));
+          console.log(JSON.stringify({ report, errors }, null, 2));
+          if (errors.length) throw new Error(`Funnel QA failed:\n${errors.join('\n')}`);
+          JS
+          node funnel-qa/verify.mjs
+
+      - name: Upload Funnel QA evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: raven-reader-funnel-v1-qa
+          path: funnel-qa/
+          retention-days: 14

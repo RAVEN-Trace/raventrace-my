@@ -1,0 +1,84 @@
+name: Apply RCI 13 Sep sitewide sync V2
+
+on:
+  push:
+    branches: [content/rci-th-13sep-sitewide-sync]
+    paths:
+      - 'scripts/apply_rci_13sep_sitewide_sync_v2.py'
+      - '.github/workflows/apply-rci-13sep-sitewide-sync-v2.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  apply:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+      - name: Generate 13 Sep sitewide evidence state
+        run: python scripts/apply_rci_13sep_sitewide_sync_v2.py
+      - name: QA 13 Sep content state
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          req = {
+            'index.html': ['SEMAKAN BUKTI · 13 SEP', 'home-2026-09-13-deep-verification', 'final forfeiture'],
+            'news/index.html': ['news-2026-09-13-deep-verification', '13 SEP 2026', 'Deep verification'],
+            'news/2026/09/13/deep-verification-rci-th/index.html': ['Lima benda yang Raven ubah', 'Empat court-confirmed', 'RM18m/RM18.6m', 'DISPUTED / UNKNOWN'],
+            'news/2026/09/12/freshness-sweep-pac-15-sep-rm18m-claim/index.html': ['EDITORIAL UPDATE · 13 SEP', 'FINAL FORFEITURE CLAIM TIDAK DISOKONG'],
+            'investigations/index.html': ['disemak hingga 13 September 2026', 'Baca deep verification'],
+            'investigations/rci-tabung-haji/governance/index.html': ['13 Sep · pemulihan kewangan ≠ akauntabiliti selesai'],
+            'investigations/rci-tabung-haji/investments/index.html': ['rm13b-category-lock', 'RM10.2b', 'RM2.6b'],
+            'investigations/rci-tabung-haji/tracks/index.html': ['track-count-lock', 'Empat individu mempunyai pertuduhan'],
+            'investigations/rci-tabung-haji/disputed-record/index.html': ['charged-count-dispute', '4 vs 5'],
+            'investigations/rci-tabung-haji/narratives/political-social-media/index.html': ['gov-response-13sep', 'DISPUTED / UNKNOWN'],
+            'corrections/index.html': ['revision-13sep', 'RM18m/RM18.6m', '19 Jul'],
+            'docs/PRODUCTION_INTEGRITY_LOCK.md': ['13 September 2026 deep verification', 'Court-confirmed charge-reading count', 'Political weaponisation'],
+          }
+          for rel, tokens in req.items():
+              p = Path(rel)
+              assert p.exists(), f'missing file: {rel}'
+              text = p.read_text(encoding='utf-8')
+              for token in tokens:
+                  assert token in text, f'{rel}: missing {token}'
+          # Guardrails against stale public cutoffs on the four standalone pages.
+          stale = {
+            'investigations/rci-tabung-haji/governance/index.html': 'Maklumat disemak hingga · 11 Sep 2026 · 23:37 MYT',
+            'investigations/rci-tabung-haji/investments/index.html': 'Maklumat disemak hingga · 10 Sep 2026 · lewat malam MYT',
+            'investigations/rci-tabung-haji/tracks/index.html': 'Maklumat disemak hingga · 11 Sep 2026 · 23:37 MYT',
+            'investigations/rci-tabung-haji/disputed-record/index.html': 'Maklumat disemak hingga · 10 Sep 2026 · lewat malam MYT',
+          }
+          for rel, token in stale.items():
+              assert token not in Path(rel).read_text(encoding='utf-8'), f'{rel}: stale cutoff remains'
+          print('13 SEP SITEWIDE QA: PASS')
+          PY
+      - name: Commit generated content
+        run: |
+          if git diff --quiet; then
+            echo 'No generated changes.'
+            exit 0
+          fi
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add \
+            index.html \
+            news/index.html \
+            news/2026/09/12/freshness-sweep-pac-15-sep-rm18m-claim/index.html \
+            news/2026/09/13/deep-verification-rci-th/index.html \
+            investigations/index.html \
+            investigations/rci-tabung-haji/governance/index.html \
+            investigations/rci-tabung-haji/investments/index.html \
+            investigations/rci-tabung-haji/tracks/index.html \
+            investigations/rci-tabung-haji/disputed-record/index.html \
+            investigations/rci-tabung-haji/narratives/political-social-media/index.html \
+            corrections/index.html \
+            docs/PRODUCTION_INTEGRITY_LOCK.md
+          git commit -m 'Sync Raven public surfaces to 13 Sep deep verification'
+          git push

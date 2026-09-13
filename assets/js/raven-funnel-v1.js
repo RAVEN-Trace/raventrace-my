@@ -129,12 +129,18 @@
       return patterns.some((p) => p.test(t));
     });
 
+    /*
+     * Rules are deliberately specific. Never use loose substrings such as
+     * /pas\b/ because Malay words like "selepas" contain the same letters.
+     * A wrong source bridge is worse than falling back to the official RCI.
+     */
     const rules = [
+      [/azeez|rm193\.5 juta/, [/tiga individu didakwa|pertuduhan/]],
       [/china|bukan islam/, [/aset dijual|bukan islam|china/]],
       [/madinah|tiada bukti kecurian|tiada salah laku/, [/madinah|audit tidak menemui bukti kecurian/]],
-      [/baitul maqdis|pas\b|rci baharu|2018/, [/pas gesa rci baharu|baitul maqdis/]],
-      [/zahid|pac\b/, [/zahid|pac/]],
-      [/amk|alat mencari keputusan politik/, [/amk|keputusan politik/]],
+      [/baitul maqdis|\bpas\b|rci baharu/, [/\bpas\b.*rci baharu|baitul maqdis/]],
+      [/zahid|\bpac\b/, [/zahid|\bpac\b/]],
+      [/\bamk\b|alat mencari keputusan politik/, [/\bamk\b|keputusan politik/]],
       [/14 kertas|18 individu|11 direman|kertas siasatan/, [/14 kertas siasatan|18 ditahan|11 direman/]],
       [/didakwa|pertuduhan|mahkamah/, [/tiga individu didakwa|pertuduhan/]]
     ];

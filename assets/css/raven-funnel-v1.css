@@ -1,0 +1,123 @@
+/* RAVEN READER FUNNEL V1
+   Threads/social intent -> Narrative -> Evidence -> CASEFILE.
+   One decision at a time; evidence before engagement theatre.
+*/
+
+.raven-funnel-ready [id^="naratif-"] {
+  scroll-margin-top: 7rem;
+}
+
+.raven-funnel-ready [id^="naratif-"]:target {
+  outline: 3px solid rgba(56,216,239,.42);
+  outline-offset: 7px;
+}
+
+.raven-narrative-sharelink {
+  display: inline-flex;
+  align-items: center;
+  gap: .4rem;
+  margin-top: .8rem;
+  appearance: none;
+  border: 0;
+  background: transparent;
+  color: #9edfeb;
+  padding: 0;
+  font: 800 .76rem/1.2 var(--sans);
+  cursor: pointer;
+  text-decoration: underline;
+  text-underline-offset: .22em;
+}
+.raven-narrative-sharelink:hover { color: #fff; }
+.raven-narrative-sharelink[data-copied="true"] { color: #b7f4cc; }
+
+.raven-evidence-bridge {
+  margin: 0;
+  padding: clamp(1.15rem, 3vw, 1.55rem) clamp(1.2rem, 3.5vw, 2.35rem);
+  border-top: 1px solid #c7dfe3;
+  border-bottom: 1px solid #d8d2c7;
+  background: #fbfaf6;
+}
+.raven-evidence-bridge-kicker {
+  margin: 0;
+  color: #087f98;
+  font: 900 .69rem/1.2 var(--sans);
+  letter-spacing: .08em;
+  text-transform: uppercase;
+}
+.raven-evidence-bridge h4 {
+  margin: .45rem 0 0;
+  color: #11171d;
+  font: 850 clamp(1.05rem, 2vw, 1.22rem)/1.25 var(--sans);
+  letter-spacing: -.02em;
+}
+.raven-evidence-source {
+  display: flex;
+  gap: .5rem;
+  align-items: flex-start;
+  margin-top: .65rem;
+  max-width: 72ch;
+  color: #596168;
+  font-size: .82rem;
+  line-height: 1.5;
+}
+.raven-evidence-source-grade {
+  flex: 0 0 auto;
+  display: inline-grid;
+  place-items: center;
+  min-width: 1.65rem;
+  min-height: 1.65rem;
+  border: 1px solid #9bc9d2;
+  border-radius: 999px;
+  background: #e8f5f7;
+  color: #075d70;
+  font: 900 .67rem/1 var(--sans);
+}
+.raven-evidence-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: .55rem;
+  margin-top: .9rem;
+}
+.raven-evidence-actions a {
+  display: inline-flex;
+  min-height: 42px;
+  align-items: center;
+  justify-content: center;
+  padding: .62rem .82rem;
+  border: 1px solid #202a32;
+  border-radius: 999px;
+  color: #10161c;
+  background: transparent;
+  font: 850 .8rem/1.2 var(--sans);
+  text-decoration: none;
+}
+.raven-evidence-actions a:first-child {
+  border-color: #087f98;
+  background: #087f98;
+  color: #fff;
+}
+.raven-evidence-actions a:hover { border-color: #087f98; color: #087f98; }
+.raven-evidence-actions a:first-child:hover { background: #075f73; color: #fff; }
+
+.raven-source-target {
+  scroll-margin-top: 7rem;
+}
+.raven-source-target:target {
+  background: #fff8e8;
+  outline: 2px solid rgba(164,101,0,.35);
+  outline-offset: 5px;
+}
+
+/* Semantic instrumentation is intentionally invisible. */
+[data-raven-event] { --raven-event-wired: 1; }
+
+@media (max-width: 620px) {
+  .raven-evidence-actions { display: grid; grid-template-columns: 1fr; }
+  .raven-evidence-actions a { width: 100%; }
+  .raven-funnel-ready [id^="naratif-"],
+  .raven-source-target { scroll-margin-top: 5.5rem; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .raven-funnel-ready [id^="naratif-"] { scroll-behavior: auto; }
+}

@@ -19,7 +19,7 @@
 
   if (!q('script[data-raven-reader-v13]')) {
     const reader = document.createElement('script');
-    reader.src = '/raventrace-my/assets/js/raven-reader-v13.js?v=1.3.0';
+    reader.src = '/raventrace-my/assets/js/raven-reader-v13.js?v=1.3.1';
     reader.defer = true;
     reader.dataset.ravenReaderV13 = 'true';
     document.head.appendChild(reader);

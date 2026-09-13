@@ -18,7 +18,7 @@
   if (!q('link[data-raven-reader-v13]')) {
     const css = document.createElement('link');
     css.rel = 'stylesheet';
-    css.href = `${ROOT}assets/css/raven-reader-v13.css?v=1.3.0`;
+    css.href = `${ROOT}assets/css/raven-reader-v13.css?v=1.3.1`;
     css.dataset.ravenReaderV13 = '';
     document.head.append(css);
   }
@@ -92,6 +92,13 @@
     document.body.classList.add('raven-reader-political');
     const article = q('.section-content');
     const sections = qa(':scope > .case-section', article || document);
+
+    const sourceSection = sections.find((section) => /sumber silang/i.test(q('.section-marker p', section)?.textContent || ''));
+    if (sourceSection) {
+      sourceSection.id ||= 'sources';
+      sourceSection.classList.add('source-room');
+    }
+
     if (article && !q('.raven-question-rail', article)) {
       const rail = document.createElement('nav');
       rail.className = 'raven-question-rail';
@@ -110,6 +117,7 @@
       });
       article.prepend(rail);
     }
+
     [['#matrix .control-grid > article','political-position'],['#language-forensics .control-grid > article','narrative-technique']].forEach(([selector,prefix]) => {
       qa(selector).forEach((card,index) => {
         card.id ||= `${prefix}-${String(index + 1).padStart(2, '0')}`;
@@ -117,6 +125,14 @@
         const status = qa(':scope > p', card).find((p) => q('.status', p));
         wireCompact(card,{kind:'political',keep:[title,status],label:'Apa bukti / konteks?',closeLabel:'Tutup bukti / konteks'});
       });
+    });
+
+    qa('.control-grid > article').forEach((card,index) => {
+      if (card.dataset.ravenCompactReady === 'true') return;
+      card.id ||= `political-proof-${String(index + 1).padStart(2, '0')}`;
+      const title = q(':scope > h3', card);
+      const status = qa(':scope > p', card).find((p) => q('.status', p));
+      wireCompact(card,{kind:'political-proof',keep:[title,status],label:'Apa perlu dibuktikan?',closeLabel:'Tutup butiran bukti'});
     });
   };
 

@@ -10,6 +10,25 @@
   const isNarrative = location.pathname.startsWith(`${RCI}narratives/`);
   const isCasefileRoot = location.pathname === RCI || location.pathname === `${RCI}index.html`;
 
+  /* Reader V1.3.1 bootstrap. Funnel is statically present on the public pages,
+     so this is the deterministic loader. Section/analytics loaders remain
+     harmless fallbacks and are de-duplicated by data-raven-reader-v13. */
+  const readerRoutes = [
+    `${ROOT}news/`,
+    `${RCI}people/`,
+    `${RCI}money/`,
+    `${RCI}timeline/`,
+    `${RCI}narratives/political-social-media/`
+  ];
+  const readerPath = location.pathname.endsWith('/index.html') ? location.pathname.replace(/index\.html$/, '') : location.pathname;
+  if (readerRoutes.includes(readerPath) && !q('script[data-raven-reader-v13]')) {
+    const reader = document.createElement('script');
+    reader.src = `${ROOT}assets/js/raven-reader-v13.js?v=1.3.1`;
+    reader.async = false;
+    reader.dataset.ravenReaderV13 = 'true';
+    document.head.appendChild(reader);
+  }
+
   const emit = (name, detail = {}) => {
     const payload = {
       name,

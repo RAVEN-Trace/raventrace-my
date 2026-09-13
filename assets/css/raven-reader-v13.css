@@ -1,10 +1,10 @@
-/* RAVEN READER V1.3 — section-page scan architecture */
+/* RAVEN READER V1.3.1 — section-page scan architecture */
 .raven-reader-card-toggle,.raven-source-room-toggle{display:none}
 .raven-question-rail,.raven-news-desk,.raven-status-first-note,.raven-money-distinction,.raven-timeline-phase-nav{margin-block:1.2rem 1.7rem}
 .raven-question-rail{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:.65rem;padding:1rem;border:1px solid #d7d2c8;background:#f8f6f0}
 .raven-question-rail>p{grid-column:1/-1;margin:0 0 .15rem;color:#424a50}
 .raven-question-rail>a{display:grid;grid-template-columns:auto 1fr;gap:.7rem;align-items:start;min-height:54px;padding:.75rem;border-top:1px solid #c9c5bc;color:#11171d;text-decoration:none}
-.raven-question-rail>a span,.raven-timeline-phase-nav a span{color:#087f98;font:900 .7rem/1.2 var(--sans);letter-spacing:.08em}
+.raven-question-rail>a span,.raven-timeline-phase-nav a span{color:#006f84;font:900 .7rem/1.2 var(--sans);letter-spacing:.08em}
 .raven-question-rail>a strong{font:800 .9rem/1.3 var(--sans)}
 .raven-news-desk{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));border-block:1px solid #c9c5bc}
 .raven-news-desk>div{padding:1rem;border-right:1px solid #d8d2c7}.raven-news-desk>div:last-child{border-right:0}

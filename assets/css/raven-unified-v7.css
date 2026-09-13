@@ -1,4 +1,4 @@
-/* RAVEN-Trace Unified Design System V7.0.3
+/* RAVEN-Trace Unified Design System V7.0.4
    Final presentation and accessibility layer shared by every public page.
    Colour is semantic: teal=evidence/action, oxblood=disputed, amber=caution. */
 
@@ -440,7 +440,7 @@ body.raven-v5 .section-links a {
 
 body.raven-v5 main :where(button, summary, .v5-quicklinks a, .raven-question-grid a,
   .raven-continue-list > a, .reading-nav a) {
-  min-height: 40px;
+  min-height: 40px !important;
 }
 
 body.raven-v5 .section-links a:hover {
@@ -496,6 +496,14 @@ body.raven-v5 .signal-strip .signal-grid > span {
   color: var(--rv7-cyan) !important;
 }
 
+body.raven-v5 .raven-question-rail.desk .raven-question-head > span {
+  color: var(--rv7-teal-deep) !important;
+}
+
+body.raven-v5 .raven-case-nav-toggle {
+  min-height: 40px !important;
+}
+
 body.raven-v5 .raven-question-rail.case .raven-question-grid :where(small, span),
 body.raven-v5 :where(.evidence-band, .measure) .evidence-row > div > span {
   color: var(--rv7-on-dark-muted) !important;
@@ -506,8 +514,8 @@ body.raven-v5 .signal-map-node > span {
 }
 
 body.raven-v5 .investigation-meta-grid > div > b,
-body.raven-v5.case-page .confidence-grid > article > span,
-body.raven-v5.case-page .history-line article > time {
+body.raven-v5 .confidence-grid > article > span,
+body.raven-v5 .history-line article > time {
   color: var(--rv7-teal-deep) !important;
 }
 

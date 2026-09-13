@@ -2,7 +2,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 CSS = '<link rel="stylesheet" href="/raventrace-my/assets/css/raven-v5.css?v=5.0.0" data-raven-v5-static>'
-UNIFIED_CSS = '<link rel="stylesheet" href="/raventrace-my/assets/css/raven-unified-v7.css?v=7.0.3" data-raven-unified>'
+UNIFIED_CSS = '<link rel="stylesheet" href="/raventrace-my/assets/css/raven-unified-v7.css?v=7.0.4" data-raven-unified>'
 JS = '<script src="/raventrace-my/assets/js/raven-v5.js?v=5.1.2" defer data-raven-v5-static></script>'
 
 paths = []

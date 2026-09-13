@@ -30,7 +30,7 @@ jobs:
           base=os.environ['BASE']
           headers={'User-Agent':'RAVEN-Trace-Live-QA/1.4','Cache-Control':'no-cache'}
           checks={
-            '/':['freshness sweep: 12 Sep 20:44 MYT','empat individu telah berdepan pertuduhan','SPRM pula menyebut lima','prosiding PAC berkaitan TH dijadual 15 Sep.','raven-v5.css?v=5.0.0','raven-v5.js?v=5.1.2','raven-unified-v7.css?v=7.0.3'],
+            '/':['freshness sweep: 12 Sep 20:44 MYT','empat individu telah berdepan pertuduhan','SPRM pula menyebut lima','prosiding PAC berkaitan TH dijadual 15 Sep.','raven-v5.css?v=5.0.0','raven-v5.js?v=5.1.2','raven-unified-v7.css?v=7.0.4'],
             '/news/':['freshness sweep 12 Sep 2026','prosiding PAC berkaitan TH dijadual 15 September.'],
             '/investigations/rci-tabung-haji/updates/':['JEJAK / 12-01','15 Sep','RM18.6 juta'],
             '/investigations/rci-tabung-haji/sources/':['id="s65"','id="s66"','parlimen.gov.my/pac/senarai-mesyuarat'],
@@ -96,12 +96,12 @@ jobs:
           checks={
             '/news/':['12 SEP 2026','prosiding PAC berkaitan TH dijadual 15 September.'],
             '/news/2026/09/12/freshness-sweep-pac-15-sep-rm18m-claim/':['Status undang-undang belum berubah','BELUM DISELESAIKAN / HOLD','15 September 2026','14 Sep','24 Sep','https://www.bernama.com/en/news.php?id=2605582'],
-            '/investigations/rci-tabung-haji/':['JEJAK / 12-01','PAC TH dijadual 15 September','SPRM menyebut lima','raven-v5.css?v=5.0.0','raven-v5.js?v=5.1.2','raven-unified-v7.css?v=7.0.3'],
+            '/investigations/rci-tabung-haji/':['JEJAK / 12-01','PAC TH dijadual 15 September','SPRM menyebut lima','raven-v5.css?v=5.0.0','raven-v5.js?v=5.1.2','raven-unified-v7.css?v=7.0.4'],
             '/investigations/rci-tabung-haji/people/':['Didakwa · belum sabit','Tindakan mahkamah dijadual · 14 Sep'],
             '/investigations/rci-tabung-haji/timeline/':['15 Sep</time><h3>PAC Parlimen','14 Sep','empat','lima'],
             '/investigations/rci-tabung-haji/tracks/':['AMLA','BELUM DIKETAHUI'],
             '/investigations/rci-tabung-haji/governance/':['Seruan Istito’ah','RM15,000','Tabung Haji · kenyataan rasmi · 11 Sep'],
-            '/investigations/rci-tabung-haji/narratives/':['SPRM','lima','Pertuduhan bukan sabitan','Naratif politik + media sosial','political-social-media/','raven-v5.css?v=5.0.0','raven-v5.js?v=5.1.2','raven-unified-v7.css?v=7.0.3'],
+            '/investigations/rci-tabung-haji/narratives/':['SPRM','lima','Pertuduhan bukan sabitan','Naratif politik + media sosial','political-social-media/','raven-v5.css?v=5.0.0','raven-v5.js?v=5.1.2','raven-unified-v7.css?v=7.0.4'],
             '/investigations/rci-tabung-haji/narratives/political-social-media/':['Kerajaan / PH','UMNO','PAS','BERSATU','AMK / sayap PH','Signal media sosial','signal naratif yang diperhatikan'],
             '/investigations/rci-tabung-haji/sources/':['2605735','2605582','pr11092026_BM','id="s65"','id="s66"'],
             '/investigations/rci-tabung-haji/updates/':['JEJAK / 12-01','15 Sep:','RM18.6 juta','AMLA'],

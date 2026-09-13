@@ -1,4 +1,4 @@
-name: Apply Raven Reader Funnel V1.2.0
+name: Apply Raven Reader Funnel V1.2.1
 
 on:
   push:
@@ -40,15 +40,15 @@ jobs:
           live=list(dict.fromkeys(live)); assert live
           for p in live:
               t=p.read_text(encoding='utf-8'); assert t.count(marker)==2,p
-              assert '/assets/css/raven-funnel-v1.css?v=1.2.0' in t,p
-              assert '/assets/js/raven-funnel-v1.js?v=1.2.0' in t,p
+              assert '/assets/css/raven-funnel-v1.css?v=1.2.1' in t,p
+              assert '/assets/js/raven-funnel-v1.js?v=1.2.1' in t,p
           n=Path('investigations/rci-tabung-haji/narratives/index.html').read_text(encoding='utf-8')
           cards=re.findall(r'<article id="(naratif-[^"]+)"',n); sources=re.findall(r'<li id="(source-[^"]+)"',n)
           assert len(cards)>=8 and len(cards)==len(set(cards)),cards
           assert len(sources)>=5 and len(sources)==len(set(sources)),sources
           assert not Path('rcitabunghaji').exists()
           for p in root.rglob('research/**/index.html'): assert marker not in p.read_text(encoding='utf-8'),p
-          print(f'Raven Reader Funnel V1.2.0 static validation PASS — {len(live)} pages, {len(cards)} narratives, {len(sources)} sources')
+          print(f'Raven Reader Funnel V1.2.1 static validation PASS — {len(live)} pages, {len(cards)} narratives, {len(sources)} sources')
           PY
           git diff --check
       - name: Commit rollout
@@ -57,5 +57,5 @@ jobs:
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
           git add index.html about corrections investigations methodology news tips
-          git commit -m 'ux: activate Raven Reader Funnel V1.2.0 across public pages'
+          git commit -m 'chore: cache-bust Raven Reader Funnel V1.2.1 across public pages'
           git push

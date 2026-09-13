@@ -4,8 +4,8 @@ import re
 import unicodedata
 
 ROOT = Path(__file__).resolve().parents[1]
-CSS = '<link rel="stylesheet" href="/raventrace-my/assets/css/raven-funnel-v1.css?v=1.2.0" data-raven-funnel-v1>'
-JS = '<script src="/raventrace-my/assets/js/raven-funnel-v1.js?v=1.2.0" defer data-raven-funnel-v1></script>'
+CSS = '<link rel="stylesheet" href="/raventrace-my/assets/css/raven-funnel-v1.css?v=1.2.1" data-raven-funnel-v1>'
+JS = '<script src="/raventrace-my/assets/js/raven-funnel-v1.js?v=1.2.1" defer data-raven-funnel-v1></script>'
 NARRATIVE = ROOT / 'investigations' / 'rci-tabung-haji' / 'narratives' / 'index.html'
 
 PUBLIC_ROOTS = [ROOT / 'index.html',ROOT / 'about',ROOT / 'corrections',ROOT / 'investigations',ROOT / 'methodology',ROOT / 'news',ROOT / 'tips']
@@ -79,6 +79,6 @@ narrative=NARRATIVE.read_text(encoding='utf-8')
 ids=re.findall(r'<article id="(naratif-[^"]+)"',narrative); source_ids=re.findall(r'<li id="(source-[^"]+)"',narrative)
 if len(ids)<8 or len(ids)!=len(set(ids)): raise RuntimeError(f'Expected >=8 unique narrative deep links, got {len(ids)}')
 if len(source_ids)<5 or len(source_ids)!=len(set(source_ids)): raise RuntimeError(f'Expected >=5 unique source deep links, got {len(source_ids)}')
-print(f'RAVEN FUNNEL V1.2.0: {len(changed)} public page(s) changed')
+print(f'RAVEN FUNNEL V1.2.1: {len(changed)} public page(s) changed')
 print(f'Narrative deep links: {len(ids)}'); [print(f'  #{x}') for x in ids]
 print(f'Source anchors: {len(source_ids)}')

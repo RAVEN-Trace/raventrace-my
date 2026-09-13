@@ -4,7 +4,6 @@ on:
   push:
     branches: [main]
     paths:
-      - 'scripts/apply_public_language_v2.py'
       - 'scripts/apply_public_language_v2_1.py'
       - 'scripts/apply_public_language_v2_2.py'
       - 'assets/js/raven-narrative-v5.js'
@@ -31,9 +30,8 @@ jobs:
       - name: Validate Narrative transformer syntax
         run: node --check assets/js/raven-narrative-v5.js
 
-      - name: Apply Raven Public Language V2
-        run: python scripts/apply_public_language_v2.py
-
+      # V2 is the one-time bootstrap and is already canonical in main.
+      # Current rollouts start from the V2 baseline and apply idempotent deep-clean passes.
       - name: Apply Raven Public Language V2.1 deep-clean
         run: python scripts/apply_public_language_v2_1.py
 

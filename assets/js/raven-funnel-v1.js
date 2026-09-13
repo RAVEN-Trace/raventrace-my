@@ -8,6 +8,7 @@
   const ROOT = '/raventrace-my/';
   const RCI = `${ROOT}investigations/rci-tabung-haji/`;
   const isNarrative = location.pathname.startsWith(`${RCI}narratives/`);
+  const isCasefileRoot = location.pathname === RCI || location.pathname === `${RCI}index.html`;
 
   const emit = (name, detail = {}) => {
     const payload = {
@@ -252,10 +253,85 @@
     addEventListener('hashchange', focusHash);
   };
 
+  /* ---------------------------------------------------------
+     Mobile-first CASEFILE progressive disclosure.
+     The canonical HTML stays fully present for SEO, source audit and no-JS.
+     On narrow screens, only the briefing is expanded by default. Readers
+     choose the next question instead of scrolling through a 50k+ px wall.
+     --------------------------------------------------------- */
+  const enhanceCasefileProgressiveDisclosure = () => {
+    if (!isCasefileRoot) return;
+    const content = q('#case-content') || q('.case-content');
+    if (!content) return;
+
+    document.body.classList.add('raven-reader-v8');
+    const controllers = new Map();
+    const sections = qa(':scope > .case-section[id]', content);
+
+    sections.forEach((section) => {
+      if (section.id === 'briefing' || section.dataset.ravenReaderReady === 'true') return;
+      const heading = q(':scope > h2', section);
+      if (!heading) return;
+
+      section.dataset.ravenReaderReady = 'true';
+      section.classList.add('raven-reader-collapsible', 'raven-reader-collapsed');
+
+      const button = document.createElement('button');
+      button.type = 'button';
+      button.className = 'raven-reader-toggle';
+      button.dataset.ravenEvent = 'case_section_toggle';
+      button.setAttribute('aria-expanded', 'false');
+      button.innerHTML = '<span>Buka bahagian</span><b aria-hidden="true">+</b>';
+
+      const title = (heading.textContent || '').replace(/\s+/g, ' ').trim();
+      const setOpen = (open, { scroll = false } = {}) => {
+        section.classList.toggle('raven-reader-collapsed', !open);
+        button.setAttribute('aria-expanded', open ? 'true' : 'false');
+        button.querySelector('span').textContent = open ? 'Tutup bahagian' : 'Buka bahagian';
+        button.querySelector('b').textContent = open ? '−' : '+';
+        button.setAttribute('aria-label', `${open ? 'Tutup' : 'Buka'} bahagian ${title}`);
+        if (scroll) requestAnimationFrame(() => section.scrollIntoView({ block: 'start', behavior: 'smooth' }));
+        emit('case_section_state', { section: section.id, open });
+      };
+      setOpen(false);
+      button.addEventListener('click', () => {
+        const open = button.getAttribute('aria-expanded') !== 'true';
+        setOpen(open, { scroll: !open });
+      });
+      heading.insertAdjacentElement('afterend', button);
+      controllers.set(section, setOpen);
+    });
+
+    const revealHashTarget = ({ scroll = false } = {}) => {
+      if (!location.hash) return;
+      const id = decodeURIComponent(location.hash.slice(1));
+      const target = document.getElementById(id);
+      const section = target?.closest?.('.raven-reader-collapsible');
+      const control = controllers.get(section);
+      if (control) control(true);
+      if (scroll && target) requestAnimationFrame(() => target.scrollIntoView({ block: 'start', behavior: 'smooth' }));
+    };
+
+    document.addEventListener('click', (event) => {
+      const link = event.target.closest?.('a[href^="#"]');
+      if (!link) return;
+      const href = link.getAttribute('href');
+      if (!href || href === '#') return;
+      const target = document.getElementById(decodeURIComponent(href.slice(1)));
+      const section = target?.closest?.('.raven-reader-collapsible');
+      const control = controllers.get(section);
+      if (control) control(true);
+    }, { capture: true });
+
+    setTimeout(() => revealHashTarget(), 120);
+    addEventListener('hashchange', () => revealHashTarget({ scroll: true }));
+  };
+
   const boot = () => {
     annotateLinks();
     startReadMetrics();
     enhanceNarratives();
+    enhanceCasefileProgressiveDisclosure();
   };
 
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot, { once: true });

@@ -106,7 +106,7 @@ required = {
     'investigations/rci-tabung-haji/updates/index.html': ['13 Sep evidence revision', 'Empat court-confirmed; SPRM pernah menyebut lima', 'RM18m/RM18.6m'],
     'investigations/rci-tabung-haji/people/index.html': ['Empat telah berdepan pertuduhan', 'Belum didakwa · 24 Sep', '4 court-confirmed / 5 agency-stated'],
     'investigations/rci-tabung-haji/timeline/index.html': ['19 Jul 2022', 'Reman lima hari', 'Reman dilanjutkan dua hari'],
-    'investigations/rci-tabung-haji/money/index.html': ['RM10.2b', 'RM2.6b', 'Bukan automatik “dicuri”'],
+    'investigations/rci-tabung-haji/money/index.html': ['RM10.2b', 'RM2.6b', 'Bukan mens rea'],
     'investigations/rci-tabung-haji/narratives/index.html': ['application ≠ final forfeiture order', 'DISPUTED / UNKNOWN', 'Like, repost dan screenshot bukan proof of truth'],
     'investigations/rci-tabung-haji/sources/index.html': ['Evidence ledger', 'Parlimen · jawapan bertulis 22 Mei 2023', '2022 withdrawal'],
 }

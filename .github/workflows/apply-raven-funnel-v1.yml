@@ -1,4 +1,4 @@
-name: Apply Raven Reader Funnel V1
+name: Apply Raven Reader Funnel V1.0.1
 
 on:
   push:
@@ -53,8 +53,8 @@ jobs:
           for p in live:
               t = p.read_text(encoding='utf-8')
               assert t.count(marker) == 2, f'Funnel CSS/JS not canonical: {p}'
-              assert '/assets/css/raven-funnel-v1.css?v=1.0.0' in t, p
-              assert '/assets/js/raven-funnel-v1.js?v=1.0.0' in t, p
+              assert '/assets/css/raven-funnel-v1.css?v=1.0.1' in t, p
+              assert '/assets/js/raven-funnel-v1.js?v=1.0.1' in t, p
 
           n = Path('investigations/rci-tabung-haji/narratives/index.html').read_text(encoding='utf-8')
           cards = re.findall(r'<article id="(naratif-[^"]+)"', n)
@@ -66,7 +66,7 @@ jobs:
 
           for p in root.rglob('research/**/index.html'):
               assert marker not in p.read_text(encoding='utf-8'), f'Historical research mutated: {p}'
-          print(f'Raven Reader Funnel V1 static validation PASS — {len(live)} pages, {len(cards)} narratives, {len(sources)} sources')
+          print(f'Raven Reader Funnel V1.0.1 static validation PASS — {len(live)} pages, {len(cards)} narratives, {len(sources)} sources')
           PY
           git diff --check
 
@@ -79,5 +79,5 @@ jobs:
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
           git add index.html about corrections investigations methodology news tips
-          git commit -m 'ux: activate Raven Reader Funnel V1 across public pages'
+          git commit -m 'ux: activate Raven Reader Funnel V1.0.1 across public pages'
           git push

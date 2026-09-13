@@ -83,11 +83,14 @@ jobs:
               await ctx.close();
             }
 
+            // Dedicated Source Room now lives on /sources/. The reader gate checks
+            // scanability on each evidence surface rather than requiring duplicated
+            // source ledgers inside every subpage.
             await inspect('political','/investigations/rci-tabung-haji/narratives/political-social-media/','.raven-political-scan',5,{source:true,extraSelector:'.raven-political-proof-scan',extraMin:4});
             await inspect('newsroom','/news/','.raven-news-scan',5);
-            await inspect('people','/investigations/rci-tabung-haji/people/','.raven-person-scan',8,{source:true});
-            await inspect('money','/investigations/rci-tabung-haji/money/','.raven-money-scan',6,{source:true});
-            await inspect('timeline','/investigations/rci-tabung-haji/timeline/','.raven-timeline-scan',10,{source:true});
+            await inspect('people','/investigations/rci-tabung-haji/people/','.raven-person-scan',6);
+            await inspect('money','/investigations/rci-tabung-haji/money/','.raven-money-scan',5);
+            await inspect('timeline','/investigations/rci-tabung-haji/timeline/','.raven-timeline-scan',10);
 
             const ctx=await browser.newContext({viewport:{width:390,height:844}});
             const deep=await ctx.newPage();

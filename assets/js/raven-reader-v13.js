@@ -179,7 +179,7 @@
   const enhanceMoney = () => {
     if (!isMoney) return;
     document.body.classList.add('raven-reader-money');
-    const grid=q('#money .metric-grid');
+    const grid=q('#money .metric-grid') || q('.section-content .metric-grid') || q('.metric-grid');
     if (!grid) return;
     if (!q('.raven-money-distinction')) {
       const strip=document.createElement('div');
@@ -188,16 +188,16 @@
       grid.before(strip);
     }
     qa(':scope > article',grid).forEach((card)=>wireCompact(card,{kind:'money',keep:[q(':scope > strong',card),q(':scope > span',card),q(':scope > h3',card)],label:'Apa maksud angka ini?',closeLabel:'Tutup penerangan'}));
-    const glossary=q('#money .metric-glossary');
+    const glossary=q('#money .metric-glossary') || q('.metric-glossary');
     if (glossary) wireCompact(glossary,{kind:'money-mechanism',keep:[q(':scope > h3',glossary)],label:'Buka mekanisme UJSB',closeLabel:'Tutup mekanisme UJSB'});
   };
 
   const enhanceTimeline = () => {
     if (!isTimeline) return;
     document.body.classList.add('raven-reader-timeline');
-    const section=q('#timeline');
+    const section=q('#timeline') || q('.section-content');
     if (!section) return;
-    const heads=qa(':scope > .subhead',section);
+    const heads=qa('.subhead',section);
     if (heads.length && !q('.raven-timeline-phase-nav',section)) {
       const nav=document.createElement('nav');
       nav.className='raven-timeline-phase-nav';
@@ -209,9 +209,9 @@
         a.innerHTML=`<span>${String.fromCharCode(65+i)}</span><strong>${h.textContent.replace(/^\s*[A-Z]\s*·\s*/,'').trim()}</strong>`;
         nav.append(a);
       });
-      q(':scope > h2',section)?.insertAdjacentElement('afterend',nav);
+      q('h2',section)?.insertAdjacentElement('afterend',nav);
     }
-    qa(':scope > .history-line',section).forEach((line,phaseIndex)=>qa(':scope > article',line).forEach((item,index)=>{
+    qa('.history-line',section).forEach((line,phaseIndex)=>qa(':scope > article',line).forEach((item,index)=>{
       item.id ||= `timeline-${String.fromCharCode(97+phaseIndex)}-${String(index+1).padStart(2,'0')}`;
       wireCompact(item,{kind:'timeline',keep:[q(':scope > time',item),q(':scope > h3',item)],label:'Kenapa ini penting?',closeLabel:'Tutup penerangan'});
     }));

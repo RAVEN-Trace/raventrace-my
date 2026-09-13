@@ -66,11 +66,11 @@ for rel in ['about/index.html', 'methodology/index.html', 'tips/index.html', 'co
         if meta not in s:
             fail(f'{rel}: missing metadata contract token {meta}')
 
-# 4) Corrections ledger must acknowledge current material changes.
+# 4) Corrections ledger must retain the prior material 11 Sep correction.
 corrections = (ROOT / 'corrections/index.html').read_text(encoding='utf-8')
 for token in ['11 SEP 2026', 'Empat atau lima individu didakwa', 'Pembetulan unit kiraan', 'Runtime lama']:
     if token not in corrections:
-        fail(f'corrections ledger missing current material change: {token}')
+        fail(f'corrections ledger missing retained material change: {token}')
 
 # 5) Public HTML must not reference corrupt OG v5 or stale runtime generations.
 stale_runtime_refs = [
@@ -88,18 +88,39 @@ for p in ROOT.rglob('*.html'):
         if ref in s:
             fail(f'{p.relative_to(ROOT)} references stale runtime: {ref}')
 
-# 6) Main current-state boundary remains explicit and static HTML remains at 11 Sep state.
+# 6) Main CASEFILE must expose the 13 Sep evidence revision and legal boundaries.
 case = (ROOT / 'investigations/rci-tabung-haji/index.html').read_text(encoding='utf-8')
-for token in ['Pertuduhan bukan sabitan', 'DIPERTIKAIKAN', '11 Sep 2026']:
+for token in [
+    'Cut-off · 13 Sep 2026',
+    'Pertuduhan ≠ bersalah',
+    'Kerugian ≠ kecurian',
+    'Empat vs lima telah didakwa',
+    '19 Jul 2022',
+    'RM18m/RM18.6m',
+]:
     if token not in case:
-        fail(f'main CASEFILE missing current evidence boundary: {token}')
+        fail(f'main CASEFILE missing 13 Sep evidence state: {token}')
 
+# 7) Core subpages must carry the same cut-off and category-safe state.
+required = {
+    'investigations/rci-tabung-haji/updates/index.html': ['13 Sep evidence revision', 'Empat court-confirmed; SPRM pernah menyebut lima', 'RM18m/RM18.6m'],
+    'investigations/rci-tabung-haji/people/index.html': ['Empat telah berdepan pertuduhan', 'Belum didakwa · 24 Sep', '4 court-confirmed / 5 agency-stated'],
+    'investigations/rci-tabung-haji/timeline/index.html': ['19 Jul 2022', 'Reman lima hari', 'Reman dilanjutkan dua hari'],
+    'investigations/rci-tabung-haji/money/index.html': ['RM10.2b', 'RM2.6b', 'Bukan mens rea'],
+    'investigations/rci-tabung-haji/narratives/index.html': ['application ≠ final forfeiture order', 'DISPUTED / UNKNOWN', 'Like, repost dan screenshot bukan proof of truth'],
+    'investigations/rci-tabung-haji/sources/index.html': ['Evidence ledger', 'Parlimen · jawapan bertulis 22 Mei 2023', '2022 withdrawal'],
+}
+for rel, tokens in required.items():
+    text = (ROOT / rel).read_text(encoding='utf-8')
+    for token in tokens:
+        if token not in text:
+            fail(f'{rel}: missing verified-state token: {token}')
+
+# Homepage has not been rewritten by this case-subpage release; retain its current published boundary.
 home = (ROOT / 'index.html').read_text(encoding='utf-8')
-# The canonical homepage uses abbreviated Malay month formatting ("11 Sep 2026").
-# Integrity checks the state, not the spelling style of the date.
-for token in ['11 Sep 2026', 'empat individu telah berdepan pertuduhan', 'SPRM pula menyebut lima']:
+for token in ['empat individu telah berdepan pertuduhan', 'SPRM pula menyebut lima']:
     if token not in home:
-        fail(f'homepage missing current static state: {token}')
+        fail(f'homepage missing retained court-count boundary: {token}')
 
 if errors:
     print('SITE INTEGRITY V1: FAIL')

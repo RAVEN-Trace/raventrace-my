@@ -4,8 +4,8 @@ import re
 import unicodedata
 
 ROOT = Path(__file__).resolve().parents[1]
-CSS = '<link rel="stylesheet" href="/raventrace-my/assets/css/raven-funnel-v1.css?v=1.0.0" data-raven-funnel-v1>'
-JS = '<script src="/raventrace-my/assets/js/raven-funnel-v1.js?v=1.0.0" defer data-raven-funnel-v1></script>'
+CSS = '<link rel="stylesheet" href="/raventrace-my/assets/css/raven-funnel-v1.css?v=1.0.1" data-raven-funnel-v1>'
+JS = '<script src="/raventrace-my/assets/js/raven-funnel-v1.js?v=1.0.1" defer data-raven-funnel-v1></script>'
 NARRATIVE = ROOT / 'investigations' / 'rci-tabung-haji' / 'narratives' / 'index.html'
 
 PUBLIC_ROOTS = [

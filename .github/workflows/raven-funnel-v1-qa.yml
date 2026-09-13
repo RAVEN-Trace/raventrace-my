@@ -62,22 +62,20 @@ jobs:
               const ctx=await browser.newContext({viewport:{width:viewport.width,height:viewport.height}});
               const page=await ctx.newPage();
               await openCurrent(page,'/investigations/rci-tabung-haji/narratives/');
-              await page.waitForSelector('.raven-evidence-bridge',{state:'attached',timeout:15000});
               await page.waitForTimeout(350);
 
-              const initial=await page.evaluate((label)=>{
-                const cards=[...document.querySelectorAll('.narrative-v5-card[id^="naratif-"]')];
-                const bridges=[...document.querySelectorAll('.raven-evidence-bridge')];
-                const first=bridges[0];
-                const isVisible=el=>!!el && getComputedStyle(el).display!=='none' && getComputedStyle(el).visibility!=='hidden' && el.getBoundingClientRect().height>0;
+              const state=await page.evaluate((label)=>{
+                const cards=[...document.querySelectorAll('.control-grid > article')];
                 return {
                   viewport:label,
                   cards:cards.length,
-                  bridges:bridges.length,
-                  sources:document.querySelectorAll('#sources .sources-grid > li[id^="source-"]').length,
-                  firstBridgeVisible:isVisible(first),
-                  primaryLinks:document.querySelectorAll('.raven-evidence-bridge a[data-raven-event="primary_source_click"]').length,
-                  caseLinks:document.querySelectorAll('.raven-evidence-bridge a[data-raven-event="case_continuation"]').length,
+                  statuses:document.querySelectorAll('.control-grid .status').length,
+                  sectionLinks:document.querySelectorAll('.section-links a').length,
+                  caseLinks:[...document.querySelectorAll('a')].filter(a=>a.getAttribute('href')==='/raventrace-my/investigations/rci-tabung-haji/').length,
+                  sourceLinks:[...document.querySelectorAll('a')].filter(a=>a.getAttribute('href')==='/raventrace-my/investigations/rci-tabung-haji/sources/').length,
+                  rm13:document.body.innerText.includes('RM13 bilion dicuri / hilang'),
+                  forfeiture:document.body.innerText.includes('application ≠ final forfeiture order'),
+                  disputed:document.body.innerText.includes('DISPUTED / UNKNOWN'),
                   css121:!!document.querySelector('link[href*="raven-funnel-v1.css?v=1.2.1"]'),
                   js121:!!document.querySelector('script[src*="raven-funnel-v1.js?v=1.2.1"]'),
                   overflow:document.documentElement.scrollWidth-document.documentElement.clientWidth,
@@ -85,31 +83,19 @@ jobs:
                 };
               },viewport.name);
 
-              check(initial.cards>=8,`${viewport.name}: cards ${initial.cards}`);
-              check(initial.cards===initial.bridges,`${viewport.name}: bridges ${initial.bridges}/${initial.cards}`);
-              check(initial.sources>=5,`${viewport.name}: sources ${initial.sources}`);
-              check(initial.primaryLinks===initial.cards,`${viewport.name}: primary-source links ${initial.primaryLinks}/${initial.cards}`);
-              check(initial.caseLinks===initial.cards,`${viewport.name}: case continuation links ${initial.caseLinks}/${initial.cards}`);
-              check(initial.css121 && initial.js121,`${viewport.name}: V1.2.1 cache keys missing`);
-              check(initial.overflow<=4,`${viewport.name}: overflow ${initial.overflow}`);
-              check(initial.api,`${viewport.name}: metrics API missing`);
+              check(state.cards>=6,`${viewport.name}: narrative units ${state.cards}`);
+              check(state.statuses>=6,`${viewport.name}: status labels ${state.statuses}`);
+              check(state.sectionLinks>=6,`${viewport.name}: section navigation incomplete`);
+              check(state.caseLinks>=1,`${viewport.name}: CASEFILE continuation missing`);
+              check(state.sourceLinks>=1,`${viewport.name}: Source Room route missing`);
+              check(state.rm13,`${viewport.name}: RM13b narrative unit missing`);
+              check(state.forfeiture,`${viewport.name}: forfeiture category distinction missing`);
+              check(state.disputed,`${viewport.name}: political-motive uncertainty missing`);
+              check(state.css121 && state.js121,`${viewport.name}: V1.2.1 cache keys missing`);
+              check(state.overflow<=4,`${viewport.name}: overflow ${state.overflow}`);
+              check(state.api,`${viewport.name}: metrics API missing`);
 
-              if(viewport.width<=720){
-                check(initial.firstBridgeVisible===false,'mobile: evidence bridge should be hidden in default scan state');
-                const summary=page.locator('.narrative-v5-card .narrative-v5-details > summary').first();
-                await summary.click();
-                await page.waitForTimeout(180);
-                const revealed=await page.evaluate(()=>{
-                  const bridge=document.querySelector('.narrative-v5-card .raven-evidence-bridge');
-                  return !!bridge && getComputedStyle(bridge).display!=='none' && bridge.getBoundingClientRect().height>0;
-                });
-                check(revealed,'mobile: evidence bridge did not reveal after opening narrative details');
-                initial.revealedAfterDetails=revealed;
-              } else {
-                check(initial.firstBridgeVisible===true,'desktop: evidence bridge should be visible');
-              }
-
-              report[viewport.name]=initial;
+              report[viewport.name]=state;
               await ctx.close();
             }
 
@@ -122,7 +108,7 @@ jobs:
         if: always()
         run: |
           mkdir -p funnel-qa
-          printf '{"contract":"funnel-compatibility","funnel":"1.2.1","reader":"1.3.1","status":"workflow completed"}\n' > funnel-qa/report.json
+          printf '{"contract":"truth-navigation-compatibility","funnel":"1.2.1","reader":"1.3.1","status":"workflow completed"}\n' > funnel-qa/report.json
       - name: Upload Funnel QA evidence
         if: always()
         uses: actions/upload-artifact@v4

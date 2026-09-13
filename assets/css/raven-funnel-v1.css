@@ -128,9 +128,6 @@
 @media (max-width: 720px) {
   body.raven-reader-v8 .case-content > .case-section.raven-reader-collapsible {
     scroll-margin-top: 5.5rem;
-  }
-
-  body.raven-reader-v8 .case-content > .case-section.raven-reader-collapsible {
     padding-block: 1.15rem;
   }
 
@@ -180,6 +177,35 @@
 
   .raven-reader-collapsible:not(.raven-reader-collapsed) > .raven-reader-toggle {
     margin-bottom: 1rem;
+  }
+
+  /* Narrative scan mode: claim + Raven verdict stay visible.
+     Evidence/context opens through the existing “Kenapa Raven kata begitu?”
+     disclosure. A direct #naratif-* link reveals the full card immediately. */
+  body.raven-funnel-ready.raven-v5-narrative
+    .narrative-v5-card:not(:target):not(:has(.narrative-v5-details[open])) .signal-record-zone,
+  body.raven-funnel-ready.raven-v5-narrative
+    .narrative-v5-card:not(:target):not(:has(.narrative-v5-details[open])) .signal-gap,
+  body.raven-funnel-ready.raven-v5-narrative
+    .narrative-v5-card:not(:target):not(:has(.narrative-v5-details[open])) .raven-evidence-bridge,
+  body.raven-funnel-ready.raven-v5-narrative
+    .narrative-v5-card:not(:target):not(:has(.narrative-v5-details[open])) .narrative-v5-meta {
+    display: none !important;
+  }
+
+  body.raven-funnel-ready.raven-v5-narrative
+    .narrative-v5-card:not(:target):not(:has(.narrative-v5-details[open])) .signal-narrative-grid {
+    grid-template-columns: minmax(0,1fr) !important;
+  }
+
+  body.raven-funnel-ready.raven-v5-narrative .narrative-v5-details > summary {
+    min-height: 46px;
+    display: flex;
+    align-items: center;
+  }
+
+  body.raven-funnel-ready.raven-v5-narrative .narrative-v5-card:target {
+    scroll-margin-top: 5.5rem;
   }
 }
 

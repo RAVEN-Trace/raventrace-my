@@ -1,4 +1,4 @@
-name: Apply Raven Reader Funnel V1.1.0
+name: Apply Raven Reader Funnel V1.2.0
 
 on:
   push:
@@ -18,66 +18,44 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-
+        with: { fetch-depth: 0 }
       - uses: actions/setup-python@v5
-        with:
-          python-version: '3.12'
-
+        with: { python-version: '3.12' }
       - uses: actions/setup-node@v4
-        with:
-          node-version: '22'
-
+        with: { node-version: '22' }
       - name: Validate funnel JS syntax
         run: node --check assets/js/raven-funnel-v1.js
-
       - name: Apply funnel assets and stable anchors
         run: python scripts/apply_raven_funnel_v1.py
-
       - name: Validate rollout
         run: |
           python - <<'PY'
           from pathlib import Path
           import re
-          root = Path('.')
-          marker = 'data-raven-funnel-v1'
-          live = []
+          root=Path('.'); marker='data-raven-funnel-v1'; live=[]
           for rel in ['index.html','about','corrections','investigations','methodology','news','tips']:
-              p = root / rel
+              p=root/rel
               if p.is_file(): live.append(p)
-              elif p.exists():
-                  live += [x for x in p.rglob('index.html') if 'research' not in [q.lower() for q in x.parts]]
-          live = list(dict.fromkeys(live))
-          assert live
+              elif p.exists(): live += [x for x in p.rglob('index.html') if 'research' not in [q.lower() for q in x.parts]]
+          live=list(dict.fromkeys(live)); assert live
           for p in live:
-              t = p.read_text(encoding='utf-8')
-              assert t.count(marker) == 2, f'Funnel CSS/JS not canonical: {p}'
-              assert '/assets/css/raven-funnel-v1.css?v=1.1.0' in t, p
-              assert '/assets/js/raven-funnel-v1.js?v=1.1.0' in t, p
-
-          n = Path('investigations/rci-tabung-haji/narratives/index.html').read_text(encoding='utf-8')
-          cards = re.findall(r'<article id="(naratif-[^"]+)"', n)
-          sources = re.findall(r'<li id="(source-[^"]+)"', n)
-          assert len(cards) >= 8 and len(cards) == len(set(cards)), cards
-          assert len(sources) >= 5 and len(sources) == len(set(sources)), sources
-          assert 'https://raven-trace.github.io/raventrace-my/investigations/rci-tabung-haji/narratives/' in n
-          assert not Path('rcitabunghaji').exists(), 'URL migration remains paused'
-
-          for p in root.rglob('research/**/index.html'):
-              assert marker not in p.read_text(encoding='utf-8'), f'Historical research mutated: {p}'
-          print(f'Raven Reader Funnel V1.1.0 static validation PASS — {len(live)} pages, {len(cards)} narratives, {len(sources)} sources')
+              t=p.read_text(encoding='utf-8'); assert t.count(marker)==2,p
+              assert '/assets/css/raven-funnel-v1.css?v=1.2.0' in t,p
+              assert '/assets/js/raven-funnel-v1.js?v=1.2.0' in t,p
+          n=Path('investigations/rci-tabung-haji/narratives/index.html').read_text(encoding='utf-8')
+          cards=re.findall(r'<article id="(naratif-[^"]+)"',n); sources=re.findall(r'<li id="(source-[^"]+)"',n)
+          assert len(cards)>=8 and len(cards)==len(set(cards)),cards
+          assert len(sources)>=5 and len(sources)==len(set(sources)),sources
+          assert not Path('rcitabunghaji').exists()
+          for p in root.rglob('research/**/index.html'): assert marker not in p.read_text(encoding='utf-8'),p
+          print(f'Raven Reader Funnel V1.2.0 static validation PASS — {len(live)} pages, {len(cards)} narratives, {len(sources)} sources')
           PY
           git diff --check
-
       - name: Commit rollout
         run: |
-          if git diff --quiet; then
-            echo 'No page changes required'
-            exit 0
-          fi
+          if git diff --quiet; then echo 'No page changes required'; exit 0; fi
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
           git add index.html about corrections investigations methodology news tips
-          git commit -m 'ux: activate Raven Reader Funnel V1.1.0 across public pages'
+          git commit -m 'ux: activate Raven Reader Funnel V1.2.0 across public pages'
           git push

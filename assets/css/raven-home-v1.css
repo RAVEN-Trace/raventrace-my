@@ -1,0 +1,261 @@
+/* RAVEN Homepage Compression V1.0.0
+   Homepage = truth navigator, not a second CASEFILE.
+   Scoped to the canonical homepage only. */
+
+body[data-raven-home="1.0.0"] {
+  --home-paper: #f3efe7;
+  --home-paper-deep: #e9e2d6;
+  --home-ink: #10151a;
+  --home-muted: #5b6268;
+  --home-line: #cfc7ba;
+  --home-dark: #080d11;
+  --home-cyan: #69d9ef;
+  --home-amber: #a86600;
+}
+
+/* Keep the Truth Desk dominant. */
+body[data-raven-home="1.0.0"] .signal-home-hero {
+  padding-bottom: clamp(2.5rem, 6vw, 4.75rem) !important;
+}
+body[data-raven-home="1.0.0"] .signal-home-hero .signal-live-strip {
+  margin-top: clamp(1.4rem, 3vw, 2.2rem);
+}
+
+/* The old second hero is now a compact active-case briefing. */
+body[data-raven-home="1.0.0"] .home-active-case {
+  background: var(--home-paper) !important;
+  color: var(--home-ink) !important;
+  padding: clamp(2.25rem, 5.5vw, 4.5rem) 0 !important;
+  border-bottom: 1px solid var(--home-line) !important;
+}
+body[data-raven-home="1.0.0"] .home-active-case::before,
+body[data-raven-home="1.0.0"] .home-active-case::after {
+  display: none !important;
+}
+body[data-raven-home="1.0.0"] .home-active-case .front-grid {
+  grid-template-columns: minmax(0, 1.45fr) minmax(250px, .7fr);
+  align-items: start;
+  gap: clamp(1.8rem, 5vw, 4.5rem);
+}
+body[data-raven-home="1.0.0"] .home-active-case .case-id,
+body[data-raven-home="1.0.0"] .home-active-case .eyebrow {
+  color: #285f69 !important;
+}
+body[data-raven-home="1.0.0"] .home-active-case h2 {
+  max-width: 15ch;
+  margin: .55rem 0 1rem;
+  color: var(--home-ink);
+  font-family: Georgia, 'Times New Roman', serif;
+  font-size: clamp(2.25rem, 5vw, 4.5rem);
+  line-height: .98;
+  letter-spacing: -.035em;
+}
+body[data-raven-home="1.0.0"] .home-active-case .front-dek {
+  max-width: 68ch;
+  margin-bottom: 1.35rem;
+  color: #343a3f !important;
+  font-size: clamp(1rem, 1.8vw, 1.15rem);
+  line-height: 1.65;
+}
+body[data-raven-home="1.0.0"] .home-case-status {
+  padding: 1.25rem 1.3rem;
+  border: 1px solid #bcb3a5 !important;
+  border-top: 3px solid #367b89 !important;
+  background: rgba(255,255,255,.42) !important;
+  box-shadow: none !important;
+}
+body[data-raven-home="1.0.0"] .home-case-status strong {
+  color: var(--home-ink) !important;
+}
+body[data-raven-home="1.0.0"] .home-case-status p {
+  margin: .7rem 0 0;
+  color: #454b50 !important;
+  line-height: 1.55;
+}
+body[data-raven-home="1.0.0"] .home-case-status .home-legal-boundary {
+  padding-top: .8rem;
+  border-top: 1px solid #cbc3b6;
+  font-weight: 700;
+}
+body[data-raven-home="1.0.0"] .home-case-freshness {
+  display: flex;
+  flex-wrap: wrap;
+  gap: .45rem .8rem;
+  margin: 0 0 .7rem;
+  color: #555d62;
+  font-size: .84rem;
+}
+body[data-raven-home="1.0.0"] .home-case-freshness span + span::before {
+  content: '·';
+  margin-right: .8rem;
+  color: #888076;
+}
+body[data-raven-home="1.0.0"] .home-active-case .inline-sources {
+  margin-top: 1rem;
+  font-size: .9rem;
+}
+
+/* Signature category-separation band stays prominent and close to the case briefing. */
+body[data-raven-home="1.0.0"] .signal-strip {
+  border-top: 0;
+}
+
+/* Latest = one lead change + two scan rows, not a second newsroom. */
+body[data-raven-home="1.0.0"] .home-latest {
+  padding-block: clamp(2.75rem, 6vw, 5.25rem) !important;
+}
+body[data-raven-home="1.0.0"] .home-latest .section-head {
+  align-items: end;
+  margin-bottom: clamp(1.5rem, 3vw, 2.4rem);
+}
+body[data-raven-home="1.0.0"] .home-latest .section-head > p {
+  max-width: 48ch;
+}
+body[data-raven-home="1.0.0"] .home-update-stack {
+  border-top: 1px solid var(--home-line);
+}
+body[data-raven-home="1.0.0"] .home-update-lead {
+  display: grid;
+  grid-template-columns: minmax(0, .55fr) minmax(0, 1.45fr);
+  gap: clamp(1.2rem, 4vw, 3.5rem);
+  padding: clamp(1.7rem, 4vw, 3rem) 0;
+  border-bottom: 1px solid var(--home-line);
+}
+body[data-raven-home="1.0.0"] .home-update-lead h3 {
+  margin: .45rem 0 0;
+  color: var(--home-ink);
+  font-family: Georgia, 'Times New Roman', serif;
+  font-size: clamp(1.75rem, 3.7vw, 3.15rem);
+  line-height: 1.02;
+  letter-spacing: -.025em;
+}
+body[data-raven-home="1.0.0"] .home-update-lead .home-update-copy p {
+  max-width: 68ch;
+  margin-top: 0;
+  color: #3c4348;
+  line-height: 1.65;
+}
+body[data-raven-home="1.0.0"] .home-update-row {
+  display: grid;
+  grid-template-columns: minmax(150px, .45fr) minmax(0, 1.55fr) auto;
+  gap: 1rem 1.35rem;
+  align-items: center;
+  padding: 1.25rem 0;
+  border-bottom: 1px solid var(--home-line);
+}
+body[data-raven-home="1.0.0"] .home-update-row h3 {
+  margin: 0;
+  color: var(--home-ink);
+  font-family: Georgia, 'Times New Roman', serif;
+  font-size: clamp(1.2rem, 2.2vw, 1.65rem);
+  line-height: 1.15;
+}
+body[data-raven-home="1.0.0"] .home-update-row > a,
+body[data-raven-home="1.0.0"] .home-update-lead a {
+  font-weight: 750;
+}
+body[data-raven-home="1.0.0"] .home-all-updates {
+  display: inline-flex;
+  margin-top: 1.4rem;
+  font-weight: 800;
+}
+
+/* A single, canonical deeper-navigation bridge replaces duplicate navigation blocks. */
+body[data-raven-home="1.0.0"] .raven-context-bridge[data-variant="home"] {
+  margin-block: 0 !important;
+  padding-block: clamp(2.7rem, 6vw, 5rem) !important;
+}
+body[data-raven-home="1.0.0"] .raven-context-bridge[data-variant="home"] .raven-context-copy h2 {
+  max-width: 12ch;
+}
+
+/* Trust is a strip, not a second methodology section. */
+body[data-raven-home="1.0.0"] .home-trust-strip {
+  padding: 1.4rem 0;
+  border-top: 1px solid #293138;
+  border-bottom: 1px solid #293138;
+  background: #0b1014;
+  color: #e9edf0;
+}
+body[data-raven-home="1.0.0"] .home-trust-inner {
+  display: grid;
+  grid-template-columns: minmax(0, 1.3fr) minmax(0, .7fr);
+  gap: 1rem 2rem;
+  align-items: center;
+}
+body[data-raven-home="1.0.0"] .home-trust-copy {
+  margin: 0;
+  color: #cdd5da;
+  line-height: 1.5;
+}
+body[data-raven-home="1.0.0"] .home-trust-copy strong {
+  color: #fff;
+}
+body[data-raven-home="1.0.0"] .home-trust-links {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: .55rem 1rem;
+}
+body[data-raven-home="1.0.0"] .home-trust-links a {
+  color: #9ce8f6;
+  font-weight: 750;
+}
+
+/* Homepage should not repeat social controls on every update. */
+body[data-raven-home="1.0.0"] #latest .raven-sharebar {
+  display: none !important;
+}
+
+@media (max-width: 780px) {
+  body[data-raven-home="1.0.0"] .home-active-case .front-grid,
+  body[data-raven-home="1.0.0"] .home-update-lead,
+  body[data-raven-home="1.0.0"] .home-trust-inner {
+    grid-template-columns: 1fr;
+  }
+  body[data-raven-home="1.0.0"] .home-active-case h2 {
+    max-width: 18ch;
+    font-size: clamp(2.15rem, 11vw, 3.2rem);
+  }
+  body[data-raven-home="1.0.0"] .home-case-status {
+    padding: 1rem;
+  }
+  body[data-raven-home="1.0.0"] .home-update-row {
+    grid-template-columns: 1fr auto;
+    align-items: start;
+  }
+  body[data-raven-home="1.0.0"] .home-update-row .meta-row {
+    grid-column: 1 / -1;
+  }
+  body[data-raven-home="1.0.0"] .home-trust-links {
+    justify-content: flex-start;
+  }
+  body[data-raven-home="1.0.0"] .home-case-freshness {
+    display: block;
+  }
+  body[data-raven-home="1.0.0"] .home-case-freshness span {
+    display: block;
+    margin-top: .2rem;
+  }
+  body[data-raven-home="1.0.0"] .home-case-freshness span + span::before {
+    display: none;
+  }
+}
+
+@media (max-width: 520px) {
+  body[data-raven-home="1.0.0"] .home-active-case,
+  body[data-raven-home="1.0.0"] .home-latest,
+  body[data-raven-home="1.0.0"] .raven-context-bridge[data-variant="home"] {
+    padding-block: 2.35rem !important;
+  }
+  body[data-raven-home="1.0.0"] .home-update-row {
+    grid-template-columns: 1fr;
+    gap: .65rem;
+  }
+  body[data-raven-home="1.0.0"] .home-update-row > a {
+    justify-self: start;
+  }
+  body[data-raven-home="1.0.0"] .home-trust-strip {
+    padding-block: 1.15rem;
+  }
+}

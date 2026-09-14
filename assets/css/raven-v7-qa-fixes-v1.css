@@ -18,9 +18,20 @@
 }
 
 /* Trust links sit on an ink-black strip; use the on-dark evidence cyan. */
-body[data-raven-home="1.0.2"] .home-trust-links a {
+body[data-raven-home="1.0.2"] .home-trust-links a,
+body[data-raven-home="2.0.0"] .home-trust-links a {
   color: #9ce8f6 !important;
   text-decoration-color: rgba(156, 232, 246, .65) !important;
+}
+
+/* Homepage V2 moved the 14 != 14 != 14 explainer from dark ink to warm paper.
+   Unified V7's on-dark cyan rule has equal specificity and can win after runtime
+   class hydration, so lock these three labels to AA-safe ink in the final layer. */
+body[data-raven-home="2.0.0"].raven-editorial-home .signal-strip .signal-grid > span {
+  color: #10151a !important;
+}
+body[data-raven-home="2.0.0"].raven-editorial-home .signal-strip .signal-grid > b {
+  color: #8a4700 !important;
 }
 
 /* Source grades are metadata on warm paper; deep teal clears AA at small sizes. */

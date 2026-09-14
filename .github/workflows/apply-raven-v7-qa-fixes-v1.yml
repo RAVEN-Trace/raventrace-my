@@ -1,0 +1,64 @@
+name: Apply Raven V7 QA Fixes V1
+
+on:
+  push:
+    branches: [fix/raven-v7-visual-qa-real]
+    paths:
+      - 'assets/css/raven-v7-qa-fixes-v1.css'
+      - 'assets/js/raven-route-fixes-v1.js'
+      - 'scripts/apply_raven_v7_qa_fixes_v1.py'
+      - '.github/workflows/apply-raven-v7-qa-fixes-v1.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  apply:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          ref: fix/raven-v7-visual-qa-real
+      - uses: actions/setup-python@v5
+        with: { python-version: '3.12' }
+      - uses: actions/setup-node@v4
+        with: { node-version: '22' }
+      - name: Validate route JS syntax
+        run: node --check assets/js/raven-route-fixes-v1.js
+      - name: Apply targeted production fixes
+        run: python scripts/apply_raven_v7_qa_fixes_v1.py
+      - name: Validate static rollout
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          root=Path('.')
+          css_targets=[
+            root/'index.html',
+            root/'investigations/rci-tabung-haji/index.html',
+            root/'investigations/rci-tabung-haji/money/index.html',
+            root/'investigations/rci-tabung-haji/narratives/index.html',
+            root/'investigations/rci-tabung-haji/sources/index.html',
+            root/'investigations/rci-tabung-haji/updates/index.html',
+            root/'news/2026/09/11/empat-atau-lima-didakwa-rekod-tidak-seragam/index.html',
+          ]
+          for p in css_targets:
+            t=p.read_text(encoding='utf-8')
+            assert t.count('data-raven-v7-qa-fixes')==1,(p,t.count('data-raven-v7-qa-fixes'))
+            assert '/assets/css/raven-v7-qa-fixes-v1.css?v=1.0.0' in t,p
+          route_targets=[root/'index.html',root/'investigations/index.html',root/'investigations/rci-tabung-haji/index.html']
+          for p in route_targets:
+            t=p.read_text(encoding='utf-8')
+            assert t.count('data-raven-route-fixes-v1')==1,(p,t.count('data-raven-route-fixes-v1'))
+          print('V7 QA fixes static validation PASS')
+          PY
+          git diff --check
+      - name: Commit rollout
+        run: |
+          if git diff --quiet; then echo 'No page changes required'; exit 0; fi
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add index.html investigations news/2026/09/11/empat-atau-lima-didakwa-rekod-tidak-seragam/index.html
+          git commit -m 'fix: apply Raven V7 visual QA repairs to public surfaces'
+          git push origin HEAD:fix/raven-v7-visual-qa-real

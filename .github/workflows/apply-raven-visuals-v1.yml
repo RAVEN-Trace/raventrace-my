@@ -1,0 +1,73 @@
+name: Apply Raven Narrative Visuals V1
+
+on:
+  push:
+    branches: [design/raven-narrative-visuals-v1]
+    paths:
+      - 'assets/visuals/**'
+      - 'assets/css/raven-visuals-v1.css'
+      - 'assets/js/raven-visuals-v1.js'
+      - 'scripts/apply_raven_visuals_v1.py'
+      - '.github/workflows/apply-raven-visuals-v1.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  apply:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          ref: design/raven-narrative-visuals-v1
+      - uses: actions/setup-python@v5
+        with: { python-version: '3.12' }
+      - uses: actions/setup-node@v4
+        with: { node-version: '22' }
+      - name: Install image tooling
+        run: python -m pip install --quiet Pillow
+      - name: Validate runtime syntax
+        run: node --check assets/js/raven-visuals-v1.js
+      - name: Apply web visuals and OG derivatives
+        run: python scripts/apply_raven_visuals_v1.py
+      - name: Validate rollout
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          from PIL import Image
+          root=Path('.')
+          pages=[
+            root/'investigations/rci-tabung-haji/index.html',
+            root/'investigations/rci-tabung-haji/narratives/index.html',
+            root/'investigations/rci-tabung-haji/money/index.html',
+            root/'investigations/rci-tabung-haji/updates/index.html',
+            root/'news/2026/09/11/empat-atau-lima-didakwa-rekod-tidak-seragam/index.html',
+          ]
+          for p in pages:
+            t=p.read_text(encoding='utf-8')
+            assert t.count('data-raven-visuals-v1')==2, (p,t.count('data-raven-visuals-v1'))
+            assert '/assets/css/raven-visuals-v1.css?v=1.0.0' in t,p
+            assert '/assets/js/raven-visuals-v1.js?v=1.0.0' in t,p
+          ogs=[
+            root/'assets/og/raven-narrative-rm13b-v1-og.jpg',
+            root/'assets/og/raven-money-rm13b-v1-og.jpg',
+            root/'assets/og/raven-4-vs-5-v1-og.jpg',
+          ]
+          for p in ogs:
+            with Image.open(p) as im: assert im.size==(1200,630),(p,im.size)
+          assert 'raven-narrative-rm13b-v1-og.jpg' in (root/'investigations/rci-tabung-haji/narratives/index.html').read_text(encoding='utf-8')
+          assert 'raven-money-rm13b-v1-og.jpg' in (root/'investigations/rci-tabung-haji/money/index.html').read_text(encoding='utf-8')
+          assert 'raven-4-vs-5-v1-og.jpg' in (root/'investigations/rci-tabung-haji/updates/index.html').read_text(encoding='utf-8')
+          print('Raven Narrative Visuals V1 validation PASS')
+          PY
+          git diff --check
+      - name: Commit rollout
+        run: |
+          if git diff --quiet; then echo 'No page changes required'; exit 0; fi
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add assets/og investigations/rci-tabung-haji news/2026/09/11/empat-atau-lima-didakwa-rekod-tidak-seragam/index.html
+          git commit -m 'feat: integrate Raven Narrative Visuals V1 across RCI surfaces'
+          git push origin HEAD:design/raven-narrative-visuals-v1

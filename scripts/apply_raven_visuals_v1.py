@@ -1,10 +1,12 @@
 from pathlib import Path
+from io import BytesIO
 from PIL import Image, ImageOps
+import cairosvg
 import re
 
 ROOT = Path(__file__).resolve().parents[1]
-CSS = '/raventrace-my/assets/css/raven-visuals-v1.css?v=1.0.0'
-JS = '/raventrace-my/assets/js/raven-visuals-v1.js?v=1.0.0'
+CSS = '/raventrace-my/assets/css/raven-visuals-v1.css?v=1.0.1'
+JS = '/raventrace-my/assets/js/raven-visuals-v1.js?v=1.0.1'
 
 TARGETS = [
     ROOT / 'investigations/rci-tabung-haji/index.html',
@@ -22,17 +24,17 @@ OG_MAP = {
 }
 
 DERIVATIVES = {
-    ROOT / 'assets/visuals/raven-narrative-rm13b-v1-web.jpg': ROOT / 'assets/og/raven-narrative-rm13b-v1-og.jpg',
-    ROOT / 'assets/visuals/raven-money-rm13b-v1-web.jpg': ROOT / 'assets/og/raven-money-rm13b-v1-og.jpg',
-    ROOT / 'assets/visuals/raven-4-vs-5-v1-web.jpg': ROOT / 'assets/og/raven-4-vs-5-v1-og.jpg',
+    ROOT / 'assets/visuals/raven-narrative-rm13b-v1-web.svg': ROOT / 'assets/og/raven-narrative-rm13b-v1-og.jpg',
+    ROOT / 'assets/visuals/raven-money-rm13b-v1-web.svg': ROOT / 'assets/og/raven-money-rm13b-v1-og.jpg',
+    ROOT / 'assets/visuals/raven-4-vs-5-v1-web.svg': ROOT / 'assets/og/raven-4-vs-5-v1-og.jpg',
 }
 
 
 def add_assets(text: str) -> str:
-    if CSS not in text:
-        text = text.replace('</head>', f'<link rel="stylesheet" href="{CSS}" data-raven-visuals-v1>\n</head>', 1)
-    if JS not in text:
-        text = text.replace('</body>', f'<script src="{JS}" defer data-raven-visuals-v1></script>\n</body>', 1)
+    text = re.sub(r'<link rel="stylesheet" href="/raventrace-my/assets/css/raven-visuals-v1\.css\?v=[^"]+" data-raven-visuals-v1>\s*', '', text)
+    text = re.sub(r'<script src="/raventrace-my/assets/js/raven-visuals-v1\.js\?v=[^"]+" defer data-raven-visuals-v1></script>\s*', '', text)
+    text = text.replace('</head>', f'<link rel="stylesheet" href="{CSS}" data-raven-visuals-v1>\n</head>', 1)
+    text = text.replace('</body>', f'<script src="{JS}" defer data-raven-visuals-v1></script>\n</body>', 1)
     return text
 
 
@@ -52,12 +54,13 @@ def set_og(text: str, rel_url: str) -> str:
 
 for src, dst in DERIVATIVES.items():
     if not src.exists():
-        raise SystemExit(f'Missing visual source: {src.relative_to(ROOT)}')
+        raise SystemExit(f'Missing SVG source: {src.relative_to(ROOT)}')
     dst.parent.mkdir(parents=True, exist_ok=True)
-    with Image.open(src) as image:
+    png_bytes = cairosvg.svg2png(url=str(src), output_width=1200, output_height=675)
+    with Image.open(BytesIO(png_bytes)) as image:
         image = image.convert('RGB')
         og = ImageOps.fit(image, (1200, 630), method=Image.Resampling.LANCZOS, centering=(0.5, 0.5))
-        og.save(dst, 'JPEG', quality=88, optimize=True, progressive=True)
+        og.save(dst, 'JPEG', quality=90, optimize=True, progressive=True)
 
 for path in TARGETS:
     if not path.exists():
@@ -68,4 +71,4 @@ for path in TARGETS:
         text = set_og(text, OG_MAP[path])
     path.write_text(text, encoding='utf-8')
 
-print('Raven Narrative Visual System V1 applied to 5 public surfaces and 3 OG derivatives generated.')
+print('Raven Narrative Visual System V1.0.1 applied to 5 public surfaces and 3 OG derivatives generated from SVG.')

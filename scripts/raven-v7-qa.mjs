@@ -28,7 +28,7 @@ const pages = walk(root)
   })
   .sort((a, b) => a.route.localeCompare(b.route));
 
-if (pages.length !== 32) throw new Error(`Expected 32 public pages, found ${pages.length}`);
+if (pages.length !== 33) throw new Error(`Expected 33 public pages, found ${pages.length}`);
 fs.mkdirSync(output, { recursive: true });
 
 const browser = await chromium.launch();

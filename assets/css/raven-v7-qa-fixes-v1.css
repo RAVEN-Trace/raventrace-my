@@ -1,0 +1,35 @@
+/* RAVEN V7 QA Fixes V1
+   Narrow production repairs surfaced by the 33-page mobile/desktop render audit. */
+
+/* Editorial visual captions must stay readable regardless of the parent surface. */
+.raven-visual figcaption {
+  margin: 0 !important;
+  padding: .72rem .85rem !important;
+  border: 1px solid #d8d3c8;
+  border-top: 0;
+  background: #fffdf8 !important;
+  color: #465158 !important;
+}
+.raven-visual figcaption strong {
+  color: #121418 !important;
+}
+.raven-visual .raven-visual-note {
+  color: #465158 !important;
+}
+
+/* Trust links sit on an ink-black strip; use the on-dark evidence cyan. */
+body[data-raven-home="1.0.2"] .home-trust-links a {
+  color: #9ce8f6 !important;
+  text-decoration-color: rgba(156, 232, 246, .65) !important;
+}
+
+/* Source grades are metadata on warm paper; deep teal clears AA at small sizes. */
+body.raven-v5 .source-room .sources-grid li > span {
+  color: #074955 !important;
+}
+
+@media (max-width: 760px) {
+  .raven-visual figcaption {
+    padding-inline: 1rem !important;
+  }
+}

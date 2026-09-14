@@ -1,4 +1,4 @@
-name: Raven Homepage Truth Navigator V1 QA
+name: Raven Homepage Truth Navigator V2 QA
 
 on:
   push:
@@ -6,6 +6,8 @@ on:
     paths:
       - 'index.html'
       - 'assets/css/raven-home-v1.css'
+      - 'assets/css/raven-home-mobile-v2.css'
+      - 'assets/visuals/raven-truth-lens-v1.svg'
       - '.github/workflows/raven-home-v1-qa.yml'
   workflow_dispatch:
 
@@ -21,20 +23,32 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
-      - name: Static homepage contract
+
+      - name: Static homepage V2 contract
         run: |
           python - <<'PY'
           from pathlib import Path
+          import xml.etree.ElementTree as ET
+
           t=Path('index.html').read_text(encoding='utf-8')
+          css=Path('assets/css/raven-home-mobile-v2.css').read_text(encoding='utf-8')
+          visual=Path('assets/visuals/raven-truth-lens-v1.svg')
           required=[
-            'data-raven-home="1.0.2"',
+            'data-raven-home="2.0.0"',
             'raven-home-v1.css?v=1.0.2',
+            'raven-home-mobile-v2.css?v=2.0.0',
             'Cerita boleh dibentuk. Bukti tak boleh dipaksa.',
             'class="front-hero home-active-case"',
             '14 pelaburan disyor diperiksa RCI',
             'class="home-update-lead"',
             'data-variant="home"',
-            'class="home-trust-strip"'
+            'class="home-trust-strip"',
+            'Raven terakhir semak halaman ini: 13 Sep',
+            'Status mahkamah disahkan hingga: 13 Sep 2026',
+            'Ditahan ≠ direman ≠ didakwa ≠ bersalah',
+            '/investigations/rci-tabung-haji/updates/',
+            '/investigations/rci-tabung-haji/people/',
+            '/investigations/rci-tabung-haji/sources/'
           ]
           for item in required: assert item in t, item
           assert t.count('class="v5-truth-intro signal-home-hero"') == 1
@@ -42,17 +56,23 @@ jobs:
           assert 'Gred A/B' not in t
           assert 'class="section newsroom-board"' not in t
           assert 'class="container public-tools"' not in t
-          assert 'Raven terakhir semak halaman ini: 12 Sep' in t
-          assert 'Status mahkamah disahkan hingga: 11 Sep 2026' in t
+          assert '/#updates"' not in t
+          assert '/#people"' not in t
+          assert '/#sources"' not in t
           assert 'mengaku tidak bersalah' in t
-          assert 'Ditahan ≠ direman ≠ didakwa ≠ bersalah' in t
-          print('Static homepage contract PASS')
+          assert "raven-truth-lens-v1.svg" in css
+          assert '.site-nav.open' in css
+          assert '.nav-toggle' in css
+          ET.parse(visual)
+          print('Static homepage V2 contract PASS')
           PY
+
       - name: Install Playwright
         run: |
           npm install --no-save playwright@1.55.0
           npx playwright install --with-deps chromium
-      - name: Verify rendered production homepage
+
+      - name: Verify rendered production homepage V2
         run: |
           mkdir -p home-qa
           node - <<'JS'
@@ -69,13 +89,13 @@ jobs:
               for(let i=0;i<40;i++){
                 await page.goto(`${base}?homeqa=${Date.now()}-${Math.random()}`,{waitUntil:'domcontentloaded',timeout:45000});
                 const ready=await page.evaluate(()=>
-                  document.body?.dataset?.ravenHome==='1.0.2' &&
-                  !!document.querySelector('link[href*="raven-home-v1.css?v=1.0.2"]')
+                  document.body?.dataset?.ravenHome==='2.0.0' &&
+                  !!document.querySelector('link[href*="raven-home-mobile-v2.css?v=2.0.0"]')
                 );
                 if(ready) return;
                 await sleep(3000);
               }
-              throw new Error('Homepage V1.0.2 production marker not deployed');
+              throw new Error('Homepage V2.0.0 production marker not deployed');
             }
 
             for(const viewport of [{name:'mobile',width:390,height:844},{name:'desktop',width:1440,height:900}]){
@@ -94,6 +114,11 @@ jobs:
                   const r=el.getBoundingClientRect();
                   return r.width<40 || r.height<40;
                 }).map(el=>({text:(el.textContent||'').trim().slice(0,70),w:Math.round(el.getBoundingClientRect().width),h:Math.round(el.getBoundingClientRect().height)}));
+                const nav=document.querySelector('[data-nav]');
+                const navToggle=document.querySelector('[data-nav-toggle]');
+                const caseStatus=document.querySelector('.home-case-status');
+                const caseArt=caseStatus ? getComputedStyle(caseStatus,'::before') : null;
+                const signal=document.querySelector('.signal-strip');
                 return {
                   viewport:vp,
                   height:document.documentElement.scrollHeight,
@@ -115,13 +140,19 @@ jobs:
                   duplicateIds:[...new Set(dups)],
                   smallControls,
                   hasGradeAB:/Gred A\/B/.test(mainText),
-                  hasFreshness:/Raven terakhir semak halaman ini: 12 Sep/.test(document.body.innerText),
-                  hasCourtFreshness:/Status mahkamah disahkan hingga: 11 Sep 2026/.test(mainText),
+                  hasFreshness:/Raven terakhir semak halaman ini: 13 Sep/.test(document.body.innerText),
+                  hasCourtFreshness:/Status mahkamah disahkan hingga: 13 Sep 2026/.test(mainText),
                   hasLegalBoundary:/Ditahan ≠ direman ≠ didakwa ≠ bersalah/.test(mainText),
                   azeezBoundary:/Abdul Azeez didakwa pada 9 September dan mengaku tidak bersalah\./.test(mainText),
                   heroTitle:document.querySelector('.v5-truth-intro h1')?.textContent?.trim(),
                   ogTitle:document.querySelector('meta[property="og:title"]')?.content || '',
-                  cssHome:!!document.querySelector('link[href*="raven-home-v1.css?v=1.0.2"]')
+                  cssHome:!!document.querySelector('link[href*="raven-home-mobile-v2.css?v=2.0.0"]'),
+                  truthLens:(caseArt?.backgroundImage||'').includes('raven-truth-lens-v1.svg'),
+                  signalBg:signal ? getComputedStyle(signal).backgroundColor : '',
+                  navVisible:visible(nav),
+                  navToggleVisible:visible(navToggle),
+                  navToggleHeight:navToggle ? Math.round(navToggle.getBoundingClientRect().height) : 0,
+                  navExpanded:navToggle?.getAttribute('aria-expanded') || null
                 };
               },viewport.name);
 
@@ -135,27 +166,53 @@ jobs:
               check(data.contextLinks===4,`${viewport.name}: deeper links ${data.contextLinks}`);
               check(data.trustStrips===1,`${viewport.name}: trust strips ${data.trustStrips}`);
               check(data.visibleSharebars===0,`${viewport.name}: visible homepage sharebars ${data.visibleSharebars}`);
-              check(data.visibleCaseArt===0,`${viewport.name}: duplicate active-case illustration still visible`);
+              check(data.visibleCaseArt===0,`${viewport.name}: legacy duplicate active-case illustration still visible`);
               check(data.visiblePolicyNotes===0,`${viewport.name}: visual-policy note should not appear on homepage`);
               check(data.newsroomBoards===0,`${viewport.name}: duplicate newsroom board remains`);
               check(data.publicTools===0,`${viewport.name}: old public-tools block remains`);
               check(data.duplicateIds.length===0,`${viewport.name}: duplicate IDs ${data.duplicateIds.join(', ')}`);
               check(data.overflow<=4,`${viewport.name}: horizontal overflow ${data.overflow}px`);
               check(!data.hasGradeAB,`${viewport.name}: Gred A/B leaked into homepage`);
-              check(data.hasFreshness,`${viewport.name}: page freshness missing`);
-              check(data.hasCourtFreshness,`${viewport.name}: court freshness missing`);
+              check(data.hasFreshness,`${viewport.name}: 13 Sep page freshness missing`);
+              check(data.hasCourtFreshness,`${viewport.name}: 13 Sep court freshness missing`);
               check(data.hasLegalBoundary,`${viewport.name}: legal boundary missing`);
               check(data.azeezBoundary,`${viewport.name}: Azeez not-guilty plea boundary missing`);
               check(data.heroTitle==='Cerita boleh dibentuk. Bukti tak boleh dipaksa.',`${viewport.name}: hero title drift`);
               check(data.ogTitle.includes('Cerita boleh dibentuk. Bukti tak boleh dipaksa.'),`${viewport.name}: generic homepage OG title missing`);
-              check(data.cssHome,`${viewport.name}: homepage CSS missing`);
+              check(data.cssHome,`${viewport.name}: homepage V2 CSS missing`);
+              check(data.truthLens,`${viewport.name}: Raven Truth Lens visual missing`);
+
               if(viewport.width<=430){
                 check(data.height<=6500,`mobile: page still too tall ${data.height}px`);
+                check(data.navToggleVisible,'mobile: Menu toggle not visible');
+                check(data.navToggleHeight>=44,`mobile: Menu toggle height ${data.navToggleHeight}px`);
+                check(!data.navVisible,'mobile: nav should start closed');
+                check(data.navExpanded==='false',`mobile: initial aria-expanded=${data.navExpanded}`);
                 const bad=data.smallControls.filter(x=>x.text && !/Sumber rasmi RCI|Status pendakwaan/.test(x.text));
                 check(bad.length===0,`mobile: undersized action controls ${JSON.stringify(bad.slice(0,8))}`);
+
+                await page.locator('[data-nav-toggle]').click();
+                await page.waitForTimeout(120);
+                const opened=await page.evaluate(()=>{
+                  const nav=document.querySelector('[data-nav]');
+                  const btn=document.querySelector('[data-nav-toggle]');
+                  const s=nav?getComputedStyle(nav):null;
+                  return {
+                    open:nav?.classList.contains('open')||false,
+                    visible:Boolean(nav&&s&&s.display!=='none'&&s.visibility!=='hidden'&&nav.getBoundingClientRect().height>0),
+                    aria:btn?.getAttribute('aria-expanded')||null,
+                    linkCount:nav?.querySelectorAll('a').length||0
+                  };
+                });
+                check(opened.open&&opened.visible,'mobile: Menu drawer did not open');
+                check(opened.aria==='true',`mobile: opened aria-expanded=${opened.aria}`);
+                check(opened.linkCount>=6,`mobile: Menu drawer links ${opened.linkCount}`);
+              } else {
+                check(data.navVisible,'desktop: primary nav should remain visible');
+                check(!data.navToggleVisible,'desktop: Menu toggle should remain hidden');
               }
 
-              await page.screenshot({path:`home-qa/${viewport.name}-home.png`,fullPage:true});
+              await page.screenshot({path:`home-qa/${viewport.name}-home-v2.png`,fullPage:true});
               report[viewport.name]=data;
               await ctx.close();
             }
@@ -166,10 +223,11 @@ jobs:
             if(errors.length) throw new Error(errors.join('\n'));
           })();
           JS
+
       - name: Upload homepage QA evidence
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: raven-home-truth-navigator-v102-qa
+          name: raven-home-truth-navigator-v2-qa
           path: home-qa/
           retention-days: 14

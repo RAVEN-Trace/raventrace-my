@@ -3,6 +3,7 @@ import { chromium } from 'playwright';
 const base=process.env.RAVEN_QA_BASE||'https://raven-trace.github.io/raventrace-my';
 const caseRoute='/investigations/rci-tabung-haji/';
 const narrativeRoute='/investigations/rci-tabung-haji/narratives/';
+const narrativeIds=['rm13b','four-five','rm18m','political','rci-crime','fully-fixed'];
 const browser=await chromium.launch();
 const failures=[];
 const record=(ok,msg)=>{if(!ok) failures.push(msg)};
@@ -14,11 +15,15 @@ async function waitForCaseReader(page){
     if(!document.body.classList.contains('raven-reader-v8')||!content) return false;
     const expected=[...content.children].filter((el)=>el.matches('.case-section[id]')&&el.id!=='briefing').length;
     return expected>0&&document.querySelectorAll('.raven-reader-toggle').length===expected;
-  },{timeout:45000});
+  },null,{timeout:45000});
   await page.waitForTimeout(250);
 }
 async function waitForNarrativeReader(page){
-  await page.waitForFunction(()=>document.body.classList.contains('raven-funnel-ready')&&document.querySelectorAll('.narrative-v5-card.signal-narrative-card').length>=8,{timeout:45000});
+  await page.waitForFunction((ids)=>{
+    const units=ids.every((id)=>document.getElementById(id));
+    const visual=document.querySelector('[data-raven-visual="narrative"] img');
+    return document.body.classList.contains('raven-funnel-ready')&&units&&Boolean(visual);
+  },narrativeIds,{timeout:45000});
   await page.waitForTimeout(250);
 }
 
@@ -37,7 +42,7 @@ async function waitForNarrativeReader(page){
     const revision=document.querySelector('#revision'), trace=revision?.querySelector('.trace-card'), briefing=document.querySelector('#briefing');
     return {expectedDeep,toggleCount:toggles.length,collapsedCount:collapsed.length,minToggleHeight:Math.min(...toggles.map(b=>b.getBoundingClientRect().height)),revisionCollapsed:revision?.classList.contains('raven-reader-collapsed')||false,revisionTraceVisible:trace?visible(trace):null,briefingVisible:briefing?visible(briefing):false,bodyHeight:document.documentElement.scrollHeight};
   });
-  record(initial.expectedDeep>=1,`mobile CASEFILE: no deep sections found`);
+  record(initial.expectedDeep>=1,'mobile CASEFILE: no deep sections found');
   record(initial.toggleCount===initial.expectedDeep,`mobile CASEFILE: expected ${initial.expectedDeep} toggles, got ${initial.toggleCount}`);
   record(initial.collapsedCount===initial.toggleCount,`mobile CASEFILE: ${initial.collapsedCount}/${initial.toggleCount} deep sections collapsed`);
   record(initial.minToggleHeight>=44,`mobile CASEFILE: target too small (${initial.minToggleHeight}px)`);
@@ -63,27 +68,37 @@ async function waitForNarrativeReader(page){
   await context.close();
 }
 
-// Narrative mobile: scan claim + verdict; evidence opens on demand.
+// Narrative mobile: six canonical narrative units + signature visual stay readable.
 {
   const context=await browser.newContext({viewport:{width:390,height:844},deviceScaleFactor:1}); const page=await context.newPage();
   await page.goto(`${base}${narrativeRoute}?${bust()}`,{waitUntil:'domcontentloaded',timeout:45000}); await waitForNarrativeReader(page);
-  const initial=await page.evaluate(()=>{const card=document.querySelector('.narrative-v5-card.signal-narrative-card'),rec=card?.querySelector('.signal-record-zone'),bridge=card?.querySelector('.raven-evidence-bridge'),verdict=card?.querySelector('.signal-verdict-zone'),details=card?.querySelector('.narrative-v5-details'); const vis=(x)=>x&&getComputedStyle(x).display!=='none'; return {id:card?.id,recordVisible:vis(rec),bridgeVisible:vis(bridge),verdictVisible:vis(verdict),detailsOpen:details?.open||false,bodyHeight:document.documentElement.scrollHeight};});
-  record(Boolean(initial.id),'mobile Narrative: no narrative card'); record(initial.verdictVisible,'mobile Narrative: verdict must remain visible'); record(!initial.recordVisible,'mobile Narrative: record should be folded initially'); record(!initial.bridgeVisible,'mobile Narrative: source bridge should be folded initially'); record(!initial.detailsOpen,'mobile Narrative: details should start closed'); record(initial.bodyHeight<19000,`mobile Narrative: still excessively tall (${initial.bodyHeight}px)`);
-  await page.locator('.narrative-v5-card.signal-narrative-card').first().locator('.narrative-v5-details > summary').click(); await page.waitForTimeout(120);
-  const open=await page.evaluate(()=>{const c=document.querySelector('.narrative-v5-card.signal-narrative-card'),r=c?.querySelector('.signal-record-zone'),b=c?.querySelector('.raven-evidence-bridge'),d=c?.querySelector('.narrative-v5-details');return {record:getComputedStyle(r).display!=='none',bridge:getComputedStyle(b).display!=='none',open:d?.open||false}});
-  record(open.open&&open.record&&open.bridge,'mobile Narrative: evidence/context did not reveal with details');
-  await page.goto(`${base}${narrativeRoute}?${bust()}#${initial.id}`,{waitUntil:'domcontentloaded',timeout:45000}); await waitForNarrativeReader(page); await page.waitForTimeout(350);
-  const target=await page.evaluate((id)=>{const c=document.getElementById(id),r=c?.querySelector('.signal-record-zone'),b=c?.querySelector('.raven-evidence-bridge');return {targeted:location.hash===`#${id}`,record:r?getComputedStyle(r).display!=='none':false,bridge:b?getComputedStyle(b).display!=='none':false}},initial.id);
-  record(target.targeted&&target.record&&target.bridge,'mobile Narrative: direct narrative deep link should expose evidence');
+  const initial=await page.evaluate((ids)=>{
+    const visible=(el)=>{if(!el)return false;const s=getComputedStyle(el),r=el.getBoundingClientRect();return s.display!=='none'&&s.visibility!=='hidden'&&r.width>0&&r.height>0};
+    const units=ids.map((id)=>document.getElementById(id));
+    const visual=document.querySelector('[data-raven-visual="narrative"]');
+    const img=visual?.querySelector('img');
+    const caption=visual?.querySelector('figcaption');
+    return {unitCount:units.filter(Boolean).length,allUnitsVisible:units.every(visible),visualVisible:visible(visual),visualSrc:img?.getAttribute('src')||'',editorialLabel:(caption?.textContent||'').includes('Editorial illustration'),bodyHeight:document.documentElement.scrollHeight};
+  },narrativeIds);
+  record(initial.unitCount===narrativeIds.length,`mobile Narrative: expected ${narrativeIds.length} units, got ${initial.unitCount}`);
+  record(initial.allUnitsVisible,'mobile Narrative: one or more canonical narrative units hidden');
+  record(initial.visualVisible,'mobile Narrative: signature visual missing or hidden');
+  record(initial.visualSrc.endsWith('raven-narrative-rm13b-v1-web.svg'),`mobile Narrative: unexpected visual source ${initial.visualSrc}`);
+  record(initial.editorialLabel,'mobile Narrative: editorial-illustration boundary missing');
+  record(initial.bodyHeight<19000,`mobile Narrative: excessively tall (${initial.bodyHeight}px)`);
+  await page.goto(`${base}${narrativeRoute}?${bust()}#rm13b`,{waitUntil:'domcontentloaded',timeout:45000}); await waitForNarrativeReader(page); await page.waitForTimeout(350);
+  const target=await page.evaluate(()=>{const c=document.getElementById('rm13b'),s=c?getComputedStyle(c):null,r=c?.getBoundingClientRect();return {targeted:location.hash==='#rm13b',visible:Boolean(c&&s&&s.display!=='none'&&s.visibility!=='hidden'&&r.width>0&&r.height>0)}});
+  record(target.targeted&&target.visible,'mobile Narrative: direct #rm13b deep link should expose the narrative unit');
   await context.close();
 }
 
-// Narrative desktop remains fully readable.
+// Narrative desktop remains fully readable with all six units and signature visual.
 {
   const context=await browser.newContext({viewport:{width:1440,height:900},deviceScaleFactor:1}); const page=await context.newPage();
   await page.goto(`${base}${narrativeRoute}?${bust()}`,{waitUntil:'domcontentloaded',timeout:45000}); await waitForNarrativeReader(page);
-  const d=await page.evaluate(()=>{const c=document.querySelector('.narrative-v5-card.signal-narrative-card'),r=c?.querySelector('.signal-record-zone'),b=c?.querySelector('.raven-evidence-bridge');return {record:r?getComputedStyle(r).display:null,bridge:b?getComputedStyle(b).display:null}});
-  record(d.record!=='none'&&d.bridge!=='none','desktop Narrative: evidence should remain visible');
+  const d=await page.evaluate((ids)=>{const visible=(el)=>{if(!el)return false;const s=getComputedStyle(el),r=el.getBoundingClientRect();return s.display!=='none'&&s.visibility!=='hidden'&&r.width>0&&r.height>0};const units=ids.map((id)=>document.getElementById(id));const visual=document.querySelector('[data-raven-visual="narrative"]');return {count:units.filter(Boolean).length,allVisible:units.every(visible),visualVisible:visible(visual)}} ,narrativeIds);
+  record(d.count===narrativeIds.length&&d.allVisible,'desktop Narrative: canonical narrative units should remain fully readable');
+  record(d.visualVisible,'desktop Narrative: signature visual should remain visible');
   await context.close();
 }
 

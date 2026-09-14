@@ -1,0 +1,57 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="675" viewBox="0 0 1200 675" role="img" aria-labelledby="title desc">
+  <title id="title">Raven Truth Lens</title>
+  <desc id="desc">Editorial illustration showing Raven's reasoning sequence: Cerita, Rekod, Jurang, Verdict.</desc>
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#0a1015"/>
+      <stop offset="1" stop-color="#121b22"/>
+    </linearGradient>
+    <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="12" stdDeviation="16" flood-color="#000" flood-opacity=".28"/>
+    </filter>
+  </defs>
+  <rect width="1200" height="675" fill="url(#bg)"/>
+  <circle cx="1080" cy="80" r="220" fill="#38d8ef" opacity=".045"/>
+  <path d="M68 88H1132" stroke="#31404a"/>
+  <text x="70" y="58" fill="#72dfef" font-family="Arial, Helvetica, sans-serif" font-size="22" font-weight="700" letter-spacing="4">RAVEN TRUTH LENS</text>
+  <text x="1130" y="58" text-anchor="end" fill="#9ba8b0" font-family="Arial, Helvetica, sans-serif" font-size="18">EDITORIAL EXPLAINER</text>
+
+  <g filter="url(#shadow)">
+    <rect x="70" y="132" width="1060" height="418" rx="18" fill="#f4efe5"/>
+  </g>
+
+  <g font-family="Arial, Helvetica, sans-serif">
+    <text x="114" y="190" fill="#6e777d" font-size="16" font-weight="700" letter-spacing="3">01</text>
+    <text x="164" y="192" fill="#12171c" font-size="30" font-weight="800">CERITA</text>
+    <text x="164" y="224" fill="#566068" font-size="19">Apa orang kata?</text>
+    <line x1="164" y1="248" x2="1038" y2="248" stroke="#d4ccc0"/>
+
+    <text x="114" y="298" fill="#0b6a78" font-size="16" font-weight="700" letter-spacing="3">02</text>
+    <text x="164" y="300" fill="#12171c" font-size="30" font-weight="800">REKOD</text>
+    <text x="164" y="332" fill="#566068" font-size="19">Apa bukti boleh sahkan?</text>
+    <line x1="164" y1="356" x2="1038" y2="356" stroke="#d4ccc0"/>
+
+    <rect x="98" y="382" width="952" height="72" rx="10" fill="#fff0d6" stroke="#c98318"/>
+    <text x="114" y="410" fill="#8d4b00" font-size="16" font-weight="800" letter-spacing="3">03</text>
+    <text x="164" y="414" fill="#6f3900" font-size="29" font-weight="900">JURANG</text>
+    <text x="354" y="414" fill="#6f3900" font-size="19">Apa yang tidak sama, tertinggal atau masih belum diketahui?</text>
+
+    <text x="114" y="508" fill="#0b6a78" font-size="16" font-weight="700" letter-spacing="3">04</text>
+    <text x="164" y="510" fill="#12171c" font-size="30" font-weight="900">VERDICT</text>
+    <text x="354" y="510" fill="#566068" font-size="19">Kesimpulan setakat bukti — bukan lebih.</text>
+  </g>
+
+  <g stroke="#45d5e8" stroke-width="3" fill="none">
+    <path d="M1058 188v56"/>
+    <path d="M1058 296v56"/>
+    <path d="M1058 458v48"/>
+  </g>
+  <g fill="#45d5e8">
+    <path d="M1058 252l-8-13h16z"/>
+    <path d="M1058 360l-8-13h16z"/>
+    <path d="M1058 514l-8-13h16z"/>
+  </g>
+
+  <text x="70" y="612" fill="#e8ecee" font-family="Georgia, 'Times New Roman', serif" font-size="28" font-weight="700">Cerita boleh dibentuk. Bukti tak boleh dipaksa.</text>
+  <text x="1130" y="612" text-anchor="end" fill="#8e9ba4" font-family="Arial, Helvetica, sans-serif" font-size="17">RAVEN-Trace · Visual konseptual, bukan dokumen bukti</text>
+</svg>

@@ -1,0 +1,48 @@
+name: Apply Homepage Mobile Visual V2
+
+on:
+  push:
+    branches: [design/home-mobile-visual-v2]
+    paths:
+      - '.github/workflows/apply-home-mobile-visual-v2.yml'
+      - 'scripts/apply_home_mobile_visual_v2.py'
+      - 'assets/css/raven-home-mobile-v2.css'
+      - 'assets/visuals/raven-truth-lens-v1.svg'
+
+permissions:
+  contents: write
+
+jobs:
+  apply:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: design/home-mobile-visual-v2
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+      - name: Apply homepage refinement
+        run: python scripts/apply_home_mobile_visual_v2.py
+      - name: Validate SVG and static homepage
+        run: |
+          python - <<'PY'
+          import xml.etree.ElementTree as ET
+          from pathlib import Path
+          ET.parse('assets/visuals/raven-truth-lens-v1.svg')
+          text=Path('index.html').read_text(encoding='utf-8')
+          assert 'raven-home-mobile-v2.css?v=2.0.0' in text
+          assert 'data-raven-home="2.0.0"' in text
+          print('SVG + homepage static validation passed')
+          PY
+      - name: Commit rollout
+        run: |
+          if git diff --quiet; then
+            echo 'No rollout changes required'
+            exit 0
+          fi
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add index.html
+          git commit -m 'design: apply homepage mobile visual V2'
+          git push

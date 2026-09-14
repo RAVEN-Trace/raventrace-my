@@ -34,9 +34,74 @@ body[data-raven-home="2.0.0"].raven-editorial-home .signal-strip .signal-grid > 
   color: #8a4700 !important;
 }
 
+/* Homepage V2 owns one signature explainer: Raven Truth Lens.
+   Suppress the legacy runtime illustration and its provenance note so the
+   orientation page does not become a visual stack. Evidence pages keep them. */
+body[data-raven-home="2.0.0"] .home-active-case .editorial-art,
+body[data-raven-home="2.0.0"] #latest .source-image-policy {
+  display: none !important;
+}
+
+/* Restore the base homepage interaction contract for V2.
+   Primary navigation/actions are thumb targets; inline source citations stay inline. */
+body[data-raven-home="2.0.0"] :where(
+  .home-case-status p:last-child > a,
+  .home-update-copy > a,
+  .home-update-row > a,
+  .home-all-updates,
+  .raven-context-desk,
+  .home-trust-links a
+) {
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
+  padding-block: .55rem;
+}
+body[data-raven-home="2.0.0"] .home-update-row > a {
+  padding-inline: .55rem;
+}
+
+/* Keep the compact trust surface visually intentional in V2. */
+body[data-raven-home="2.0.0"] .home-trust-strip {
+  padding: 1.4rem 0;
+  border-top: 1px solid #293138;
+  border-bottom: 1px solid #293138;
+  background: #0b1014;
+  color: #e9edf0;
+}
+body[data-raven-home="2.0.0"] .home-trust-inner {
+  display: grid;
+  grid-template-columns: minmax(0, 1.3fr) minmax(0, .7fr);
+  gap: 1rem 2rem;
+  align-items: center;
+}
+body[data-raven-home="2.0.0"] .home-trust-copy {
+  margin: 0;
+  color: #cdd5da;
+  line-height: 1.5;
+}
+body[data-raven-home="2.0.0"] .home-trust-copy strong {
+  color: #fff;
+}
+body[data-raven-home="2.0.0"] .home-trust-links {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: .35rem 1rem;
+}
+
 /* Source grades are metadata on warm paper; deep teal clears AA at small sizes. */
 body.raven-v5 .source-room .sources-grid li > span {
   color: #074955 !important;
+}
+
+@media (max-width: 780px) {
+  body[data-raven-home="2.0.0"] .home-trust-inner {
+    grid-template-columns: 1fr;
+  }
+  body[data-raven-home="2.0.0"] .home-trust-links {
+    justify-content: flex-start;
+  }
 }
 
 @media (max-width: 760px) {

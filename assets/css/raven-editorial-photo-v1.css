@@ -181,3 +181,117 @@ body[data-raven-home="2.0.0"] .home-case-status .raven-editorial-photo {
     border-inline: 0;
   }
 }
+
+
+/* RCI Tabung Haji — easy-read orientation map */
+.raven-case-map-section {
+  background: #f3efe7;
+  border-block: 1px solid rgba(16, 21, 26, .16);
+}
+
+.raven-case-map-inner {
+  max-width: 1040px;
+  margin-inline: auto;
+  padding-block: clamp(1.35rem, 3vw, 2.4rem);
+}
+
+.raven-case-map-head {
+  max-width: 760px;
+  margin-bottom: 1rem;
+}
+
+.raven-case-map-head .eyebrow {
+  margin-bottom: .35rem;
+}
+
+.raven-case-map-head h2 {
+  margin: 0 0 .45rem;
+  font-size: clamp(1.8rem, 4vw, 3.2rem);
+  line-height: .98;
+  letter-spacing: -.035em;
+}
+
+.raven-case-map-head p:last-child {
+  margin-bottom: 0;
+  max-width: 64ch;
+}
+
+.raven-case-map {
+  margin: 0;
+  max-width: 960px;
+  background: #fffdf8;
+  border: 1px solid rgba(16, 21, 26, .18);
+  box-shadow: 0 18px 50px rgba(16, 21, 26, .10);
+}
+
+.raven-case-map > a {
+  display: block;
+  background: #fffdf8;
+  cursor: zoom-in;
+}
+
+.raven-case-map img {
+  display: block;
+  width: 100%;
+  height: auto;
+  aspect-ratio: auto !important;
+  object-fit: contain !important;
+  background: #fffdf8;
+}
+
+.raven-case-map figcaption {
+  padding: .8rem 1rem;
+  color: #3f474c;
+  background: #fffdf8;
+  border-top: 1px solid rgba(16, 21, 26, .12);
+  font: 600 .78rem/1.5 system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+}
+
+.raven-case-map-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: .65rem;
+  margin-top: 1rem;
+}
+
+.raven-case-map-summary {
+  max-width: 960px;
+  margin-top: 1rem;
+  padding: .9rem 1rem;
+  border-left: 3px solid #0b5d6b;
+  background: #fffdf8;
+}
+
+.raven-case-map-summary strong {
+  color: #0b5d6b;
+}
+
+.home-map-entry {
+  margin-top: .7rem;
+}
+
+@media (max-width: 780px) {
+  .raven-case-map-inner {
+    padding-inline: 0;
+  }
+
+  .raven-case-map-head,
+  .raven-case-map-actions,
+  .raven-case-map-summary {
+    margin-left: 1rem;
+    margin-right: 1rem;
+  }
+
+  .raven-case-map {
+    border-inline: 0;
+    box-shadow: none;
+  }
+
+  .raven-case-map figcaption {
+    padding-inline: 1rem;
+  }
+
+  .raven-case-map-actions .btn {
+    min-height: 44px;
+  }
+}

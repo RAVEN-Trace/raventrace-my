@@ -43,9 +43,11 @@ jobs:
             'class="home-update-lead"',
             'data-variant="home"',
             'class="home-trust-strip"',
-            'Raven terakhir semak halaman ini: 13 Sep',
-            'Status mahkamah disahkan hingga: 13 Sep 2026',
+            'Raven terakhir semak halaman ini: 19 Sep',
+            'Status mahkamah disahkan hingga: 19 Sep 2026',
             'Ditahan ≠ direman ≠ didakwa ≠ bersalah',
+            'Enam individu sudah didakwa. Lima siasatan SPRM masih aktif.',
+            'lima kertas siasatan',
             '/investigations/rci-tabung-haji/updates/',
             '/investigations/rci-tabung-haji/people/',
             '/investigations/rci-tabung-haji/sources/'
@@ -140,9 +142,10 @@ jobs:
                   duplicateIds:[...new Set(dups)],
                   smallControls,
                   hasGradeAB:/Gred A\/B/.test(mainText),
-                  hasFreshness:/Raven terakhir semak halaman ini: 13 Sep/.test(document.body.innerText),
-                  hasCourtFreshness:/Status mahkamah disahkan hingga: 13 Sep 2026/.test(mainText),
+                  hasFreshness:/Raven terakhir semak halaman ini: 19 Sep/.test(document.body.innerText),
+                  hasCourtFreshness:/Status mahkamah disahkan hingga: 19 Sep 2026/.test(mainText),
                   hasLegalBoundary:/Ditahan ≠ direman ≠ didakwa ≠ bersalah/.test(mainText),
+                  hasCurrentCaseState:/Enam individu sudah didakwa\. Lima siasatan SPRM masih aktif\./.test(mainText) && /lima kertas siasatan/i.test(mainText),
                   azeezBoundary:/Abdul Azeez didakwa pada 9 September dan mengaku tidak bersalah\./.test(mainText),
                   heroTitle:document.querySelector('.v5-truth-intro h1')?.textContent?.trim(),
                   ogTitle:document.querySelector('meta[property="og:title"]')?.content || '',
@@ -173,9 +176,10 @@ jobs:
               check(data.duplicateIds.length===0,`${viewport.name}: duplicate IDs ${data.duplicateIds.join(', ')}`);
               check(data.overflow<=4,`${viewport.name}: horizontal overflow ${data.overflow}px`);
               check(!data.hasGradeAB,`${viewport.name}: Gred A/B leaked into homepage`);
-              check(data.hasFreshness,`${viewport.name}: 13 Sep page freshness missing`);
-              check(data.hasCourtFreshness,`${viewport.name}: 13 Sep court freshness missing`);
+              check(data.hasFreshness,`${viewport.name}: 19 Sep page freshness missing`);
+              check(data.hasCourtFreshness,`${viewport.name}: 19 Sep court freshness missing`);
               check(data.hasLegalBoundary,`${viewport.name}: legal boundary missing`);
+              check(data.hasCurrentCaseState,`${viewport.name}: current 19 Sep case state missing`);
               check(data.azeezBoundary,`${viewport.name}: Azeez not-guilty plea boundary missing`);
               check(data.heroTitle==='Cerita boleh dibentuk. Bukti tak boleh dipaksa.',`${viewport.name}: hero title drift`);
               check(data.ogTitle.includes('Cerita boleh dibentuk. Bukti tak boleh dipaksa.'),`${viewport.name}: generic homepage OG title missing`);

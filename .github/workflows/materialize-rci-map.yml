@@ -1,0 +1,37 @@
+name: Materialize RCI map asset
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - '.raven-upload/**'
+      - '.github/workflows/materialize-rci-map.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  materialize:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Rebuild RCI infographic
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p assets/img/editorial
+          cat .raven-upload/rci-map.part* | base64 -d > assets/img/editorial/rci-tabung-haji-peta-mudah-faham-19sep2026-v2.webp
+          test -s assets/img/editorial/rci-tabung-haji-peta-mudah-faham-19sep2026-v2.webp
+          file assets/img/editorial/rci-tabung-haji-peta-mudah-faham-19sep2026-v2.webp
+          bytes="$(wc -c < assets/img/editorial/rci-tabung-haji-peta-mudah-faham-19sep2026-v2.webp)"
+          test "$bytes" -gt 90000
+          test "$bytes" -lt 100000
+          rm -rf .raven-upload
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git commit -m "Materialize RCI Tabung Haji infographic asset"
+          git push

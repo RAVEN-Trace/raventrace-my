@@ -18,8 +18,12 @@
   const isCase=path==='/raventrace-my/investigations/rci-tabung-haji/'||path.endsWith('/investigations/rci-tabung-haji/index.html');
   const isUpdates=path.includes('/investigations/rci-tabung-haji/updates/');
   const isCountStory=path.includes('/news/2026/09/11/empat-atau-lima-didakwa-rekod-tidak-seragam/');
-  if(isCase||isUpdates||isCountStory){
-    const target=isCase?(q('#revision')||q('#briefing')):(q('.section-content .case-section')||q('.story-body')||q('article'));
-    if(target && !q('[data-raven-visual="four-five"]')){const v=make('/raventrace-my/assets/visuals/raven-4-vs-5-v1-web.svg','Visual Raven membandingkan empat charge-readings yang disokong rekod mahkamah dengan lima dalam kenyataan agensi, sambil menandakan bahawa kedua-dua kategori tidak sama.','Dua rekod awam dipaparkan serentak tanpa menyembunyikan percanggahan.','disputed');v.dataset.ravenVisual='four-five';if(isCase)insertAfter(target.querySelector('h2')||target,v);else target.insertBefore(v,target.firstChild);}
+  if(isCase||isUpdates){
+    const target=isCase?(q('#briefing')||q('#revision')):(q('.section-content .case-section')||q('article'));
+    if(target && !q('[data-raven-visual="six-eight-five"]')){const v=make('/raventrace-my/assets/visuals/raven-6-8-5-v1-web.svg','Visual Raven menunjukkan enam actual arraignments, lapan isu dalam formulasi SPRM dan lima kertas siasatan yang masih aktif setakat 19 September 2026.','People, issues dan active papers ialah kategori berbeza; pertuduhan dan siasatan bukan sabitan.','evidence');v.dataset.ravenVisual='six-eight-five';if(isCase)insertAfter(target.querySelector('h2')||target,v);else target.insertBefore(v,target.firstChild);}
+  }
+  if(isCountStory){
+    const target=q('.story-body')||q('article');
+    if(target && !q('[data-raven-visual="four-five"]')){const v=make('/raventrace-my/assets/visuals/raven-4-vs-5-v1-web.svg','Historical visual Raven comparing four court-confirmed charge-readings with five in an agency statement at the 11–13 September checkpoint.','Historical discrepancy retained as an audit trail; later court developments superseded the count.','disputed');v.dataset.ravenVisual='four-five';target.insertBefore(v,target.firstChild);}
   }
 })();

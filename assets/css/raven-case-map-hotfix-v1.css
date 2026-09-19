@@ -1,0 +1,152 @@
+/* RAVEN CASE MAP HOTFIX V1
+   Replaces the failed/blank raster orientation map with a responsive,
+   accessible HTML/CSS evidence-flow graphic. */
+
+.raven-case-map--html {
+  overflow: hidden;
+}
+
+.raven-case-map--html .raven-map-canvas {
+  padding: clamp(1rem, 2.5vw, 2rem);
+  background:
+    linear-gradient(rgba(11,93,107,.045) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(11,93,107,.045) 1px, transparent 1px),
+    #fffdf8;
+  background-size: 32px 32px;
+}
+
+.raven-map-kicker {
+  margin: 0 0 .9rem;
+  color: #074955;
+  font: 800 .74rem/1.35 system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  letter-spacing: .09em;
+  text-transform: uppercase;
+}
+
+.raven-map-flow {
+  display: grid;
+  grid-template-columns: minmax(0,1fr) auto minmax(0,1fr) auto minmax(0,1fr) auto minmax(0,1fr);
+  gap: .6rem;
+  align-items: stretch;
+}
+
+.raven-map-stage {
+  position: relative;
+  min-width: 0;
+  padding: 1rem;
+  border-top: 4px solid #0b5d6b;
+  border-bottom: 1px solid #d8d3c8;
+  background: rgba(255,253,248,.94);
+}
+
+.raven-map-stage-no {
+  display: block;
+  margin-bottom: .85rem;
+  color: #0b5d6b;
+  font: 900 .76rem/1 system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  letter-spacing: .08em;
+}
+
+.raven-map-stage h3 {
+  margin: 0 0 .45rem;
+  color: #121418;
+  font-size: clamp(1rem, 1.8vw, 1.2rem);
+  line-height: 1.15;
+}
+
+.raven-map-stage p {
+  margin: 0;
+  color: #465158;
+  font-size: .9rem;
+  line-height: 1.55;
+}
+
+.raven-map-arrow {
+  display: grid;
+  place-items: center;
+  color: #0b5d6b;
+  font: 900 1.3rem/1 system-ui, sans-serif;
+}
+
+.raven-map-support {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: .75rem;
+  margin-top: 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid #d8d3c8;
+}
+
+.raven-map-support article {
+  padding: .85rem 1rem;
+  background: #f3efe7;
+  border-left: 3px solid #8b6a2e;
+}
+
+.raven-map-support strong {
+  display: block;
+  margin-bottom: .28rem;
+  color: #6b3100;
+  font-size: .84rem;
+}
+
+.raven-map-support span {
+  display: block;
+  color: #465158;
+  font-size: .86rem;
+  line-height: 1.45;
+}
+
+.raven-map-boundary {
+  margin-top: 1rem;
+  padding: .9rem 1rem;
+  border: 1px solid #d8d3c8;
+  border-left: 5px solid #7a1f2b;
+  background: #f5e9eb;
+  color: #343c42;
+}
+
+.raven-map-boundary strong {
+  color: #7a1f2b;
+}
+
+.raven-map-boundary p {
+  margin: 0;
+  line-height: 1.55;
+}
+
+.raven-case-map--html figcaption {
+  border-top: 1px solid rgba(16,21,26,.12);
+}
+
+@media (max-width: 780px) {
+  .raven-case-map--html .raven-map-canvas {
+    padding: 1rem;
+    background-size: 24px 24px;
+  }
+
+  .raven-map-flow {
+    grid-template-columns: 1fr;
+    gap: 0;
+  }
+
+  .raven-map-stage {
+    padding: 1rem .95rem;
+    border-top-width: 3px;
+  }
+
+  .raven-map-arrow {
+    min-height: 34px;
+    transform: rotate(90deg);
+  }
+
+  .raven-map-support {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .raven-case-map--html * {
+    scroll-behavior: auto !important;
+  }
+}

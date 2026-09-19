@@ -59,8 +59,8 @@ body[data-raven-home="2.0.0"] .home-case-status::after {
 }
 
 body[data-raven-home="2.0.0"] .home-case-status .raven-editorial-photo {
-  margin: -1.25rem -1.3rem 1rem;
-  width: calc(100% + 2.6rem);
+  margin: 0 0 1rem !important;
+  width: 100% !important;
   border-top: 0;
 }
 
@@ -74,8 +74,8 @@ body[data-raven-home="2.0.0"] .home-case-status .raven-editorial-photo {
 
 @media (max-width: 780px) {
   body[data-raven-home="2.0.0"] .home-case-status .raven-editorial-photo {
-    margin: -1rem -1rem .9rem;
-    width: calc(100% + 2rem);
+    margin: 0 0 .9rem !important;
+    width: 100% !important;
   }
 
   .raven-photo-band .container {

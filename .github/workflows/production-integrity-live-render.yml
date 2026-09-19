@@ -70,7 +70,7 @@ jobs:
           checks={
             '/':['Enam individu sudah didakwa. Lima siasatan SPRM masih aktif.','Pertuduhan dan siasatan tidak sama dengan sabitan.'],
             '/investigations/rci-tabung-haji/':['RCI finding ≠ sabitan','Pertuduhan ≠ bersalah','Kerugian ≠ kecurian'],
-            '/investigations/rci-tabung-haji/people/':['Pertuduhan bukan sabitan','Reman bukan pertuduhan'],
+            '/investigations/rci-tabung-haji/people/':['Semua individu dianggap tidak bersalah sehingga dibuktikan bersalah oleh mahkamah.','Raven tidak menyamakan disebut, disiasat, direman, didakwa dan bersalah.'],
             '/investigations/rci-tabung-haji/money/':['Kerugian besar tidak dengan sendiri membuktikan kecurian','bukan automatic theft finding'],
             '/investigations/rci-tabung-haji/narratives/':['loss ≠ theft','application ≠ final forfeiture order','DISPUTED / UNKNOWN'],
           }

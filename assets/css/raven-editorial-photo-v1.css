@@ -295,3 +295,245 @@ body[data-raven-home="2.0.0"] .home-case-status .raven-editorial-photo {
     min-height: 44px;
   }
 }
+
+
+/* Native RCI orientation map — resilient fallback and primary mobile treatment */
+.raven-case-map-native {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1rem;
+  max-width: 960px;
+  margin: 0;
+}
+
+.map-core,
+.map-node,
+.map-photo,
+.map-memory {
+  border: 1px solid rgba(16,21,26,.16);
+  background: #fffdf8;
+}
+
+.map-core {
+  grid-column: 1 / -1;
+  padding: clamp(1.2rem, 2.5vw, 2rem);
+  background:
+    radial-gradient(circle at 70% 25%, rgba(56,216,239,.14), transparent 32%),
+    #0b1014;
+  color: #f7f4ed;
+}
+
+.map-core span {
+  display: block;
+  color: #86dbe9;
+  font: 900 .76rem/1.2 system-ui, sans-serif;
+  letter-spacing: .12em;
+}
+
+.map-core strong {
+  display: block;
+  margin-top: .35rem;
+  max-width: 18ch;
+  font: 800 clamp(1.55rem, 3vw, 2.7rem)/1.02 Georgia, "Times New Roman", serif;
+}
+
+.map-core p {
+  margin: .65rem 0 0;
+  color: #c7d0d5;
+}
+
+.map-node {
+  padding: 1.05rem 1.1rem 1.15rem;
+  border-top-width: 4px;
+}
+
+.map-node h3 {
+  margin: .35rem 0 .7rem;
+  font-size: clamp(1.15rem, 2vw, 1.45rem);
+  line-height: 1.1;
+}
+
+.map-node ul {
+  margin: 0;
+  padding-left: 1.15rem;
+}
+
+.map-node li + li {
+  margin-top: .5rem;
+}
+
+.map-node-kicker {
+  display: flex;
+  align-items: center;
+  gap: .55rem;
+  font: 900 .78rem/1.2 system-ui, sans-serif;
+  letter-spacing: .045em;
+  text-transform: uppercase;
+}
+
+.map-node-kicker span {
+  display: inline-grid;
+  place-items: center;
+  width: 2rem;
+  height: 2rem;
+  border-radius: 999px;
+  color: #fff;
+  background: #11161c;
+}
+
+.map-node--teal { border-top-color: #0b5d6b; }
+.map-node--teal .map-node-kicker { color: #0b5d6b; }
+
+.map-node--amber { border-top-color: #a04a00; }
+.map-node--amber .map-node-kicker { color: #874000; }
+
+.map-node--green { border-top-color: #1f6b4c; }
+.map-node--green .map-node-kicker { color: #1f6b4c; }
+
+.map-node--red { border-top-color: #7a1f2b; }
+.map-node--red .map-node-kicker { color: #7a1f2b; }
+
+.map-node--warning {
+  border-top-color: #a04a00;
+  background: #fff8ef;
+}
+
+.map-node--blue {
+  border-top-color: #0b5d6b;
+  background: #f2fbfc;
+}
+
+.map-photo {
+  margin: 0;
+  overflow: hidden;
+  background: #0b1014;
+}
+
+.map-photo img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  min-height: 230px;
+  object-fit: cover;
+}
+
+.map-photo figcaption {
+  padding: .58rem .7rem;
+  background: #0b1014;
+  color: #c9d1d5;
+  font: 650 .68rem/1.4 system-ui, sans-serif;
+}
+
+.map-mini-timeline {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.map-mini-timeline li {
+  display: grid;
+  grid-template-columns: 4.6rem 1fr;
+  gap: .75rem;
+  padding: .55rem 0;
+  border-top: 1px solid rgba(16,21,26,.12);
+}
+
+.map-mini-timeline li:first-child {
+  border-top: 0;
+}
+
+.map-mini-timeline b {
+  color: #1f6b4c;
+}
+
+.map-not-equal {
+  display: grid;
+  gap: .5rem;
+}
+
+.map-not-equal span {
+  display: block;
+  padding: .65rem .7rem;
+  border: 1px solid rgba(122,31,43,.18);
+  background: #fffdf8;
+}
+
+.map-reading-key {
+  display: grid;
+  gap: .5rem;
+}
+
+.map-reading-key a {
+  display: grid;
+  grid-template-columns: 7.2rem 1fr;
+  gap: .65rem;
+  align-items: center;
+  padding: .65rem .7rem;
+  border: 1px solid rgba(11,93,107,.18);
+  background: #fff;
+  color: #121418;
+  text-decoration: none;
+}
+
+.map-reading-key a:hover,
+.map-reading-key a:focus-visible {
+  border-color: #0b5d6b;
+  text-decoration: underline;
+}
+
+.map-reading-key b {
+  color: #0b5d6b;
+  font-size: .76rem;
+  letter-spacing: .04em;
+}
+
+.map-memory {
+  grid-column: 1 / -1;
+  padding: 1rem 1.1rem;
+  border-left: 5px solid #a04a00;
+  background: #fff4da;
+}
+
+.map-memory strong {
+  display: block;
+  margin-bottom: .25rem;
+  font-size: 1.1rem;
+}
+
+.map-memory p {
+  margin: 0;
+  font-size: clamp(1rem, 1.8vw, 1.2rem);
+  line-height: 1.45;
+}
+
+@media (max-width: 780px) {
+  .raven-case-map-native {
+    grid-template-columns: 1fr;
+    gap: .8rem;
+  }
+
+  .map-core,
+  .map-memory {
+    grid-column: 1;
+  }
+
+  .map-node,
+  .map-core,
+  .map-memory {
+    margin-inline: 1rem;
+  }
+
+  .map-photo {
+    border-inline: 0;
+  }
+
+  .map-photo img {
+    min-height: 210px;
+    aspect-ratio: 16 / 10;
+  }
+
+  .map-reading-key a {
+    grid-template-columns: 6.4rem 1fr;
+    min-height: 44px;
+  }
+}

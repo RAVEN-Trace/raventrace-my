@@ -25,25 +25,26 @@ jobs:
     env:
       BASE: https://raven-trace.github.io/raventrace-my
     steps:
-      - name: Wait for complete 13 Sep evidence payload
+      - name: Wait for complete 19 Sep evidence payload
         run: |
           python - <<'PY'
           import os,time,urllib.request
           base=os.environ['BASE']
-          headers={'User-Agent':'RAVEN-Trace-Live-QA/13SepVerification','Cache-Control':'no-cache'}
+          headers={'User-Agent':'RAVEN-Trace-Live-QA/19SepMaster','Cache-Control':'no-cache'}
           checks={
-            '/':['empat individu telah berdepan pertuduhan','SPRM pula menyebut lima','raven-v5.css?v=5.0.0','raven-unified-v7.css?v=7.0.5'],
-            '/news/':['SEMAKAN TERBARU','REKOD TAK SEPADAN'],
-            '/investigations/rci-tabung-haji/':['Cut-off · 13 Sep 2026','13 Sep evidence revision','Empat vs lima telah didakwa','19 Jul 2022','RM18m/RM18.6m'],
-            '/investigations/rci-tabung-haji/updates/':['RCI TABUNG HAJI · PERKEMBANGAN KES','13 Sep evidence revision','Empat court-confirmed; SPRM pernah menyebut lima','RM18m/RM18.6m'],
-            '/investigations/rci-tabung-haji/people/':['Empat telah berdepan pertuduhan','Belum didakwa · 24 Sep','4 court-confirmed / 5 agency-stated'],
-            '/investigations/rci-tabung-haji/timeline/':['19 Jul 2022','Reman lima hari','Reman dilanjutkan dua hari'],
-            '/investigations/rci-tabung-haji/money/':['RM10.2b','RM2.6b','Bukan mens rea'],
-            '/investigations/rci-tabung-haji/narratives/':['RM13 bilion dicuri / hilang','application ≠ final forfeiture order','DISPUTED / UNKNOWN','Like, repost dan screenshot bukan proof of truth'],
-            '/investigations/rci-tabung-haji/narratives/political-social-media/':['AUDIT NARATIF POLITIK + MEDIA SOSIAL','Petunjuk media sosial','Siapa bawa cerita apa?'],
-            '/investigations/rci-tabung-haji/sources/':['Evidence ledger','Parlimen · jawapan bertulis 22 Mei 2023','2022 withdrawal','Social-media limitation'],
-            '/about/':['Cari yang benar.','Pecahkan cerita.','Cara kerja RAVEN-Trace','Kebebasan editorial + penggunaan AI'],
-            '/methodology/':['Cara Raven bekerja','A · Sumber asal / bukti langsung','metadata','Cari sumber asal'],
+            '/':['Enam individu sudah didakwa. Lima siasatan SPRM masih aktif.','19 Sep 2026 · deep investigation','Mohamad Hashim didakwa; PAC memulakan prosiding pertama TH.'],
+            '/news/':['6 individu didakwa; 5 siasatan SPRM masih aktif.','Mohamad Hashim didakwa RM14,000; PAC memulakan prosiding pertama TH.'],
+            '/investigations/':['disemak hingga 19 Sep 2026 · deep investigation','19 Sep:</strong> SPRM menyatakan enam individu telah didakwa','PAC sudah bermula'],
+            '/investigations/rci-tabung-haji/':['Cut-off · 19 Sep 2026 · 19:33 MYT','Multi-track accountability · aktif','lima kertas siasatan SPRM masih aktif'],
+            '/investigations/rci-tabung-haji/updates/':['6 didakwa · 8 isu · 5 siasatan SPRM masih aktif.','Mohamad Hashim Mukhatap didakwa berkaitan RM14,000.','Lima workstream aktif kini dinamakan.'],
+            '/investigations/rci-tabung-haji/people/':['Enam individu telah berdepan pertuduhan yang dibacakan.','Didakwa · 14 Sep','Didakwa · 15 Sep'],
+            '/investigations/rci-tabung-haji/timeline/':['Perubahan terkini selepas 13 September.','15 Sep','19 Sep'],
+            '/investigations/rci-tabung-haji/money/':['RM10.2b','RM2.6b','RM12.5–12.6b','Bukan mens rea'],
+            '/investigations/rci-tabung-haji/narratives/':['RM13 bilion dicuri / hilang','application ≠ final forfeiture order','DISPUTED / UNKNOWN','Naratif yang kuat tidak semestinya benar.'],
+            '/investigations/rci-tabung-haji/narratives/political-social-media/':['Buang parti, buang slogan, buang emosi','Government position · 16 Sep','19 Sep enforcement disclosure'],
+            '/investigations/rci-tabung-haji/sources/':['Sumber yang mengubah current state.','Evidence ledger'],
+            '/about/':['Cari yang benar.','Pecahkan cerita.'],
+            '/methodology/':['Cara Raven bekerja','A · Sumber asal / bukti langsung'],
           }
           for attempt in range(60):
               ok=True
@@ -55,29 +56,29 @@ jobs:
                   except Exception as e:
                       ok=False; print('wait',attempt,path,type(e).__name__,str(e)[:120])
               if ok:
-                  print('13 SEP VERIFIED PAYLOAD READY')
+                  print('19 SEP MASTER PAYLOAD READY')
                   raise SystemExit(0)
               time.sleep(5)
-          raise SystemExit('Timed out waiting for 13 Sep verified Pages payload')
+          raise SystemExit('Timed out waiting for 19 Sep master Pages payload')
           PY
 
       - name: Verify legal and factual boundary
         run: |
           python - <<'PY'
           import os,urllib.request,time
-          base=os.environ['BASE']; h={'User-Agent':'RAVEN-Trace-Live-QA/13SepVerification','Cache-Control':'no-cache'}
+          base=os.environ['BASE']; h={'User-Agent':'RAVEN-Trace-Live-QA/19SepMaster','Cache-Control':'no-cache'}
           checks={
-            '/':['empat individu telah berdepan pertuduhan','SPRM pula menyebut lima'],
+            '/':['Enam individu sudah didakwa. Lima siasatan SPRM masih aktif.','Pertuduhan dan siasatan tidak sama dengan sabitan.'],
             '/investigations/rci-tabung-haji/':['RCI finding ≠ sabitan','Pertuduhan ≠ bersalah','Kerugian ≠ kecurian'],
             '/investigations/rci-tabung-haji/people/':['Pertuduhan bukan sabitan','Reman bukan pertuduhan'],
             '/investigations/rci-tabung-haji/money/':['Kerugian besar tidak dengan sendiri membuktikan kecurian','bukan automatic theft finding'],
-            '/investigations/rci-tabung-haji/narratives/':['loss ≠ theft','application ≠ final forfeiture order','timing politik tidak membuktikan political direction'],
+            '/investigations/rci-tabung-haji/narratives/':['loss ≠ theft','application ≠ final forfeiture order','DISPUTED / UNKNOWN'],
           }
           for path,tokens in checks.items():
               req=urllib.request.Request(base+path+'?qa='+str(time.time_ns()),headers=h)
               text=urllib.request.urlopen(req,timeout=20).read().decode('utf-8','replace')
               for x in tokens: assert x in text, f'{path}: missing {x}'
-          forbidden=['5 individu telah didakwa','Azeez mengambil RM193.5 juta','RM18.6 juta telah dilucuthakkan','SPRM dikawal politik','Jamil Khir telah didakwa']
+          forbidden=['Azeez mengambil RM193.5 juta','RM18.6 juta telah dilucuthakkan','SPRM dikawal politik','Jamil Khir bersalah','enam individu telah disabitkan']
           for path in checks:
               req=urllib.request.Request(base+path+'?qa2='+str(time.time_ns()),headers=h)
               text=urllib.request.urlopen(req,timeout=20).read().decode('utf-8','replace')
@@ -89,7 +90,7 @@ jobs:
         run: |
           python - <<'PY'
           import os,time,urllib.request
-          base=os.environ['BASE']; h={'User-Agent':'RAVEN-Trace-Live-QA/13SepVerification','Cache-Control':'no-cache'}
+          base=os.environ['BASE']; h={'User-Agent':'RAVEN-Trace-Live-QA/19SepMaster','Cache-Control':'no-cache'}
           paths=['/','/news/','/about/','/methodology/','/investigations/rci-tabung-haji/updates/','/investigations/rci-tabung-haji/narratives/','/investigations/rci-tabung-haji/narratives/political-social-media/']
           stale=['Category collapse + number laundering','ANALISIS / INFERENCE · MOTIF TIDAK DIBUKTIKAN','comparative selective-enforcement analysis','counter-narrative','signal yang diperhatikan','pemberat engagement','DISPUTED RECORD','Chronology mahkamah','dokumen primer penuh','frame yang paling sedap didengar','metodologi sampel','pelaporan beratribusi','Generalisasi sentimen platform','Peta aktor','sintesis politik','menetapkan motif agensi','RAVEN-Trace Protocol','Independence & AI-assisted disclosure','DIPERTIKAIKAN · REKOD','Apa perlu ditahan?']
           for path in paths:
@@ -107,7 +108,7 @@ jobs:
           assets=['/assets/js/raven-evidence-ux.js?v=3.0.0','/assets/js/raven-publication-core.js?v=3.0.0','/assets/js/raven-narrative.js?v=2.0.0']
           forbidden=['Jamil Khir','Abdul Azeez','Azmi Ahmad','9 September 2026','18:29 MYT','ravenCaseState','.section-cutoff']
           for path in assets:
-              req=urllib.request.Request(base+path+'&qa='+str(time.time_ns()),headers={'User-Agent':'RAVEN-Trace-Live-QA/13SepVerification','Cache-Control':'no-cache'})
+              req=urllib.request.Request(base+path+'&qa='+str(time.time_ns()),headers={'User-Agent':'RAVEN-Trace-Live-QA/19SepMaster','Cache-Control':'no-cache'})
               text=urllib.request.urlopen(req,timeout=20).read().decode('utf-8','replace')
               for x in forbidden: assert x not in text, f'{path}: factual mutator token present: {x}'
           print('RUNTIME INERT: PASS')

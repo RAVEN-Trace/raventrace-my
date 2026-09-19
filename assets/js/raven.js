@@ -284,7 +284,7 @@
   };
 
   const attachSourceFigure = async (container, sourceUrls, className) => {
-    if (!container || q(':scope > .source-story-visual', container)) return true;
+    if (!container || q(':scope > .source-story-visual', container) || q(':scope > .raven-news-thumb', container)) return true;
     const sourceUrl = chooseSource(sourceUrls);
     if (!sourceUrl) return false;
     const title = q('h1, h2, h3', container)?.textContent.trim() || '';

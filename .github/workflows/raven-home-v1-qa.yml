@@ -146,7 +146,7 @@ jobs:
                   hasCourtFreshness:/Status mahkamah disahkan hingga: 19 Sep 2026/.test(mainText),
                   hasLegalBoundary:/Ditahan ≠ direman ≠ didakwa ≠ bersalah/.test(mainText),
                   hasCurrentCaseState:/Enam individu sudah didakwa\. Lima siasatan SPRM masih aktif\./.test(mainText) && /lima kertas siasatan/i.test(mainText),
-                  azeezBoundary:/Abdul Azeez didakwa pada 9 September dan mengaku tidak bersalah\./.test(mainText),
+                  caseBoundary:/Pertuduhan dan siasatan tidak sama dengan sabitan\./i.test(mainText),
                   heroTitle:document.querySelector('.v5-truth-intro h1')?.textContent?.trim(),
                   ogTitle:document.querySelector('meta[property="og:title"]')?.content || '',
                   cssHome:!!document.querySelector('link[href*="raven-home-mobile-v2.css?v=2.0.0"]'),
@@ -180,7 +180,7 @@ jobs:
               check(data.hasCourtFreshness,`${viewport.name}: 19 Sep court freshness missing`);
               check(data.hasLegalBoundary,`${viewport.name}: legal boundary missing`);
               check(data.hasCurrentCaseState,`${viewport.name}: current 19 Sep case state missing`);
-              check(data.azeezBoundary,`${viewport.name}: Azeez not-guilty plea boundary missing`);
+              check(data.caseBoundary,`${viewport.name}: current legal-boundary wording missing`);
               check(data.heroTitle==='Cerita boleh dibentuk. Bukti tak boleh dipaksa.',`${viewport.name}: hero title drift`);
               check(data.ogTitle.includes('Cerita boleh dibentuk. Bukti tak boleh dipaksa.'),`${viewport.name}: generic homepage OG title missing`);
               check(data.cssHome,`${viewport.name}: homepage V2 CSS missing`);

@@ -64,6 +64,10 @@ async function auditPage(page, view, item) {
     }
   ` });
   await page.waitForTimeout(180);
+  await page.evaluate(() => {
+    document.querySelectorAll('img').forEach((img) => { img.loading = 'eager'; });
+  });
+  await page.waitForLoadState('networkidle', { timeout: 5000 }).catch(() => {});
   await page.addScriptTag({ path: axePath });
 
   const metrics = await page.evaluate(async ({ mobile }) => {
@@ -132,6 +136,9 @@ async function auditPage(page, view, item) {
       duplicateIds: [...new Set(duplicateIds)],
       missingAnchors: [...new Set(missingAnchors)],
       fakeShareLinks: document.querySelectorAll('.raven-share-link[href="#"]').length,
+      brokenImages: [...document.images]
+        .filter((img) => img.currentSrc && img.complete && img.naturalWidth === 0)
+        .map((img) => ({ src: img.currentSrc, alt: img.alt || '' })),
       unifiedCss: Boolean(document.querySelector('link[href*="raven-unified-v7.css?v=7.0.5"]')),
       skipLink: Boolean(document.querySelector('.skip-link'))
     };
@@ -146,6 +153,7 @@ async function auditPage(page, view, item) {
   record(metrics.duplicateIds.length === 0, `${prefix}: duplicate IDs ${metrics.duplicateIds.join(', ')}`);
   record(metrics.missingAnchors.length === 0, `${prefix}: missing anchors ${metrics.missingAnchors.join(', ')}`);
   record(metrics.fakeShareLinks === 0, `${prefix}: ${metrics.fakeShareLinks} fake share links remain`);
+  record(metrics.brokenImages.length === 0, `${prefix}: broken images ${metrics.brokenImages.map((img) => img.src).join(", ")}`);
   record(metrics.skipLink, `${prefix}: skip link missing`);
 
   const screenshot = view.name === 'mobile' || ['home', 'news', 'investigations--rci-tabung-haji', 'investigations--rci-tabung-haji--narratives'].includes(item.name);

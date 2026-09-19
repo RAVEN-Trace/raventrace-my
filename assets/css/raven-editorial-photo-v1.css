@@ -1,0 +1,97 @@
+/* RAVEN Editorial Photo V1
+   Generated visuals are contextual illustration, never evidence. */
+
+.raven-editorial-photo {
+  margin: 0;
+  overflow: hidden;
+  border-top: 1px solid rgba(16, 21, 26, .16);
+  border-bottom: 1px solid rgba(16, 21, 26, .16);
+  background: #0b1014;
+}
+
+.raven-editorial-photo img {
+  display: block;
+  width: 100%;
+  height: auto;
+  aspect-ratio: 16 / 9;
+  object-fit: cover;
+}
+
+.raven-editorial-photo figcaption {
+  margin: 0;
+  padding: .68rem .8rem;
+  background: #0b1014;
+  color: #c9d1d5;
+  font: 600 .73rem/1.45 system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  letter-spacing: .01em;
+}
+
+.raven-photo-band {
+  margin: 0;
+  padding: 0;
+  background: #f3efe7;
+}
+
+.raven-photo-band .container {
+  padding-top: clamp(1rem, 2vw, 1.5rem);
+  padding-bottom: clamp(1rem, 2vw, 1.5rem);
+}
+
+.raven-photo-band .raven-editorial-photo {
+  max-width: 1100px;
+  margin-inline: auto;
+}
+
+.raven-photo-band--case {
+  background: #0b1014;
+}
+
+.raven-photo-band--case .raven-editorial-photo {
+  border-color: #293138;
+}
+
+/* Homepage: replace the old abstract Truth Lens pseudo-art with one human,
+   documentary-style editorial image. */
+body[data-raven-home="2.0.0"] .home-case-status::before,
+body[data-raven-home="2.0.0"] .home-case-status::after {
+  display: none !important;
+  content: none !important;
+}
+
+body[data-raven-home="2.0.0"] .home-case-status .raven-editorial-photo {
+  margin: -1.25rem -1.3rem 1rem;
+  width: calc(100% + 2.6rem);
+  border-top: 0;
+}
+
+/* Keep generated imagery clearly subordinate to evidence text. */
+.raven-editorial-photo figcaption::before {
+  content: "EDITORIAL · ";
+  color: #86dbe9;
+  font-weight: 900;
+  letter-spacing: .08em;
+}
+
+@media (max-width: 780px) {
+  body[data-raven-home="2.0.0"] .home-case-status .raven-editorial-photo {
+    margin: -1rem -1rem .9rem;
+    width: calc(100% + 2rem);
+  }
+
+  .raven-photo-band .container {
+    padding-inline: 0;
+  }
+
+  .raven-photo-band .raven-editorial-photo {
+    border-left: 0;
+    border-right: 0;
+  }
+
+  .raven-editorial-photo img {
+    aspect-ratio: 16 / 10;
+  }
+
+  .raven-editorial-photo figcaption {
+    padding-inline: 1rem;
+  }
+}

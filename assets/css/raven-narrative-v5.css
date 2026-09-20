@@ -1,4 +1,4 @@
-/* RAVEN-Trace · Narrative Reading Experience V5.1
+/* RAVEN-Trace · Narrative Reading Experience V5.3
    Goal: public comprehension first. Verdict -> verified record -> optional detail. */
 
 .raven-v5-narrative .narrative-v5-intro {
@@ -260,4 +260,317 @@ body.raven-v5.raven-v5-narrative .narrative-v5-card h3 {
   .raven-v5-narrative .narrative-v5-verdict p { font-size: .98rem !important; }
   .raven-v5-narrative .narrative-v5-record p,
   .raven-v5-narrative .narrative-v5-detail-block p { font-size: .92rem !important; }
+}
+
+
+/* =========================================================
+   V5.3 · COPY-LOCKED NARRATIVE STRUCTURE
+   No visible copy is generated or rewritten. Existing H3/P/B/status
+   nodes are only regrouped into a readable Claim → Record → Gap →
+   Verdict visual sequence.
+   ========================================================= */
+body[data-raven-copy-lock="true"].raven-v5-narrative
+  .case-section .control-grid.narrative-locked-grid {
+  display: grid !important;
+  grid-template-columns: 1fr !important;
+  gap: clamp(1.8rem, 4.5vw, 3.4rem) !important;
+  margin-top: 1.5rem !important;
+  border: 0 !important;
+  background: transparent !important;
+}
+
+body[data-raven-copy-lock="true"].raven-v5-narrative
+  .narrative-locked-card {
+  overflow: clip;
+  min-height: 0 !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  border: 1px solid #c9c5bc !important;
+  border-top: 0 !important;
+  border-radius: 0 !important;
+  background: #fff !important;
+  box-shadow: 0 20px 55px rgba(10,13,17,.06) !important;
+}
+
+body[data-raven-copy-lock="true"].raven-v5-narrative
+  .narrative-locked-card::before,
+body[data-raven-copy-lock="true"].raven-v5-narrative
+  .narrative-locked-card::after {
+  display: none !important;
+}
+
+body[data-raven-copy-lock="true"].raven-v5-narrative
+  .narrative-locked-split {
+  display: grid;
+  grid-template-columns: minmax(0,.92fr) minmax(0,1.08fr);
+}
+
+body[data-raven-copy-lock="true"].raven-v5-narrative
+  .narrative-locked-claim {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  min-height: 250px;
+  padding: clamp(1.35rem,3.5vw,2.35rem);
+  background: #10161c;
+  color: #fff;
+}
+
+body[data-raven-copy-lock="true"].raven-v5-narrative
+  .narrative-locked-claim h3 {
+  margin: 0 !important;
+  padding: 0 !important;
+  color: #fff !important;
+  font-family: Georgia,'Times New Roman',serif !important;
+  font-size: clamp(1.85rem,4vw,3.65rem) !important;
+  font-weight: 700 !important;
+  line-height: 1 !important;
+  letter-spacing: -.035em !important;
+  text-transform: none !important;
+  text-shadow: 0 1px 0 rgba(0,0,0,.3);
+}
+
+body[data-raven-copy-lock="true"].raven-v5-narrative
+  .narrative-locked-claim .narrative-status-row {
+  margin: 1.25rem 0 0 !important;
+  padding: 0 !important;
+  border: 0 !important;
+}
+
+body[data-raven-copy-lock="true"].raven-v5-narrative
+  .narrative-locked-record {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: .95rem;
+  padding: clamp(1.35rem,3.5vw,2.35rem);
+  background: #fff;
+}
+
+body[data-raven-copy-lock="true"].raven-v5-narrative
+  .narrative-locked-record > p {
+  margin: 0 !important;
+  color: #273139 !important;
+  font-size: clamp(.98rem,1.45vw,1.08rem) !important;
+  line-height: 1.67 !important;
+}
+
+body[data-raven-copy-lock="true"].raven-v5-narrative
+  .narrative-locked-record > p > b,
+body[data-raven-copy-lock="true"].raven-v5-narrative
+  .narrative-locked-record > p > strong {
+  display: block;
+  margin-bottom: .38rem;
+  color: #075d70 !important;
+  font: 900 .72rem/1.25 var(--mono);
+  letter-spacing: .055em;
+  text-transform: none;
+}
+
+body[data-raven-copy-lock="true"].raven-v5-narrative
+  .narrative-locked-gap {
+  margin: 0 !important;
+  padding: 1.15rem clamp(1.35rem,3.5vw,2.35rem) !important;
+  border-top: 1px solid #e0c681 !important;
+  border-bottom: 1px solid #e0c681 !important;
+  background: #fff4d9 !important;
+}
+
+body[data-raven-copy-lock="true"].raven-v5-narrative
+  .narrative-locked-gap > p {
+  margin: 0 !important;
+  max-width: 82ch;
+  color: #4f3a18 !important;
+  font-size: .98rem !important;
+  line-height: 1.62 !important;
+}
+
+body[data-raven-copy-lock="true"].raven-v5-narrative
+  .narrative-locked-gap > p > b,
+body[data-raven-copy-lock="true"].raven-v5-narrative
+  .narrative-locked-gap > p > strong {
+  color: #6d4300 !important;
+}
+
+body[data-raven-copy-lock="true"].raven-v5-narrative
+  .narrative-locked-verdict {
+  display: block !important;
+  padding: 1.25rem clamp(1.35rem,3.5vw,2.35rem) 1.45rem !important;
+  border-bottom: 1px solid #c7dfe3 !important;
+  background: #f1f8f9 !important;
+}
+
+body[data-raven-copy-lock="true"].raven-v5-narrative
+  .narrative-locked-verdict > p {
+  margin: 0 !important;
+  max-width: 82ch;
+  color: #0c252c !important;
+  font-size: clamp(1rem,1.65vw,1.16rem) !important;
+  font-weight: 650;
+  line-height: 1.58 !important;
+}
+
+body[data-raven-copy-lock="true"].raven-v5-narrative
+  .narrative-locked-verdict > p > b,
+body[data-raven-copy-lock="true"].raven-v5-narrative
+  .narrative-locked-verdict > p > strong {
+  color: #075d70 !important;
+}
+
+body[data-raven-copy-lock="true"].raven-v5-narrative
+  .narrative-locked-extra {
+  padding: 1rem clamp(1.35rem,3.5vw,2.35rem) 1.25rem;
+  border-top: 1px solid #e1ddd4;
+  background: #fff;
+}
+
+body[data-raven-copy-lock="true"].raven-v5-narrative
+  .narrative-locked-extra > p {
+  margin: .55rem 0 0 !important;
+  color: #465058 !important;
+  line-height: 1.62 !important;
+}
+
+body[data-raven-copy-lock="true"].raven-v5-narrative
+  .narrative-locked-card:target {
+  scroll-margin-top: 6rem;
+  outline: 3px solid #087f98;
+  outline-offset: 4px;
+}
+
+@media (max-width: 900px) {
+  body[data-raven-copy-lock="true"].raven-v5-narrative
+    .narrative-locked-split {
+    grid-template-columns: 1fr;
+  }
+
+  body[data-raven-copy-lock="true"].raven-v5-narrative
+    .narrative-locked-claim {
+    min-height: 0;
+  }
+}
+
+@media (max-width: 620px) {
+  body[data-raven-copy-lock="true"].raven-v5-narrative
+    .case-section .control-grid.narrative-locked-grid {
+    gap: 1.45rem !important;
+  }
+
+  body[data-raven-copy-lock="true"].raven-v5-narrative
+    .narrative-locked-claim,
+  body[data-raven-copy-lock="true"].raven-v5-narrative
+    .narrative-locked-record {
+    padding: 1.2rem;
+  }
+
+  body[data-raven-copy-lock="true"].raven-v5-narrative
+    .narrative-locked-claim h3 {
+    font-size: clamp(1.72rem,8.8vw,2.7rem) !important;
+  }
+
+  body[data-raven-copy-lock="true"].raven-v5-narrative
+    .narrative-locked-gap,
+  body[data-raven-copy-lock="true"].raven-v5-narrative
+    .narrative-locked-verdict,
+  body[data-raven-copy-lock="true"].raven-v5-narrative
+    .narrative-locked-extra {
+    padding-inline: 1.2rem !important;
+  }
+}
+
+
+/* =========================================================
+   V5.3 · DEEP NARRATIVE COMPARISON SURFACE
+   Political/social audit keeps every existing word; only the
+   comparison geometry, hierarchy and reading contrast change.
+   ========================================================= */
+body[data-raven-narrative-deep="true"].raven-v5-narrative .control-grid {
+  display: grid !important;
+  grid-template-columns: repeat(2,minmax(0,1fr)) !important;
+  gap: 1rem !important;
+  margin-top: 1.35rem !important;
+  border: 0 !important;
+  background: transparent !important;
+}
+
+body[data-raven-narrative-deep="true"].raven-v5-narrative #political-19sep .control-grid {
+  grid-template-columns: repeat(3,minmax(0,1fr)) !important;
+}
+
+body[data-raven-narrative-deep="true"].raven-v5-narrative #language-forensics .control-grid {
+  grid-template-columns: repeat(3,minmax(0,1fr)) !important;
+}
+
+body[data-raven-narrative-deep="true"].raven-v5-narrative .control-grid > article {
+  min-height: 0 !important;
+  padding: 1.15rem 1.2rem 1.2rem !important;
+  border: 1px solid #d5d0c6 !important;
+  border-top: 4px solid #111820 !important;
+  border-radius: 0 !important;
+  background: #fffdf8 !important;
+  box-shadow: none !important;
+}
+
+body[data-raven-narrative-deep="true"].raven-v5-narrative .control-grid > article > h3 {
+  margin: 0 0 .8rem !important;
+  padding: 0 !important;
+  color: #111820 !important;
+  font-family: Georgia,'Times New Roman',serif !important;
+  font-size: clamp(1.22rem,2vw,1.6rem) !important;
+  font-weight: 700 !important;
+  line-height: 1.12 !important;
+  letter-spacing: -.02em !important;
+  text-transform: none !important;
+}
+
+body[data-raven-narrative-deep="true"].raven-v5-narrative .control-grid > article > p {
+  margin: .68rem 0 0 !important;
+  color: #3f494f !important;
+  font-size: .92rem !important;
+  line-height: 1.62 !important;
+}
+
+body[data-raven-narrative-deep="true"].raven-v5-narrative .control-grid > article > p:first-of-type {
+  margin-top: 0 !important;
+}
+
+body[data-raven-narrative-deep="true"].raven-v5-narrative .control-grid .status {
+  max-width: 100%;
+  white-space: normal;
+}
+
+body[data-raven-narrative-deep="true"].raven-v5-narrative #matrix .control-grid > article {
+  border-top-color: #0b5d6b !important;
+}
+
+body[data-raven-narrative-deep="true"].raven-v5-narrative #language-forensics .control-grid > article {
+  border-top-color: #a46500 !important;
+}
+
+body[data-raven-narrative-deep="true"].raven-v5-narrative #political-19sep .control-grid > article {
+  border-top-color: #087f98 !important;
+}
+
+@media (max-width: 1050px) {
+  body[data-raven-narrative-deep="true"].raven-v5-narrative #political-19sep .control-grid,
+  body[data-raven-narrative-deep="true"].raven-v5-narrative #language-forensics .control-grid {
+    grid-template-columns: repeat(2,minmax(0,1fr)) !important;
+  }
+}
+
+@media (max-width: 700px) {
+  body[data-raven-narrative-deep="true"].raven-v5-narrative .control-grid,
+  body[data-raven-narrative-deep="true"].raven-v5-narrative #political-19sep .control-grid,
+  body[data-raven-narrative-deep="true"].raven-v5-narrative #language-forensics .control-grid {
+    grid-template-columns: 1fr !important;
+    gap: .85rem !important;
+  }
+
+  body[data-raven-narrative-deep="true"].raven-v5-narrative .control-grid > article {
+    padding: 1rem !important;
+  }
+
+  body[data-raven-narrative-deep="true"].raven-v5-narrative .control-grid > article > h3 {
+    font-size: clamp(1.18rem,6vw,1.48rem) !important;
+  }
 }

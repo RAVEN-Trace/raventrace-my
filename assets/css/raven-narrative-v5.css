@@ -1,4 +1,4 @@
-/* RAVEN-Trace · Narrative Reading Experience V5.3.1
+/* RAVEN-Trace · Narrative Reading Experience V5.3.2
    Goal: public comprehension first. Verdict -> verified record -> optional detail. */
 
 .raven-v5-narrative .narrative-v5-intro {
@@ -281,6 +281,7 @@ body[data-raven-copy-lock="true"]
 
 body[data-raven-copy-lock="true"]
   .narrative-locked-card {
+  display: block !important;
   overflow: clip;
   min-height: 0 !important;
   margin: 0 !important;

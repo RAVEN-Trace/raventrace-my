@@ -20,9 +20,10 @@ async function waitForCaseReader(page){
 }
 async function waitForNarrativeReader(page){
   await page.waitForFunction((ids)=>{
-    const units=ids.every((id)=>document.getElementById(id));
+    const units=ids.map((id)=>document.getElementById(id));
     const visual=document.querySelector('[data-raven-visual="narrative"] img');
-    return document.body.classList.contains('raven-funnel-ready')&&units&&Boolean(visual);
+    const copyLocked=units.every((unit)=>unit?.dataset?.copyLock==='preserved');
+    return document.body.dataset.ravenNarrativeStructure==='locked-v1'&&units.every(Boolean)&&copyLocked&&Boolean(visual);
   },narrativeIds,{timeout:45000});
   await page.waitForTimeout(250);
 }
@@ -78,10 +79,25 @@ async function waitForNarrativeReader(page){
     const visual=document.querySelector('[data-raven-visual="narrative"]');
     const img=visual?.querySelector('img');
     const caption=visual?.querySelector('figcaption');
-    return {unitCount:units.filter(Boolean).length,allUnitsVisible:units.every(visible),visualVisible:visible(visual),visualSrc:img?.getAttribute('src')||'',editorialLabel:(caption?.textContent||'').includes('Editorial illustration'),bodyHeight:document.documentElement.scrollHeight};
+    const firstSplit=units[0]?.querySelector('.narrative-locked-split');
+    const splitColumns=firstSplit?getComputedStyle(firstSplit).gridTemplateColumns.split(/\\s+/).filter(Boolean).length:0;
+    return {
+      unitCount:units.filter(Boolean).length,
+      allUnitsVisible:units.every(visible),
+      copyPreserved:units.filter((unit)=>unit?.dataset?.copyLock==='preserved').length,
+      allStructured:units.every((unit)=>Boolean(unit?.querySelector('.narrative-locked-claim')&&unit?.querySelector('.narrative-locked-record'))),
+      splitColumns,
+      visualVisible:visible(visual),
+      visualSrc:img?.getAttribute('src')||'',
+      editorialLabel:(caption?.textContent||'').includes('Editorial illustration'),
+      bodyHeight:document.documentElement.scrollHeight
+    };
   },narrativeIds);
   record(initial.unitCount===narrativeIds.length,`mobile Narrative: expected ${narrativeIds.length} units, got ${initial.unitCount}`);
   record(initial.allUnitsVisible,'mobile Narrative: one or more canonical narrative units hidden');
+  record(initial.copyPreserved===narrativeIds.length,`mobile Narrative: copy-lock preserved on ${initial.copyPreserved}/${narrativeIds.length} units`);
+  record(initial.allStructured,'mobile Narrative: Claim/Record structural wrappers missing');
+  record(initial.splitColumns===1,`mobile Narrative: expected one-column split, got ${initial.splitColumns}`);
   record(initial.visualVisible,'mobile Narrative: signature visual missing or hidden');
   record(initial.visualSrc.endsWith('raven-narrative-rm13b-v1-web.svg'),`mobile Narrative: unexpected visual source ${initial.visualSrc}`);
   record(initial.editorialLabel,'mobile Narrative: editorial-illustration boundary missing');
@@ -96,8 +112,22 @@ async function waitForNarrativeReader(page){
 {
   const context=await browser.newContext({viewport:{width:1440,height:900},deviceScaleFactor:1}); const page=await context.newPage();
   await page.goto(`${base}${narrativeRoute}?${bust()}`,{waitUntil:'domcontentloaded',timeout:45000}); await waitForNarrativeReader(page);
-  const d=await page.evaluate((ids)=>{const visible=(el)=>{if(!el)return false;const s=getComputedStyle(el),r=el.getBoundingClientRect();return s.display!=='none'&&s.visibility!=='hidden'&&r.width>0&&r.height>0};const units=ids.map((id)=>document.getElementById(id));const visual=document.querySelector('[data-raven-visual="narrative"]');return {count:units.filter(Boolean).length,allVisible:units.every(visible),visualVisible:visible(visual)}} ,narrativeIds);
+  const d=await page.evaluate((ids)=>{
+    const visible=(el)=>{if(!el)return false;const s=getComputedStyle(el),r=el.getBoundingClientRect();return s.display!=='none'&&s.visibility!=='hidden'&&r.width>0&&r.height>0};
+    const units=ids.map((id)=>document.getElementById(id));
+    const visual=document.querySelector('[data-raven-visual="narrative"]');
+    const firstSplit=units[0]?.querySelector('.narrative-locked-split');
+    return {
+      count:units.filter(Boolean).length,
+      allVisible:units.every(visible),
+      copyPreserved:units.filter((unit)=>unit?.dataset?.copyLock==='preserved').length,
+      splitColumns:firstSplit?getComputedStyle(firstSplit).gridTemplateColumns.split(/\\s+/).filter(Boolean).length:0,
+      visualVisible:visible(visual)
+    };
+  },narrativeIds);
   record(d.count===narrativeIds.length&&d.allVisible,'desktop Narrative: canonical narrative units should remain fully readable');
+  record(d.copyPreserved===narrativeIds.length,`desktop Narrative: copy-lock preserved on ${d.copyPreserved}/${narrativeIds.length} units`);
+  record(d.splitColumns===2,`desktop Narrative: expected two-column Claim/Record split, got ${d.splitColumns}`);
   record(d.visualVisible,'desktop Narrative: signature visual should remain visible');
   await context.close();
 }

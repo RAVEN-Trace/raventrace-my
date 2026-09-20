@@ -12,6 +12,9 @@ ROOT = Path(__file__).resolve().parents[1]
 
 def swap(path: Path, replacements: list[tuple[str, str]]) -> None:
     text = path.read_text(encoding='utf-8')
+    if 'data-raven-copy-lock="true"' in text:
+        print('copy-lock skip', path.relative_to(ROOT))
+        return
     old_text = text
     for old, new in replacements:
         if old in text:
@@ -124,11 +127,11 @@ swap(METHOD, [
 main = NARR.read_text(encoding='utf-8')
 social = SOCIAL.read_text(encoding='utf-8')
 
-for tok in ['RM193.5 juta','14 kertas siasatan','Pertuduhan bukan sabitan','naratif-azeez-ambil-rm193-5-juta','naratif-sakau-duit-umat-islam']:
+assert 'data-raven-copy-lock="true"' in main
+assert 'data-raven-copy-lock="true"' in social
+for tok in ['RM13 bilion dicuri / hilang','6 actual arraignments','application ≠ final forfeiture order','DISPUTED / UNKNOWN','Active paper ≠ proven offence','Naratif yang kuat tidak semestinya benar.']:
     assert tok in main, tok
-for tok in ['Raven kata macam mana?','Apa trick cerita ni?','Apa yang cerita tak sebut?','Apa bukti yang boleh ubah keputusan Raven?','Keyakinan Raven:']:
-    assert tok in main, tok
-for tok in ['Petunjuk media sosial','Betulkan cerita, bukan balas slogan dengan slogan','VIRAL TAK BERMAKSUD SUARA SEMUA ORANG']:
+for tok in ['Buang parti, buang slogan, buang emosi','Government position · 16 Sep','UMNO position','19 Sep enforcement disclosure','VIRAL TAK BERMAKSUD SUARA SEMUA ORANG']:
     assert tok in social, tok
 
 for stale in ['counter-narrative','accounting treatment','selective targeting','signal yang diperhatikan','Signal media sosial','pemberat engagement','Category collapse + number laundering','policy position, bukan finding undang-undang']:

@@ -46,7 +46,7 @@ jobs:
           for p in css_targets:
             t=p.read_text(encoding='utf-8')
             assert t.count('data-raven-v7-qa-fixes')==1,(p,t.count('data-raven-v7-qa-fixes'))
-            assert '/assets/css/raven-v7-qa-fixes-v1.css?v=1.0.0' in t,p
+            assert '/assets/css/raven-v7-qa-fixes-v1.css?v=1.0.1' in t,p
           route_targets=[root/'index.html',root/'investigations/index.html',root/'investigations/rci-tabung-haji/index.html']
           for p in route_targets:
             t=p.read_text(encoding='utf-8')

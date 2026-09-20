@@ -4,6 +4,7 @@ const base=process.env.RAVEN_QA_BASE||'https://raven-trace.github.io/raventrace-
 const caseRoute='/investigations/rci-tabung-haji/';
 const narrativeRoute='/investigations/rci-tabung-haji/narratives/';
 const narrativeIds=['rm13b','four-five','rm18m','political','rci-crime','fully-fixed'];
+const expectedNarrativeCss='raven-narrative-v5.css?v=5.3.2';
 const browser=await chromium.launch();
 const failures=[];
 const record=(ok,msg)=>{if(!ok) failures.push(msg)};
@@ -19,13 +20,26 @@ async function waitForCaseReader(page){
   await page.waitForTimeout(250);
 }
 async function waitForNarrativeReader(page){
-  await page.waitForFunction((ids)=>{
-    const units=ids.map((id)=>document.getElementById(id));
-    const visual=document.querySelector('[data-raven-visual="narrative"] img');
-    const copyLocked=units.every((unit)=>unit?.dataset?.copyLock==='preserved');
-    return document.body.dataset.ravenNarrativeStructure==='locked-v1'&&units.every(Boolean)&&copyLocked&&Boolean(visual);
-  },narrativeIds,{timeout:45000});
-  await page.waitForTimeout(250);
+  const deadline=Date.now()+45000;
+  while(Date.now()<deadline){
+    const ready=await page.evaluate(({ids,expectedCss})=>{
+      const units=ids.map((id)=>document.getElementById(id));
+      const visual=document.querySelector('[data-raven-visual="narrative"] img');
+      const copyLocked=units.every((unit)=>unit?.dataset?.copyLock==='preserved');
+      const cssReady=[...document.querySelectorAll('link[rel="stylesheet"]')]
+        .some((link)=>(link.getAttribute('href')||'').includes(expectedCss));
+      return document.body.dataset.ravenNarrativeStructure==='locked-v1'&&units.every(Boolean)&&copyLocked&&Boolean(visual)&&cssReady;
+    },{ids:narrativeIds,expectedCss:expectedNarrativeCss}).catch(()=>false);
+    if(ready){
+      await page.waitForTimeout(250);
+      return;
+    }
+    await page.waitForTimeout(1000);
+    const current=new URL(page.url());
+    current.searchParams.set('ravenreaderv8',`${Date.now()}-${Math.random()}`);
+    await page.goto(current.toString(),{waitUntil:'domcontentloaded',timeout:45000});
+  }
+  throw new Error(`Narrative V5.3.2 did not become live within QA window: ${page.url()}`);
 }
 
 // CASEFILE mobile: briefing first, depth on demand.
@@ -80,13 +94,19 @@ async function waitForNarrativeReader(page){
     const img=visual?.querySelector('img');
     const caption=visual?.querySelector('figcaption');
     const firstSplit=units[0]?.querySelector('.narrative-locked-split');
-    const splitColumns=firstSplit?getComputedStyle(firstSplit).gridTemplateColumns.split(/\s+/).filter(Boolean).length:0;
+    const claim=firstSplit?.querySelector('.narrative-locked-claim');
+    const recordZone=firstSplit?.querySelector('.narrative-locked-record');
+    const claimRect=claim?.getBoundingClientRect();
+    const recordRect=recordZone?.getBoundingClientRect();
+    const splitDisplay=firstSplit?getComputedStyle(firstSplit).display:'';
+    const stacked=Boolean(claimRect&&recordRect&&recordRect.top>=claimRect.bottom-2&&Math.abs(recordRect.left-claimRect.left)<3);
     return {
       unitCount:units.filter(Boolean).length,
       allUnitsVisible:units.every(visible),
       copyPreserved:units.filter((unit)=>unit?.dataset?.copyLock==='preserved').length,
       allStructured:units.every((unit)=>Boolean(unit?.querySelector('.narrative-locked-claim')&&unit?.querySelector('.narrative-locked-record'))),
-      splitColumns,
+      splitDisplay,
+      stacked,
       visualVisible:visible(visual),
       visualSrc:img?.getAttribute('src')||'',
       editorialLabel:(caption?.textContent||'').includes('Editorial illustration'),
@@ -97,7 +117,8 @@ async function waitForNarrativeReader(page){
   record(initial.allUnitsVisible,'mobile Narrative: one or more canonical narrative units hidden');
   record(initial.copyPreserved===narrativeIds.length,`mobile Narrative: copy-lock preserved on ${initial.copyPreserved}/${narrativeIds.length} units`);
   record(initial.allStructured,'mobile Narrative: Claim/Record structural wrappers missing');
-  record(initial.splitColumns===1,`mobile Narrative: expected one-column split, got ${initial.splitColumns}`);
+  record(initial.splitDisplay==='grid',`mobile Narrative: split display=${initial.splitDisplay}`);
+  record(initial.stacked,'mobile Narrative: Claim/Record should stack vertically');
   record(initial.visualVisible,'mobile Narrative: signature visual missing or hidden');
   record(initial.visualSrc.endsWith('raven-narrative-rm13b-v1-web.svg'),`mobile Narrative: unexpected visual source ${initial.visualSrc}`);
   record(initial.editorialLabel,'mobile Narrative: editorial-illustration boundary missing');
@@ -117,17 +138,25 @@ async function waitForNarrativeReader(page){
     const units=ids.map((id)=>document.getElementById(id));
     const visual=document.querySelector('[data-raven-visual="narrative"]');
     const firstSplit=units[0]?.querySelector('.narrative-locked-split');
+    const claim=firstSplit?.querySelector('.narrative-locked-claim');
+    const recordZone=firstSplit?.querySelector('.narrative-locked-record');
+    const claimRect=claim?.getBoundingClientRect();
+    const recordRect=recordZone?.getBoundingClientRect();
+    const splitDisplay=firstSplit?getComputedStyle(firstSplit).display:'';
+    const sideBySide=Boolean(claimRect&&recordRect&&Math.abs(claimRect.top-recordRect.top)<3&&recordRect.left>=claimRect.right-3);
     return {
       count:units.filter(Boolean).length,
       allVisible:units.every(visible),
       copyPreserved:units.filter((unit)=>unit?.dataset?.copyLock==='preserved').length,
-      splitColumns:firstSplit?getComputedStyle(firstSplit).gridTemplateColumns.split(/\s+/).filter(Boolean).length:0,
+      splitDisplay,
+      sideBySide,
       visualVisible:visible(visual)
     };
   },narrativeIds);
   record(d.count===narrativeIds.length&&d.allVisible,'desktop Narrative: canonical narrative units should remain fully readable');
   record(d.copyPreserved===narrativeIds.length,`desktop Narrative: copy-lock preserved on ${d.copyPreserved}/${narrativeIds.length} units`);
-  record(d.splitColumns===2,`desktop Narrative: expected two-column Claim/Record split, got ${d.splitColumns}`);
+  record(d.splitDisplay==='grid',`desktop Narrative: split display=${d.splitDisplay}`);
+  record(d.sideBySide,'desktop Narrative: Claim/Record should render side-by-side');
   record(d.visualVisible,'desktop Narrative: signature visual should remain visible');
   await context.close();
 }

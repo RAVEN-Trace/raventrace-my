@@ -2,7 +2,7 @@ from pathlib import Path
 import re
 
 ROOT = Path(__file__).resolve().parents[1]
-CSS = '/raventrace-my/assets/css/raven-v7-qa-fixes-v1.css?v=1.0.0'
+CSS = '/raventrace-my/assets/css/raven-v7-qa-fixes-v1.css?v=1.0.1'
 JS = '/raventrace-my/assets/js/raven-route-fixes-v1.js?v=1.0.0'
 
 CSS_TARGETS = [

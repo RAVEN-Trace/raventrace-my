@@ -12,6 +12,9 @@ ROOT = Path(__file__).resolve().parents[1]
 def swap(rel, replacements):
     p = ROOT / rel
     s = p.read_text(encoding='utf-8')
+    if 'data-raven-copy-lock="true"' in s:
+        print('copy-lock skip', rel)
+        return
     before = s
     for a,b in replacements:
         s = s.replace(a,b)

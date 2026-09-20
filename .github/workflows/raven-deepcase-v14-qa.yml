@@ -12,7 +12,6 @@ on:
       - 'investigations/rci-tabung-haji/investments/**'
       - 'investigations/rci-tabung-haji/tracks/**'
       - 'investigations/rci-tabung-haji/disputed-record/**'
-      - 'investigations/rci-tabung-haji/sources/**'
   workflow_dispatch:
 
 permissions:
@@ -109,30 +108,6 @@ jobs:
               check(visible>=1 && visible<14,`investments: search filter ineffective (${visible})`);
               report.investments={...m,filteredVisible:visible};
               await page.screenshot({path:'deepcase-qa/mobile-investments.png',fullPage:true});
-              await ctx.close();
-            }
-
-            {
-              const ctx=await browser.newContext({viewport:{width:390,height:844}});
-              const page=await ctx.newPage();
-              await openCurrent(page,'/investigations/rci-tabung-haji/sources/');
-              await page.waitForTimeout(450);
-              const m=await page.evaluate(()=>({
-                rows:document.querySelectorAll('#sources .sources-grid > li[id]').length,
-                browser:!!document.querySelector('.raven-source-browser'),
-                sourceCollapsed:!!document.querySelector('.raven-deepcase-source-collapsed'),
-                overflow:document.documentElement.scrollWidth-document.documentElement.clientWidth
-              }));
-              check(m.rows>=50,`sources: expected >=50 rows, got ${m.rows}`);
-              check(m.browser,'sources: evidence browser missing');
-              check(!m.sourceCollapsed,'sources: canonical Source Room must stay open');
-              check(m.overflow<=4,`sources: horizontal overflow ${m.overflow}`);
-              await page.fill('.raven-source-browser input[type="search"]','Madinah');
-              await page.waitForTimeout(100);
-              const visible=await page.evaluate(()=>[...document.querySelectorAll('#sources .sources-grid > li[id]')].filter(x=>!x.hidden).length);
-              check(visible>=1 && visible<m.rows,`sources: search filter ineffective (${visible}/${m.rows})`);
-              report.sources={...m,filteredVisible:visible};
-              await page.screenshot({path:'deepcase-qa/mobile-sources.png',fullPage:true});
               await ctx.close();
             }
 

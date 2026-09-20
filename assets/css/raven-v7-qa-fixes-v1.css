@@ -1,4 +1,4 @@
-/* RAVEN V7 QA Fixes V1
+/* RAVEN V7 QA Fixes V1.0.1
    Narrow production repairs surfaced by the 33-page mobile/desktop render audit. */
 
 /* Editorial visual captions must stay readable regardless of the parent surface. */
@@ -15,6 +15,19 @@
 }
 .raven-visual .raven-visual-note {
   color: #465158 !important;
+}
+
+
+/* Editorial-photo captions sit on ink-black image rails. Keep the provenance
+   label AA-readable even when a parent surface forces dark text downstream. */
+body.raven-v5 .raven-editorial-photo > figcaption,
+body.raven-v5 .raven-news-thumb > figcaption {
+  background: #0b1014 !important;
+  color: #c9d1d5 !important;
+}
+body.raven-v5 .raven-editorial-photo > figcaption::before,
+body.raven-v5 .raven-news-thumb > figcaption::before {
+  color: #86dbe9 !important;
 }
 
 /* Trust links sit on an ink-black strip; use the on-dark evidence cyan. */

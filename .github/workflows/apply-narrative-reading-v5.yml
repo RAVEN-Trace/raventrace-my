@@ -36,8 +36,11 @@ jobs:
           test -s assets/js/raven-narrative-v5.js
           grep -q 'raven-narrative-v5.css?v=5.3.0' investigations/rci-tabung-haji/narratives/index.html
           test "$(grep -o 'raven-narrative-v5.js?v=5.3.0' investigations/rci-tabung-haji/narratives/index.html | wc -l)" -eq 1
-          grep -q 'Naratif utama' investigations/rci-tabung-haji/narratives/index.html
-          grep -q 'Apa yang boleh disahkan?' investigations/rci-tabung-haji/narratives/index.html
+          grep -q 'data-raven-copy-lock="true"' investigations/rci-tabung-haji/narratives/index.html
+          grep -q '<b>Rekod:</b>' investigations/rci-tabung-haji/narratives/index.html
+          grep -q '<b>Jurang cerita:</b>' investigations/rci-tabung-haji/narratives/index.html
+          grep -q '<b>Raven:</b>' investigations/rci-tabung-haji/narratives/index.html
+          ! grep -q 'raven-narrative-v3-1.css' investigations/rci-tabung-haji/narratives/index.html
           git diff --check
       - name: Commit rollout
         run: |

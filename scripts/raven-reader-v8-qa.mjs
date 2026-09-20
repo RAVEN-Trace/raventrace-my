@@ -80,7 +80,7 @@ async function waitForNarrativeReader(page){
     const img=visual?.querySelector('img');
     const caption=visual?.querySelector('figcaption');
     const firstSplit=units[0]?.querySelector('.narrative-locked-split');
-    const splitColumns=firstSplit?getComputedStyle(firstSplit).gridTemplateColumns.split(/\\s+/).filter(Boolean).length:0;
+    const splitColumns=firstSplit?getComputedStyle(firstSplit).gridTemplateColumns.split(/\s+/).filter(Boolean).length:0;
     return {
       unitCount:units.filter(Boolean).length,
       allUnitsVisible:units.every(visible),
@@ -121,7 +121,7 @@ async function waitForNarrativeReader(page){
       count:units.filter(Boolean).length,
       allVisible:units.every(visible),
       copyPreserved:units.filter((unit)=>unit?.dataset?.copyLock==='preserved').length,
-      splitColumns:firstSplit?getComputedStyle(firstSplit).gridTemplateColumns.split(/\\s+/).filter(Boolean).length:0,
+      splitColumns:firstSplit?getComputedStyle(firstSplit).gridTemplateColumns.split(/\s+/).filter(Boolean).length:0,
       visualVisible:visible(visual)
     };
   },narrativeIds);

@@ -42,7 +42,7 @@ def normalize_narrative_rule(text: str) -> str:
 
     block = match.group(0).strip()
     text = text[:match.start()].rstrip() + '\n' + text[match.end():].lstrip()
-    anchor_re = re.compile(r'</article>\\s*</main>')
+    anchor_re = re.compile(r'</article>\s*</main>')
     if not anchor_re.search(text):
         raise RuntimeError('Narrative closing main/article anchor missing')
     text = anchor_re.sub(lambda m: f'\n{block}\n{m.group(0)}', text, count=1)

@@ -477,3 +477,100 @@ body[data-raven-copy-lock="true"].raven-v5-narrative
     padding-inline: 1.2rem !important;
   }
 }
+
+
+/* =========================================================
+   V5.3 · DEEP NARRATIVE COMPARISON SURFACE
+   Political/social audit keeps every existing word; only the
+   comparison geometry, hierarchy and reading contrast change.
+   ========================================================= */
+body[data-raven-narrative-deep="true"].raven-v5-narrative .control-grid {
+  display: grid !important;
+  grid-template-columns: repeat(2,minmax(0,1fr)) !important;
+  gap: 1rem !important;
+  margin-top: 1.35rem !important;
+  border: 0 !important;
+  background: transparent !important;
+}
+
+body[data-raven-narrative-deep="true"].raven-v5-narrative #political-19sep .control-grid {
+  grid-template-columns: repeat(3,minmax(0,1fr)) !important;
+}
+
+body[data-raven-narrative-deep="true"].raven-v5-narrative #language-forensics .control-grid {
+  grid-template-columns: repeat(3,minmax(0,1fr)) !important;
+}
+
+body[data-raven-narrative-deep="true"].raven-v5-narrative .control-grid > article {
+  min-height: 0 !important;
+  padding: 1.15rem 1.2rem 1.2rem !important;
+  border: 1px solid #d5d0c6 !important;
+  border-top: 4px solid #111820 !important;
+  border-radius: 0 !important;
+  background: #fffdf8 !important;
+  box-shadow: none !important;
+}
+
+body[data-raven-narrative-deep="true"].raven-v5-narrative .control-grid > article > h3 {
+  margin: 0 0 .8rem !important;
+  padding: 0 !important;
+  color: #111820 !important;
+  font-family: Georgia,'Times New Roman',serif !important;
+  font-size: clamp(1.22rem,2vw,1.6rem) !important;
+  font-weight: 700 !important;
+  line-height: 1.12 !important;
+  letter-spacing: -.02em !important;
+  text-transform: none !important;
+}
+
+body[data-raven-narrative-deep="true"].raven-v5-narrative .control-grid > article > p {
+  margin: .68rem 0 0 !important;
+  color: #3f494f !important;
+  font-size: .92rem !important;
+  line-height: 1.62 !important;
+}
+
+body[data-raven-narrative-deep="true"].raven-v5-narrative .control-grid > article > p:first-of-type {
+  margin-top: 0 !important;
+}
+
+body[data-raven-narrative-deep="true"].raven-v5-narrative .control-grid .status {
+  max-width: 100%;
+  white-space: normal;
+}
+
+body[data-raven-narrative-deep="true"].raven-v5-narrative #matrix .control-grid > article {
+  border-top-color: #0b5d6b !important;
+}
+
+body[data-raven-narrative-deep="true"].raven-v5-narrative #language-forensics .control-grid > article {
+  border-top-color: #a46500 !important;
+}
+
+body[data-raven-narrative-deep="true"].raven-v5-narrative #political-19sep .control-grid > article {
+  border-top-color: #087f98 !important;
+}
+
+@media (max-width: 1050px) {
+  body[data-raven-narrative-deep="true"].raven-v5-narrative #political-19sep .control-grid,
+  body[data-raven-narrative-deep="true"].raven-v5-narrative #language-forensics .control-grid {
+    grid-template-columns: repeat(2,minmax(0,1fr)) !important;
+  }
+}
+
+@media (max-width: 700px) {
+  body[data-raven-narrative-deep="true"].raven-v5-narrative .control-grid,
+  body[data-raven-narrative-deep="true"].raven-v5-narrative #political-19sep .control-grid,
+  body[data-raven-narrative-deep="true"].raven-v5-narrative #language-forensics .control-grid {
+    grid-template-columns: 1fr !important;
+    gap: .85rem !important;
+  }
+
+  body[data-raven-narrative-deep="true"].raven-v5-narrative .control-grid > article {
+    padding: 1rem !important;
+  }
+
+  body[data-raven-narrative-deep="true"].raven-v5-narrative .control-grid > article > h3 {
+    font-size: clamp(1.18rem,6vw,1.48rem) !important;
+  }
+}

@@ -58,7 +58,7 @@ jobs:
           assert '<link rel="canonical" href="https://raven-trace.github.io/raventrace-my/investigations/rci-tabung-haji/">' in case
           assert '/investigations/rci-tabung-haji/narratives/' in home
           assert '/investigations/rci-tabung-haji/narratives/' in case
-          assert narrative.count('raven-narrative-v5.css?v=5.3.0') == 1, 'Narrative V5.3 CSS missing or duplicated'
+          assert narrative.count('raven-narrative-v5.css?v=5.3.1') == 1, 'Narrative V5.3 CSS missing or duplicated'
           assert narrative.count('raven-narrative-v5.js?v=5.3.0') == 1, 'Narrative V5.3 JS missing or duplicated'
           assert 'data-raven-copy-lock="true"' in narrative, 'Narrative copy-lock marker missing'
           assert 'raven-narrative-v3-1.css' not in narrative, 'Retired Narrative V3 CSS leaked into canonical page'

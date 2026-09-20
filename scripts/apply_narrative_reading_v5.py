@@ -5,7 +5,7 @@ ROOT = Path(__file__).resolve().parents[1]
 PAGE = ROOT / 'investigations' / 'rci-tabung-haji' / 'narratives' / 'index.html'
 
 text = PAGE.read_text(encoding='utf-8')
-css = '<link rel="stylesheet" href="/raventrace-my/assets/css/raven-narrative-v5.css?v=5.3.0" data-raven-narrative-v5>'
+css = '<link rel="stylesheet" href="/raventrace-my/assets/css/raven-narrative-v5.css?v=5.3.1" data-raven-narrative-v5>'
 js = '<script src="/raventrace-my/assets/js/raven-narrative-v5.js?v=5.3.0" defer data-raven-narrative-v5></script>'
 
 # Retire the dead V3 presentation layer from the canonical Narrative page only.
@@ -49,7 +49,7 @@ text = text.replace(marker, marker + '\n' + js, 1)
 PAGE.write_text(text, encoding='utf-8')
 
 out = PAGE.read_text(encoding='utf-8')
-assert out.count('raven-narrative-v5.css?v=5.3.0') == 1
+assert out.count('raven-narrative-v5.css?v=5.3.1') == 1
 assert out.count('raven-narrative-v5.js?v=5.3.0') == 1
 assert 'data-raven-copy-lock="true"' in out
 assert 'raven-narrative-v3-1.css' not in out

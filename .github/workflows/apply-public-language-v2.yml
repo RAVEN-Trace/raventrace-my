@@ -38,7 +38,7 @@ jobs:
 
           assert 'data-raven-copy-lock="true"' in main
           assert 'data-raven-copy-lock="true"' in social
-          assert main.count('raven-narrative-v5.css?v=5.3.0') == 1
+          assert main.count('raven-narrative-v5.css?v=5.3.1') == 1
           assert main.count('raven-narrative-v5.js?v=5.3.0') == 1
           assert 'raven-narrative-v3-1.css' not in main
           assert 'raven-narrative-v3-1.css' not in social

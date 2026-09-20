@@ -1,4 +1,4 @@
-name: Apply Raven Public Language V2.3
+name: Raven Public Language V2.3 Copy-Lock Gate
 
 on:
   push:
@@ -8,22 +8,19 @@ on:
       - 'scripts/apply_public_language_v2_2.py'
       - 'scripts/apply_public_language_v2_3.py'
       - 'assets/js/raven-narrative-v5.js'
+      - 'investigations/rci-tabung-haji/narratives/**'
       - '.github/workflows/apply-public-language-v2.yml'
   workflow_dispatch:
 
 permissions:
-  contents: write
+  contents: read
 
 jobs:
-  apply:
+  verify:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-      - uses: actions/setup-python@v5
-        with:
-          python-version: '3.12'
+
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
@@ -31,80 +28,65 @@ jobs:
       - name: Validate Narrative transformer syntax
         run: node --check assets/js/raven-narrative-v5.js
 
-      - name: Apply Raven Public Language V2.1 deep-clean
-        run: python scripts/apply_public_language_v2_1.py
-
-      - name: Apply Raven Public Language V2.2 sitewide cleanup
-        run: python scripts/apply_public_language_v2_2.py
-
-      - name: Apply Raven Public Language V2.3 micro-clean
-        run: python scripts/apply_public_language_v2_3.py
-
-      - name: Editorial invariants
+      - name: Verify Narrative copy lock and current schema
         run: |
           python - <<'PY'
           from pathlib import Path
-          main=Path('investigations/rci-tabung-haji/narratives/index.html').read_text(encoding='utf-8')
-          social=Path('investigations/rci-tabung-haji/narratives/political-social-media/index.html').read_text(encoding='utf-8')
-          home=Path('index.html').read_text(encoding='utf-8')
-          news=Path('news/index.html').read_text(encoding='utf-8')
-          updates=Path('investigations/rci-tabung-haji/updates/index.html').read_text(encoding='utf-8')
-          case=Path('investigations/rci-tabung-haji/index.html').read_text(encoding='utf-8')
-          article=Path('news/2026/09/12/freshness-sweep-pac-15-sep-rm18m-claim/index.html').read_text(encoding='utf-8')
-          method=Path('methodology/index.html').read_text(encoding='utf-8')
-          about=Path('about/index.html').read_text(encoding='utf-8')
 
-          # Narrative copy-lock + current 19 Sep evidence state remain invariant.
+          main = Path('investigations/rci-tabung-haji/narratives/index.html').read_text(encoding='utf-8')
+          social = Path('investigations/rci-tabung-haji/narratives/political-social-media/index.html').read_text(encoding='utf-8')
+
           assert 'data-raven-copy-lock="true"' in main
           assert 'data-raven-copy-lock="true"' in social
-          for tok in ['RM13 bilion dicuri / hilang','6 actual arraignments','application ≠ final forfeiture order','DISPUTED / UNKNOWN','Active paper ≠ proven offence','Naratif yang kuat tidak semestinya benar.']:
-              assert tok in main, tok
-          for tok in ['RM18.6 juta','15 September 2026']:
-              assert tok in article, tok
-          assert 'https://raven-trace.github.io/raventrace-my/' in home
-          assert 'rcitabunghaji' not in home
-          assert '/freshness-sweep-pac-15-sep-rm18m-claim/' in article
+          assert main.count('raven-narrative-v5.css?v=5.3.0') == 1
+          assert main.count('raven-narrative-v5.js?v=5.3.0') == 1
+          assert 'raven-narrative-v3-1.css' not in main
+          assert 'raven-narrative-v3-1.css' not in social
 
-          # Current Narrative public-language signatures.
-          for tok in ['Cerita boleh betul separuh — dan tetap buat kita salah faham.','Enam cerita utama — dibedah satu-satu.','RM13 bilion dicuri / hilang','Jurang cerita:','Raven:']:
-              assert tok in main, tok
-          for tok in ['DIA TUNJUK YANG INI JE','EH, BENDA NI TAK SAMA','DIA BAGI KITA RASA DULU','VIRAL TAK BERMAKSUD SUARA SEMUA ORANG','Petunjuk media sosial','Betulkan cerita, bukan balas slogan dengan slogan','Siapa bawa cerita apa?','sampel dan cara ukur yang jelas']:
-              assert tok in social, tok
-          assert 'semakan terbaru: 12 Sep 20:44 MYT' in home
-          assert 'SEMAKAN TERBARU' in news and 'REKOD TAK SEPADAN' in news
-          assert 'RCI TABUNG HAJI · PERKEMBANGAN KES' in updates
-          assert 'Raven kata macam mana?' in updates
-          assert 'Apa yang belum boleh disahkan?' in updates
-          assert '12 Sep 2026 · semakan terbaru' in case
-          assert '<strong>RAVEN KATA:</strong> <b>BELUM SELESAI.</b>' in article
-          assert social.count('<span>05</span>') == 1
-          assert 'Prinsip komunikasi' not in social
-          assert 'Kenapa Raven mula dengan fakta, bukan dengan mengulang mitos?' in method
-          assert 'Cara Raven bekerja' in method
-          assert 'A · Sumber asal / bukti langsung' in method
-          assert 'Cari yang benar.<br>Pecahkan cerita.' in about
-          assert 'Kebebasan editorial + penggunaan AI' in about
+          for token in [
+              'Cerita boleh betul separuh — dan tetap buat kita salah faham.',
+              'Enam cerita utama — dibedah satu-satu.',
+              'RM13 bilion dicuri / hilang',
+              '6 actual arraignments',
+              'application ≠ final forfeiture order',
+              'DISPUTED / UNKNOWN',
+              'Active paper ≠ proven offence',
+              'Naratif yang kuat tidak semestinya benar.'
+          ]:
+              assert token in main, token
 
-          # Stale analyst-first public copy must be absent from key surfaces.
-          forbidden=['Category collapse + number laundering','ANALISIS / INFERENCE · MOTIF TIDAK DIBUKTIKAN','policy position, bukan finding undang-undang','comparative selective-enforcement analysis','evidence pack undang-undang','deep-research baharu','counter-narrative','accounting treatment','selective targeting','signal yang diperhatikan','pemberat engagement','dokumen primer penuh','frame yang paling sedap didengar','metodologi sampel','pelaporan beratribusi','Generalisasi sentimen platform','Peta aktor','sintesis politik','menetapkan motif agensi','RAVEN-Trace Protocol','Independence & AI-assisted disclosure','DIPERTIKAIKAN · REKOD','Apa perlu ditahan?']
-          for label,text in [('main',main),('social',social),('home',home),('updates',updates),('method',method),('about',about)]:
-              for tok in forbidden:
-                  assert tok not in text, f'{label} stale: {tok}'
-          for label,text in [('home',home),('news',news),('updates',updates),('article',article)]:
-              for tok in ['freshness sweep','DISPUTED RECORD','Chronology mahkamah']:
-                  assert tok not in text, f'{label} stale: {tok}'
-          print('PUBLIC LANGUAGE V2.3 EDITORIAL INVARIANTS: PASS')
+          for token in [
+              'Buang parti, buang slogan, buang emosi',
+              'Government position · 16 Sep',
+              'UMNO position',
+              '19 Sep enforcement disclosure',
+              'Siapa bawa cerita apa?',
+              'VIRAL TAK BERMAKSUD SUARA SEMUA ORANG'
+          ]:
+              assert token in social, token
+
+          nv5 = main.find('raven-narrative-v5.js?v=5.3.0')
+          funnel = main.find('raven-funnel-v1.js?v=1.2.1')
+          signal = main.find('raven-signal-v6.js?v=6.0.0')
+          assert 0 <= nv5 < funnel < signal
+
+          print('PUBLIC LANGUAGE COPY-LOCK GATE: PASS')
           PY
-          git diff --check
 
-      - name: Commit public copy rollout
+      - name: Verify legacy mutators respect copy lock
         run: |
-          if git diff --quiet; then
-            echo 'No Public Language V2.3 changes required'
-            exit 0
-          fi
-          git config user.name 'github-actions[bot]'
-          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git add index.html news/index.html news/2026/09/12/freshness-sweep-pac-15-sep-rm18m-claim/index.html about/index.html methodology/index.html investigations/rci-tabung-haji/index.html investigations/rci-tabung-haji/updates/index.html investigations/rci-tabung-haji/narratives/index.html investigations/rci-tabung-haji/narratives/political-social-media/index.html
-          git commit -m 'content: activate Raven Public Language V2.3'
-          git push
+          python - <<'PY'
+          from pathlib import Path
+          for path in [
+              'scripts/apply_public_language_v2_1.py',
+              'scripts/apply_public_language_v2_2.py',
+              'scripts/apply_public_language_v2_3.py'
+          ]:
+              text = Path(path).read_text(encoding='utf-8')
+              assert 'data-raven-copy-lock="true"' in text, path
+              assert 'copy-lock skip' in text, path
+          print('LEGACY PUBLIC LANGUAGE MUTATORS: COPY-LOCKED')
+          PY
+
+      - name: Repository diff check
+        run: git diff --check

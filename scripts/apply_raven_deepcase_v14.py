@@ -10,7 +10,6 @@ TARGETS = [
     ROOT / 'investigations' / 'rci-tabung-haji' / 'investments' / 'index.html',
     ROOT / 'investigations' / 'rci-tabung-haji' / 'tracks' / 'index.html',
     ROOT / 'investigations' / 'rci-tabung-haji' / 'disputed-record' / 'index.html',
-    ROOT / 'investigations' / 'rci-tabung-haji' / 'sources' / 'index.html',
 ]
 
 def wire(text: str) -> str:

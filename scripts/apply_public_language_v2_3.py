@@ -12,6 +12,9 @@ ROOT = Path(__file__).resolve().parents[1]
 def swap(rel: str, replacements: list[tuple[str, str]]) -> None:
     path = ROOT / rel
     text = path.read_text(encoding='utf-8')
+    if 'data-raven-copy-lock="true"' in text:
+        print('copy-lock skip', rel)
+        return
     before = text
     for old, new in replacements:
         text = text.replace(old, new)
@@ -120,11 +123,11 @@ method=(ROOT/'methodology/index.html').read_text(encoding='utf-8')
 home=(ROOT/'index.html').read_text(encoding='utf-8')
 updates=(ROOT/'investigations/rci-tabung-haji/updates/index.html').read_text(encoding='utf-8')
 
-for tok in ['RM193.5 juta','14 kertas siasatan','Pertuduhan bukan sabitan','naratif-azeez-ambil-rm193-5-juta','naratif-sakau-duit-umat-islam']:
+assert 'data-raven-copy-lock="true"' in main
+assert 'data-raven-copy-lock="true"' in social
+for tok in ['RM13 bilion dicuri / hilang','6 actual arraignments','application ≠ final forfeiture order','DISPUTED / UNKNOWN','Active paper ≠ proven offence','Naratif yang kuat tidak semestinya benar.']:
     assert tok in main, tok
-for tok in ['Naratif utama — ketepikan cara cerita dibawa. Tengok apa yang tinggal.','dokumen asal','sampel dan cara memilihnya yang cukup jelas','Penerangan awam yang terikat pada bukti']:
-    assert tok in main, tok
-for tok in ['Siapa bawa cerita apa?','sampel dan cara ukur yang jelas','sederhana sebagai ringkasan politik','Raven tandakan ia sebagai bercanggah']:
+for tok in ['Buang parti, buang slogan, buang emosi','Government position · 16 Sep','UMNO position','19 Sep enforcement disclosure','Siapa bawa cerita apa?','VIRAL TAK BERMAKSUD SUARA SEMUA ORANG']:
     assert tok in social, tok
 assert 'Cara kerja RAVEN-Trace' in about
 assert 'Kebebasan editorial + penggunaan AI' in about

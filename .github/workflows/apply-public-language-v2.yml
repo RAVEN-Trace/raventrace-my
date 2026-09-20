@@ -54,8 +54,10 @@ jobs:
           method=Path('methodology/index.html').read_text(encoding='utf-8')
           about=Path('about/index.html').read_text(encoding='utf-8')
 
-          # Findings/status/routing remain invariant.
-          for tok in ['RM193.5 juta','14 kertas siasatan','Pertuduhan bukan sabitan','naratif-azeez-ambil-rm193-5-juta','naratif-sakau-duit-umat-islam']:
+          # Narrative copy-lock + current 19 Sep evidence state remain invariant.
+          assert 'data-raven-copy-lock="true"' in main
+          assert 'data-raven-copy-lock="true"' in social
+          for tok in ['RM13 bilion dicuri / hilang','6 actual arraignments','application ≠ final forfeiture order','DISPUTED / UNKNOWN','Active paper ≠ proven offence','Naratif yang kuat tidak semestinya benar.']:
               assert tok in main, tok
           for tok in ['RM18.6 juta','15 September 2026']:
               assert tok in article, tok
@@ -63,8 +65,8 @@ jobs:
           assert 'rcitabunghaji' not in home
           assert '/freshness-sweep-pac-15-sep-rm18m-claim/' in article
 
-          # Raven public-language signatures.
-          for tok in ['Orang tengah cakap macam-macam. Yang mana cerita, yang mana bukti?','Cara Raven check','REKOD PERTUDUHAN TAK SOKONG DAKWAAN INI','KENYATAAN ITU SAH · KESIMPULAN BESARNYA BELUM TENTU','Raven kata macam mana?','Apa trick cerita ni?','Apa bukti yang boleh ubah keputusan Raven?','Naratif utama — ketepikan cara cerita dibawa. Tengok apa yang tinggal.','Penerangan awam yang terikat pada bukti']:
+          # Current Narrative public-language signatures.
+          for tok in ['Cerita boleh betul separuh — dan tetap buat kita salah faham.','Enam cerita utama — dibedah satu-satu.','RM13 bilion dicuri / hilang','Jurang cerita:','Raven:']:
               assert tok in main, tok
           for tok in ['DIA TUNJUK YANG INI JE','EH, BENDA NI TAK SAMA','DIA BAGI KITA RASA DULU','VIRAL TAK BERMAKSUD SUARA SEMUA ORANG','Petunjuk media sosial','Betulkan cerita, bukan balas slogan dengan slogan','Siapa bawa cerita apa?','sampel dan cara ukur yang jelas']:
               assert tok in social, tok

@@ -1,4 +1,4 @@
-/* RAVEN-Trace Unified Design System V7.0.5
+/* RAVEN-Trace Unified Design System V7.0.6
    Final presentation and accessibility layer shared by every public page.
    Colour is semantic: teal=evidence/action, oxblood=disputed, amber=caution. */
 
@@ -622,4 +622,61 @@ body.raven-v5 .skip-link:focus {
   body.raven-v5 :where(.btn, .filter-btn, .raven-share-btn, .raven-share-link, .status) {
     border: 2px solid ButtonText;
   }
+}
+
+
+/* =========================================================
+   V7.0.6 — SUPPORT-PAGE SURFACE CORRECTION
+   Methodology / About / Corrections / Tips intentionally use
+   warm paper headers. Do not inherit the generic dark-header
+   interaction palette after runtime class hydration.
+   ========================================================= */
+body.raven-v5.raven-signal-support :where(.article-header, .section-intro) {
+  background: var(--rv7-paper) !important;
+  color: var(--rv7-ink) !important;
+}
+
+body.raven-v5.raven-signal-support :where(.article-header, .section-intro)
+  :where(h1, h2, h3, p, li, dd) {
+  color: var(--rv7-ink) !important;
+}
+
+body.raven-v5.raven-signal-support :where(.article-header, .section-intro)
+  :where(.eyebrow, .story-kicker, .section-kicker, .case-id, .role) {
+  color: var(--rv7-teal-deep) !important;
+}
+
+body.raven-v5.raven-signal-support :where(.article-header, .section-intro)
+  a:not(.btn):not(.filter-btn) {
+  color: var(--rv7-teal-deep) !important;
+  text-decoration-color: rgba(7, 79, 93, .55) !important;
+}
+
+body.raven-v5.raven-signal-support :where(.article-header, .section-intro) .btn {
+  border-color: #747b80 !important;
+  background: transparent !important;
+  color: var(--rv7-ink) !important;
+}
+
+body.raven-v5.raven-signal-support :where(.article-header, .section-intro) .btn-primary {
+  border-color: var(--rv7-teal) !important;
+  background: var(--rv7-teal) !important;
+  color: #fff !important;
+}
+
+body.raven-v5.raven-signal-support :where(.article-header, .section-intro) .btn-primary:hover {
+  border-color: var(--rv7-teal-deep) !important;
+  background: var(--rv7-teal-deep) !important;
+  color: #fff !important;
+}
+
+body.raven-v5.raven-signal-support :where(.article-header, .section-intro) .v5-human-note {
+  border-color: #8aa7ad !important;
+  background: var(--rv7-cyan-soft) !important;
+  color: #273b43 !important;
+}
+
+body.raven-v5.raven-signal-support :where(.article-header, .section-intro) :focus-visible {
+  outline-color: var(--rv7-focus) !important;
+  box-shadow: 0 0 0 2px var(--rv7-paper) !important;
 }

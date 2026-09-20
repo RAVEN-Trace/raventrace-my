@@ -35,7 +35,7 @@ jobs:
           visual=Path('assets/visuals/raven-truth-lens-v1.svg')
           required=[
             'data-raven-home="2.0.0"',
-            'raven-home-v1.css?v=1.0.2',
+            'raven-home-v1.css?v=1.0.3',
             'raven-home-mobile-v2.css?v=2.0.0',
             'Cerita boleh dibentuk. Bukti tak boleh dipaksa.',
             'class="front-hero home-active-case"',

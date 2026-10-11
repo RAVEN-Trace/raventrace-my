@@ -43,18 +43,18 @@ jobs:
             'class="home-update-lead"',
             'data-variant="home"',
             'class="home-trust-strip"',
-            'Raven terakhir semak halaman ini: 19 Sep',
-            'Status mahkamah disahkan hingga: 19 Sep 2026',
+            'Raven terakhir semak halaman ini: 11 Okt',
+            'Status pertuduhan disemak hingga: 11 Okt 2026',
             'Ditahan ≠ direman ≠ didakwa ≠ bersalah',
-            'Enam individu sudah didakwa. Lima siasatan SPRM masih aktif.',
-            'lima kertas siasatan',
+            'Sekurang-kurangnya tujuh individu didakwa',
+            'Lima siasatan SPRM ialah kenyataan bertarikh 19 September',
             '/investigations/rci-tabung-haji/updates/',
             '/investigations/rci-tabung-haji/people/',
             '/investigations/rci-tabung-haji/sources/'
           ]
           for item in required: assert item in t, item
           assert t.count('class="v5-truth-intro signal-home-hero"') == 1
-          assert t.count('class="home-update-row"') == 2
+          assert t.count('class="home-update-row"') == 3
           assert 'Gred A/B' not in t
           assert 'class="section newsroom-board"' not in t
           assert 'class="container public-tools"' not in t
@@ -92,6 +92,7 @@ jobs:
                 await page.goto(`${base}?homeqa=${Date.now()}-${Math.random()}`,{waitUntil:'domcontentloaded',timeout:45000});
                 const ready=await page.evaluate(()=>
                   document.body?.dataset?.ravenHome==='2.0.0' &&
+                  document.body?.innerText?.includes('11 Okt 2026') &&
                   !!document.querySelector('link[href*="raven-home-mobile-v2.css?v=2.0.0"]')
                 );
                 if(ready) return;
@@ -142,11 +143,11 @@ jobs:
                   duplicateIds:[...new Set(dups)],
                   smallControls,
                   hasGradeAB:/Gred A\/B/.test(mainText),
-                  hasFreshness:/Raven terakhir semak halaman ini: 19 Sep/.test(document.body.innerText),
-                  hasCourtFreshness:/Status mahkamah disahkan hingga: 19 Sep 2026/.test(mainText),
+                  hasFreshness:/Raven terakhir semak halaman ini: 11 Okt/.test(document.body.innerText),
+                  hasCourtFreshness:/Status pertuduhan disemak hingga: 11 Okt 2026/.test(mainText),
                   hasLegalBoundary:/Ditahan ≠ direman ≠ didakwa ≠ bersalah/.test(mainText),
-                  hasCurrentCaseState:/Enam individu sudah didakwa\. Lima siasatan SPRM masih aktif\./.test(mainText) && /lima kertas siasatan/i.test(mainText),
-                  caseBoundary:/Pertuduhan dan siasatan tidak sama dengan sabitan\./i.test(mainText),
+                  hasCurrentCaseState:/Sekurang-kurangnya tujuh individu didakwa/.test(mainText) && /Lima siasatan SPRM ialah kenyataan bertarikh 19 September/.test(mainText),
+                  caseBoundary:/Semua pertuduhan belum dibuktikan\./i.test(mainText),
                   heroTitle:document.querySelector('.v5-truth-intro h1')?.textContent?.trim(),
                   ogTitle:document.querySelector('meta[property="og:title"]')?.content || '',
                   cssHome:!!document.querySelector('link[href*="raven-home-mobile-v2.css?v=2.0.0"]'),
@@ -163,7 +164,7 @@ jobs:
               check(data.activeCases===1,`${viewport.name}: active case blocks ${data.activeCases}`);
               check(data.signalStrips===1,`${viewport.name}: signal strips ${data.signalStrips}`);
               check(data.leadUpdates===1,`${viewport.name}: lead updates ${data.leadUpdates}`);
-              check(data.updateRows===2,`${viewport.name}: compact update rows ${data.updateRows}`);
+              check(data.updateRows===3,`${viewport.name}: compact update rows ${data.updateRows}`);
               check(data.updateCards===0,`${viewport.name}: legacy update cards still present ${data.updateCards}`);
               check(data.contextBridges===1,`${viewport.name}: home context bridges ${data.contextBridges}`);
               check(data.contextLinks===4,`${viewport.name}: deeper links ${data.contextLinks}`);
@@ -176,10 +177,10 @@ jobs:
               check(data.duplicateIds.length===0,`${viewport.name}: duplicate IDs ${data.duplicateIds.join(', ')}`);
               check(data.overflow<=4,`${viewport.name}: horizontal overflow ${data.overflow}px`);
               check(!data.hasGradeAB,`${viewport.name}: Gred A/B leaked into homepage`);
-              check(data.hasFreshness,`${viewport.name}: 19 Sep page freshness missing`);
-              check(data.hasCourtFreshness,`${viewport.name}: 19 Sep court freshness missing`);
+              check(data.hasFreshness,`${viewport.name}: 11 Oct page freshness missing`);
+              check(data.hasCourtFreshness,`${viewport.name}: 11 Oct court freshness missing`);
               check(data.hasLegalBoundary,`${viewport.name}: legal boundary missing`);
-              check(data.hasCurrentCaseState,`${viewport.name}: current 19 Sep case state missing`);
+              check(data.hasCurrentCaseState,`${viewport.name}: current 11 Oct case state missing`);
               check(data.caseBoundary,`${viewport.name}: current legal-boundary wording missing`);
               check(data.heroTitle==='Cerita boleh dibentuk. Bukti tak boleh dipaksa.',`${viewport.name}: hero title drift`);
               check(data.ogTitle.includes('Cerita boleh dibentuk. Bukti tak boleh dipaksa.'),`${viewport.name}: generic homepage OG title missing`);
@@ -192,7 +193,7 @@ jobs:
                 check(data.navToggleHeight>=44,`mobile: Menu toggle height ${data.navToggleHeight}px`);
                 check(!data.navVisible,'mobile: nav should start closed');
                 check(data.navExpanded==='false',`mobile: initial aria-expanded=${data.navExpanded}`);
-                const bad=data.smallControls.filter(x=>x.text && !/Sumber rasmi RCI|Status pendakwaan/.test(x.text));
+                const bad=data.smallControls.filter(x=>x.text && !/Sumber rasmi RCI|Status pendakwaan|Pendakwaan terkini|Status syor/.test(x.text));
                 check(bad.length===0,`mobile: undersized action controls ${JSON.stringify(bad.slice(0,8))}`);
 
                 await page.locator('[data-nav-toggle]').click();

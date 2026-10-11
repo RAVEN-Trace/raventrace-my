@@ -88,10 +88,12 @@ for p in ROOT.rglob('*.html'):
         if ref in s:
             fail(f'{p.relative_to(ROOT)} references stale runtime: {ref}')
 
-# 6) Main CASEFILE must expose the current 19 Sep evidence state and legal boundaries.
+# 6) Main CASEFILE must expose the 11 Oct current state and preserve the 19 Sep evidence archive.
 case = (ROOT / 'investigations/rci-tabung-haji/index.html').read_text(encoding='utf-8')
 for token in [
-    'Cut-off · 19 Sep 2026',
+    'Cut-off · 11 Okt 2026',
+    'id="verified-11oct"',
+    '<dt>07</dt>',
     'TH-RCI-2026-0919',
     '6 actual arraignments',
     'Pertuduhan ≠ bersalah',
@@ -100,13 +102,13 @@ for token in [
     'RM18m/RM18.6m',
 ]:
     if token not in case:
-        fail(f'main CASEFILE missing 19 Sep evidence state: {token}')
+        fail(f'main CASEFILE missing Oct current state or Sep archive: {token}')
 
-# 7) Core subpages must carry the same current state while retaining material correction history.
+# 7) Core subpages must carry 11 Oct current state while retaining material 19 Sep correction history.
 required = {
     'investigations/rci-tabung-haji/updates/index.html': ['19 Sep master status', 'Lima workstream aktif kini dinamakan', 'RM18m/RM18.6m', '6 actual arraignments'],
-    'investigations/rci-tabung-haji/people/index.html': ['Enam individu telah berdepan pertuduhan', 'Dijadual · 24 Sep', '6 actual arraignments'],
-    'investigations/rci-tabung-haji/timeline/index.html': ['19 Jul 2022', '19 Sep 2026', 'Mohamad Hashim', 'Saudi MLA'],
+    'investigations/rci-tabung-haji/people/index.html': ['id="verified-11oct"', 'ARKIB 19 Sep', 'Dijadual · 24 Sep', '6 actual arraignments', 'RM302,499.27', 'RM8,882.77'],
+    'investigations/rci-tabung-haji/timeline/index.html': ['id="verified-11oct"', '19 Jul 2022', '19 Sep', 'Mohamad Hashim', 'Saudi MLA', '8 Okt 2026'],
     'investigations/rci-tabung-haji/money/index.html': ['RM10.2b', 'RM2.6b', 'RM860.308m', 'RM14k'],
     'investigations/rci-tabung-haji/narratives/index.html': ['asset declaration notice ≠ confiscation', 'DISPUTED / UNPROVEN', 'Like, repost dan screenshot bukan proof of truth'],
     'investigations/rci-tabung-haji/sources/index.html': ['19 Sep source delta', 'sep19-s01', '2022 withdrawal'],
@@ -119,9 +121,9 @@ for rel, tokens in required.items():
 
 # Homepage must expose current legal/enforcement state rather than a superseded 13 Sep counter.
 home = (ROOT / 'index.html').read_text(encoding='utf-8')
-for token in ['Raven terakhir semak halaman ini: 19 Sep 2026', 'Enam individu sudah didakwa', 'lima kertas siasatan']:
+for token in ['Raven terakhir semak halaman ini: 11 Okt 2026', 'Sekurang-kurangnya tujuh individu didakwa', 'CURRENT STATE · 11 OKT', 'ARKIB · 19 SEP']:
     if token not in home:
-        fail(f'homepage missing current 19 Sep boundary: {token}')
+        fail(f'homepage missing 11 Oct update or archival boundary: {token}')
 
 if errors:
     print('SITE INTEGRITY V1: FAIL')

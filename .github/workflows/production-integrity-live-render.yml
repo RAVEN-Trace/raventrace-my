@@ -1,4 +1,4 @@
-# Live production gate for factual/legal state + public-language presentation
+# Live production gate for current verified state + dated historical archive
 name: Production Integrity Live Render
 
 on:
@@ -25,50 +25,52 @@ jobs:
     env:
       BASE: https://raven-trace.github.io/raventrace-my
     steps:
-      - name: Wait for complete 19 Sep evidence payload
+      - name: Wait for 11 Oct current state and dated September archive
         run: |
           python - <<'PY'
           import os,time,urllib.request
           base=os.environ['BASE']
-          headers={'User-Agent':'RAVEN-Trace-Live-QA/19SepMaster','Cache-Control':'no-cache'}
+          headers={'User-Agent':'RAVEN-Trace-Live-QA/11OctCurrent','Cache-Control':'no-cache'}
           checks={
-            '/':['Enam individu sudah didakwa. Lima siasatan SPRM masih aktif.','19 Sep 2026 · deep investigation','Mohamad Hashim didakwa; PAC memulakan prosiding pertama TH.'],
-            '/news/':['6 individu didakwa; 5 siasatan SPRM masih aktif.','Mohamad Hashim didakwa RM14,000; PAC memulakan prosiding pertama TH.'],
-            '/investigations/':['disemak hingga 19 Sep 2026 · deep investigation','19 Sep:</strong> SPRM menyatakan enam individu telah didakwa','PAC sudah bermula'],
-            '/investigations/rci-tabung-haji/':['Cut-off · 19 Sep 2026 · 19:33 MYT','Multi-track accountability · aktif','kertas siasatan SPRM masih aktif setakat 19 Sep'],
-            '/investigations/rci-tabung-haji/updates/':['6 didakwa · 8 isu · 5 siasatan SPRM masih aktif.','Mohamad Hashim Mukhatap didakwa berkaitan RM14,000.','Lima workstream aktif kini dinamakan.'],
-            '/investigations/rci-tabung-haji/people/':['Enam individu telah berdepan pertuduhan yang dibacakan.','Didakwa · 14 Sep','Didakwa · 15 Sep'],
-            '/investigations/rci-tabung-haji/timeline/':['Perubahan terkini selepas 13 September.','15 Sep','19 Sep'],
+            '/':['Raven terakhir semak halaman ini: 11 Okt 2026','Sekurang-kurangnya tujuh individu didakwa','13 daripada 17 syor bawah TH'],
+            '/news/':['Newsroom · semakan terkini 11 Okt 2026','13 daripada 17 syor RCI bawah TH','ARKIB · 19 SEP'],
+            '/investigations/':['Maklumat disemak hingga · 11 Okt 2026','Sekurang-kurangnya tujuh individu','Perkembangan terbaru · 11 Okt'],
+            '/investigations/rci-tabung-haji/':['Cut-off · 11 Okt 2026 · MYT','id="verified-11oct"','ARKIB · REKOD 19 SEP 2026'],
+            '/investigations/rci-tabung-haji/updates/':['Perkembangan utama disemak hingga · 11 Okt 2026','13 / 17 syor TH selesai menurut Menteri.','Adi Azuan menjadi individu ketujuh.','Sesi PAC 13, 15, 19 dan 20 Okt masih dijadualkan.'],
+            '/investigations/rci-tabung-haji/people/':['Status individu RCI Tabung Haji setakat 11 Oktober 2026','Adi Azuan Abdul Ghani','ARKIB 19 Sep'],
+            '/investigations/rci-tabung-haji/timeline/':['Kronologi RCI Tabung Haji disemak hingga 11 Oktober 2026','Adi Azuan','30 Sep 2026'],
             '/investigations/rci-tabung-haji/money/':['RM10.2b','RM2.6b','RM12.5–12.6b','Bukan mens rea'],
             '/investigations/rci-tabung-haji/narratives/':['RM13 bilion dicuri / hilang','application ≠ final forfeiture order','DISPUTED / UNKNOWN','Naratif yang kuat tidak semestinya benar.'],
             '/investigations/rci-tabung-haji/narratives/political-social-media/':['Buang parti, buang slogan, buang emosi','Government position · 16 Sep','19 Sep enforcement disclosure'],
-            '/investigations/rci-tabung-haji/sources/':['Sumber yang mengubah current state.','Evidence ledger'],
+            '/investigations/rci-tabung-haji/sources/':['id="oct11-s10"','Evidence ledger'],
             '/about/':['Cari yang benar.','Pecahkan cerita.'],
             '/methodology/':['Cara Raven bekerja','A · Sumber asal / bukti langsung'],
           }
-          for attempt in range(60):
+          for attempt in range(36):
               ok=True
               for path,tokens in checks.items():
                   try:
                       req=urllib.request.Request(base+path+'?liveqa='+str(time.time_ns()),headers=headers)
                       text=urllib.request.urlopen(req,timeout=15).read().decode('utf-8','replace')
-                      if not all(x in text for x in tokens): ok=False
+                      if not all(x in text for x in tokens):
+                          ok=False
+                          if attempt in (0,10,25): print('MISSING',path,[x for x in tokens if x not in text],flush=True)
                   except Exception as e:
                       ok=False; print('wait',attempt,path,type(e).__name__,str(e)[:120])
               if ok:
-                  print('19 SEP MASTER PAYLOAD READY')
+                  print('11 OCT CURRENT + SEPTEMBER ARCHIVE READY')
                   raise SystemExit(0)
               time.sleep(5)
-          raise SystemExit('Timed out waiting for 19 Sep master Pages payload')
+          raise SystemExit('Timed out waiting for 11 Oct current Pages payload')
           PY
 
       - name: Verify legal and factual boundary
         run: |
           python - <<'PY'
           import os,urllib.request,time
-          base=os.environ['BASE']; h={'User-Agent':'RAVEN-Trace-Live-QA/19SepMaster','Cache-Control':'no-cache'}
+          base=os.environ['BASE']; h={'User-Agent':'RAVEN-Trace-Live-QA/11OctCurrent','Cache-Control':'no-cache'}
           checks={
-            '/':['Enam individu sudah didakwa. Lima siasatan SPRM masih aktif.','Pertuduhan dan siasatan tidak sama dengan sabitan.'],
+            '/':['Sekurang-kurangnya tujuh individu didakwa','Pertuduhan dan siasatan tidak sama dengan sabitan.'],
             '/investigations/rci-tabung-haji/':['RCI finding ≠ sabitan','Pertuduhan ≠ bersalah','Kerugian ≠ kecurian'],
             '/investigations/rci-tabung-haji/people/':['Semua individu dianggap tidak bersalah sehingga dibuktikan bersalah oleh mahkamah.','Raven tidak menyamakan disebut, disiasat, direman, didakwa dan bersalah.'],
             '/investigations/rci-tabung-haji/money/':['Kerugian besar tidak dengan sendiri membuktikan kecurian','bukan automatic theft finding'],
@@ -90,7 +92,7 @@ jobs:
         run: |
           python - <<'PY'
           import os,time,urllib.request
-          base=os.environ['BASE']; h={'User-Agent':'RAVEN-Trace-Live-QA/19SepMaster','Cache-Control':'no-cache'}
+          base=os.environ['BASE']; h={'User-Agent':'RAVEN-Trace-Live-QA/11OctCurrent','Cache-Control':'no-cache'}
           paths=['/','/news/','/about/','/methodology/','/investigations/rci-tabung-haji/updates/','/investigations/rci-tabung-haji/narratives/','/investigations/rci-tabung-haji/narratives/political-social-media/']
           stale=['Category collapse + number laundering','ANALISIS / INFERENCE · MOTIF TIDAK DIBUKTIKAN','comparative selective-enforcement analysis','counter-narrative','signal yang diperhatikan','pemberat engagement','DISPUTED RECORD','Chronology mahkamah','dokumen primer penuh','frame yang paling sedap didengar','metodologi sampel','pelaporan beratribusi','Generalisasi sentimen platform','Peta aktor','sintesis politik','menetapkan motif agensi','RAVEN-Trace Protocol','Independence & AI-assisted disclosure','DIPERTIKAIKAN · REKOD','Apa perlu ditahan?']
           for path in paths:
@@ -108,7 +110,7 @@ jobs:
           assets=['/assets/js/raven-evidence-ux.js?v=3.0.0','/assets/js/raven-publication-core.js?v=3.0.0','/assets/js/raven-narrative.js?v=2.0.0']
           forbidden=['Jamil Khir','Abdul Azeez','Azmi Ahmad','9 September 2026','18:29 MYT','ravenCaseState','.section-cutoff']
           for path in assets:
-              req=urllib.request.Request(base+path+'&qa='+str(time.time_ns()),headers={'User-Agent':'RAVEN-Trace-Live-QA/19SepMaster','Cache-Control':'no-cache'})
+              req=urllib.request.Request(base+path+'&qa='+str(time.time_ns()),headers={'User-Agent':'RAVEN-Trace-Live-QA/11OctCurrent','Cache-Control':'no-cache'})
               text=urllib.request.urlopen(req,timeout=20).read().decode('utf-8','replace')
               for x in forbidden: assert x not in text, f'{path}: factual mutator token present: {x}'
           print('RUNTIME INERT: PASS')

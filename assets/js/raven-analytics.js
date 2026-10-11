@@ -65,7 +65,7 @@
       campaign: incoming.campaign || CAMPAIGN,
       content: incoming.content || '',
       referrer: incoming.referrer,
-      landing: `${location.pathname}${location.search}`,
+      landing: location.pathname,
       startedAt: Date.now()
     };
     try { sessionStorage.setItem(STORAGE_KEY, JSON.stringify(attribution)); } catch { /* optional */ }
@@ -82,10 +82,19 @@
     traffic_class: INTERNAL ? 'internal' : 'public'
   });
 
+  // Never forward query strings or external URLs from source/share links.
+  const safeEventValue = (key, value) => {
+    if (!/^(url|href|landing|target_url|source_url)$/.test(key)) return clean(value);
+    try {
+      const url = new URL(String(value), location.origin);
+      return url.origin === location.origin ? url.pathname : url.hostname;
+    } catch { return ''; }
+  };
   const safeProps = (props = {}) => Object.fromEntries(
     Object.entries({ ...context(), ...props })
       .filter(([, value]) => value !== undefined && value !== null && value !== '')
-      .map(([key, value]) => [slug(key), clean(value)])
+      .map(([key, value]) => [slug(key), safeEventValue(slug(key), value)])
+      .filter(([, value]) => value !== '')
   );
 
   const dispatch = (name, props = {}) => {
@@ -112,7 +121,7 @@
   };
 
   window.RavenAnalytics = {
-    version: '1.1.0',
+    version: '1.2.0',
     attribution: () => ({ ...(attribution || {}) }),
     context,
     track: dispatch,
@@ -127,8 +136,25 @@
   });
 
   document.addEventListener('click', (event) => {
-    const target = event.target.closest('a, button');
+    const target = event.target?.closest?.('a, button');
     if (!target) return;
+
+    // Anonymous reader-stage signals, never the visitor identity or full URL.
+    // Lytical independently auto-records link clicks; downstream ingestion of
+    // these Raven custom events must be verified before claiming conversions.
+    if (target.matches('a[href]')) {
+      let destination;
+      try { destination = new URL(target.href, location.href); } catch { /* ignore invalid href */ }
+      const isLocal = destination?.origin === location.origin;
+      const destinationPath = isLocal ? destination.pathname : '';
+      const explicitStage = target.dataset.ravenJourney;
+      const stage = explicitStage || (destinationPath.endsWith('/sources/') ? 'evidence' : '');
+      if (['understand', 'narrative', 'evidence'].includes(stage)) {
+        dispatch('raven_journey_click', {
+          stage, origin_path: location.pathname, target_path: destinationPath
+        });
+      }
+    }
     if (target.matches('.story-source-list a, #sources a[href^="http"], .inline-sources a[href^="http"]')) {
       dispatch('source_click', { label: target.textContent, href: target.href || '' });
     }

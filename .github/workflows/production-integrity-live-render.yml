@@ -70,7 +70,7 @@ jobs:
           import os,urllib.request,time
           base=os.environ['BASE']; h={'User-Agent':'RAVEN-Trace-Live-QA/11OctCurrent','Cache-Control':'no-cache'}
           checks={
-            '/':['Sekurang-kurangnya tujuh individu didakwa','Pertuduhan dan siasatan tidak sama dengan sabitan.'],
+            '/':['Sekurang-kurangnya tujuh individu didakwa','Semua pertuduhan belum dibuktikan.'],
             '/investigations/rci-tabung-haji/':['RCI finding ≠ sabitan','Pertuduhan ≠ bersalah','Kerugian ≠ kecurian'],
             '/investigations/rci-tabung-haji/people/':['Semua individu dianggap tidak bersalah sehingga dibuktikan bersalah oleh mahkamah.','Raven tidak menyamakan disebut, disiasat, direman, didakwa dan bersalah.'],
             '/investigations/rci-tabung-haji/money/':['Kerugian besar tidak dengan sendiri membuktikan kecurian','bukan automatic theft finding'],

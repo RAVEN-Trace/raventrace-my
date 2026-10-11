@@ -102,7 +102,7 @@
 
   if (!q('script[data-raven-analytics]')) {
     const analytics = document.createElement('script');
-    analytics.src = '/raventrace-my/assets/js/raven-analytics.js?v=1.0.0';
+    analytics.src = '/raventrace-my/assets/js/raven-analytics.js?v=1.2.0';
     analytics.defer = true;
     analytics.dataset.ravenAnalytics = 'true';
     document.head.appendChild(analytics);
